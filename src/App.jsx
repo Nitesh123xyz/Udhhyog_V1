@@ -1,6 +1,6 @@
 import Navbar from "./components/Navbar";
 import { Outlet, useLocation } from "react-router-dom";
-import { useCheckingUserMutation } from "./features/api/authSlice";
+import { useCheckingUserMutation } from "./features/auth/authSlice";
 
 const App = () => {
   const location = useLocation();
@@ -11,12 +11,19 @@ const App = () => {
     useCheckingUserMutation();
 
   return (
-    <>
-      {!HideNavbar && <Navbar />}
-      <main>
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      {!HideNavbar && (
+        <div className="hidden lg:block md:w-20">
+          <Navbar />
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="flex-1">
         <Outlet />
       </main>
-    </>
+    </div>
   );
 };
 

@@ -36,7 +36,7 @@ const Animation = () => {
         cover: {
           opacity: 1,
           color: {
-            value: "",
+            value: "white",
           },
         },
         enable: false,

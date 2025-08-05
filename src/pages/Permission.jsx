@@ -1,488 +1,1244 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
+  Home,
   Users,
+  BarChart3,
   Settings,
-  Shield,
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
+  FileText,
+  ShoppingBag,
+  Bell,
+  Calendar,
+  MessageSquare,
+  LogOut,
+  ChevronRight,
   ChevronDown,
+  UserPlus,
+  UserCheck,
+  Shield,
+  TrendingUp,
+  PieChart,
+  Activity,
+  Globe,
+  Users2,
+  Eye,
+  MousePointer,
+  Package,
+  ShoppingCart,
+  Package2,
+  FileCheck,
+  ClipboardList,
+  Receipt,
+  Cog,
+  Database,
+  Lock,
+  Zap,
+  FileSpreadsheet,
+  FileImage,
+  Download,
+  Upload,
+  Archive,
+  Folder,
+  Search,
   Filter,
+  DollarSign,
+  Building,
+  User,
+  CreditCard,
+  Truck,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Star,
+  Tag,
+  Percent,
+  Calculator,
+  Bookmark,
+  Flag,
+  Hash,
+  Link,
+  PlusCircle,
+  MinusCircle,
+  Edit,
+  Trash,
+  Copy,
+  Share,
+  Send,
+  Save,
+  FileCode,
+  FileX,
+  FileArchive,
+  Key,
+  Car,
+  Coffee,
 } from "lucide-react";
 
-const Permissions = () => {
-  const [activeTab, setActiveTab] = useState("users");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRole, setSelectedRole] = useState("all");
-  const [showRoleModal, setShowRoleModal] = useState(false);
-  const [showUserModal, setShowUserModal] = useState(false);
+const Permission = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [expandedSections, setExpandedSections] = useState({});
+  const [expandedSubSections, setExpandedSubSections] = useState({});
+  const [expandedSubSubSections, setExpandedSubSubSections] = useState({});
+  const [expandedSubSubSubSections, setExpandedSubSubSubSections] = useState(
+    {}
+  );
 
-  // Mock data
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "Admin",
-      status: "Active",
-      lastLogin: "2024-01-15",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "Editor",
-      status: "Active",
-      lastLogin: "2024-01-14",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      role: "Viewer",
-      status: "Inactive",
-      lastLogin: "2024-01-10",
-    },
-    {
-      id: 4,
-      name: "Sarah Wilson",
-      email: "sarah@example.com",
-      role: "Moderator",
-      status: "Active",
-      lastLogin: "2024-01-13",
-    },
-  ]);
+  // Reset all expanded states when navbar is collapsed
+  useEffect(() => {
+    if (!isExpanded) {
+      setExpandedSections({});
+      setExpandedSubSections({});
+      setExpandedSubSubSections({});
+      setExpandedSubSubSubSections({});
+    }
+  }, [isExpanded]);
 
-  const [roles, setRoles] = useState([
+  const menuItems = [
     {
-      id: 1,
-      name: "Admin",
-      users: 1,
-      permissions: ["read", "write", "delete", "manage_users", "manage_roles"],
-      color: "bg-red-100 text-red-800",
+      icon: Home,
+      label: "Dashboard",
+      active: false,
+      path: "/dashboard",
     },
     {
-      id: 2,
-      name: "Editor",
-      users: 1,
-      permissions: ["read", "write", "delete"],
-      color: "bg-blue-100 text-blue-800",
+      icon: Users,
+      label: "User Management",
+      hasSubmenu: true,
+      submenu: [
+        {
+          icon: UserPlus,
+          label: "Add Users",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: User,
+              label: "Individual User",
+              path: "/users/add/individual",
+            },
+            { icon: Users2, label: "Bulk Import", path: "/users/add/bulk" },
+            { icon: Upload, label: "CSV Upload", path: "/users/add/csv" },
+            { icon: Link, label: "API Integration", path: "/users/add/api" },
+          ],
+        },
+        {
+          icon: UserCheck,
+          label: "Active Users",
+          active: true, // Set as default active
+          hasSubmenu: true,
+          submenu: [
+            { icon: Eye, label: "View All", path: "/users/active/all" },
+            {
+              icon: Search,
+              label: "Search Users",
+              path: "/users/active/search",
+            },
+            {
+              icon: Filter,
+              label: "Filter Users",
+              path: "/users/active/filter",
+            },
+            {
+              icon: Download,
+              label: "Export Users",
+              path: "/users/active/export",
+            },
+          ],
+        },
+        {
+          icon: Shield,
+          label: "Permissions",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: Lock,
+              label: "Role Management",
+              path: "/users/permissions/roles",
+            },
+            {
+              icon: Key,
+              label: "Access Control",
+              path: "/users/permissions/access",
+            },
+            {
+              icon: Settings,
+              label: "Permission Sets",
+              path: "/users/permissions/sets",
+            },
+          ],
+        },
+      ],
     },
     {
-      id: 3,
-      name: "Moderator",
-      users: 1,
-      permissions: ["read", "write", "moderate"],
-      color: "bg-green-100 text-green-800",
+      icon: BarChart3,
+      label: "Analytics",
+      hasSubmenu: true,
+      submenu: [
+        {
+          icon: TrendingUp,
+          label: "Traffic",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: Globe,
+              label: "Website Traffic",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: Eye,
+                  label: "Page Views",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Clock,
+                      label: "Real-time Views",
+                      path: "/analytics/traffic/website/pageviews/realtime",
+                    },
+                    {
+                      icon: Calendar,
+                      label: "Daily Views",
+                      path: "/analytics/traffic/website/pageviews/daily",
+                    },
+                    {
+                      icon: TrendingUp,
+                      label: "Weekly Trends",
+                      path: "/analytics/traffic/website/pageviews/weekly",
+                    },
+                    {
+                      icon: Archive,
+                      label: "Historical Data",
+                      path: "/analytics/traffic/website/pageviews/historical",
+                    },
+                  ],
+                },
+                {
+                  icon: Users2,
+                  label: "Unique Visitors",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Globe,
+                      label: "New Visitors",
+                      path: "/analytics/traffic/website/unique/new",
+                    },
+                    {
+                      icon: Bookmark,
+                      label: "Returning Visitors",
+                      path: "/analytics/traffic/website/unique/returning",
+                    },
+                    {
+                      icon: MapPin,
+                      label: "Geographic Distribution",
+                      path: "/analytics/traffic/website/unique/geo",
+                    },
+                  ],
+                },
+                {
+                  icon: Clock,
+                  label: "Session Duration",
+                  path: "/analytics/traffic/website/duration",
+                },
+                {
+                  icon: MousePointer,
+                  label: "Bounce Rate",
+                  path: "/analytics/traffic/website/bounce",
+                },
+              ],
+            },
+            {
+              icon: Users2,
+              label: "User Sessions",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: Clock,
+                  label: "Active Sessions",
+                  path: "/analytics/traffic/sessions/active",
+                },
+                {
+                  icon: Calendar,
+                  label: "Session History",
+                  path: "/analytics/traffic/sessions/history",
+                },
+                {
+                  icon: Activity,
+                  label: "Session Analysis",
+                  path: "/analytics/traffic/sessions/analysis",
+                },
+              ],
+            },
+            {
+              icon: MousePointer,
+              label: "Click Analytics",
+              path: "/analytics/traffic/clicks",
+            },
+          ],
+        },
+        {
+          icon: PieChart,
+          label: "Revenue",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: DollarSign,
+              label: "Total Revenue",
+              path: "/analytics/revenue/total",
+            },
+            {
+              icon: TrendingUp,
+              label: "Revenue Growth",
+              path: "/analytics/revenue/growth",
+            },
+            {
+              icon: Calendar,
+              label: "Monthly Reports",
+              path: "/analytics/revenue/monthly",
+            },
+            {
+              icon: Calculator,
+              label: "Profit Margins",
+              path: "/analytics/revenue/margins",
+            },
+          ],
+        },
+        {
+          icon: Activity,
+          label: "Reports",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: FileText,
+              label: "Generate Reports",
+              path: "/analytics/reports/generate",
+            },
+            {
+              icon: Archive,
+              label: "Report Archive",
+              path: "/analytics/reports/archive",
+            },
+            {
+              icon: Download,
+              label: "Export Data",
+              path: "/analytics/reports/export",
+            },
+            {
+              icon: Calendar,
+              label: "Scheduled Reports",
+              path: "/analytics/reports/scheduled",
+            },
+          ],
+        },
+      ],
     },
     {
-      id: 4,
-      name: "Viewer",
-      users: 1,
-      permissions: ["read"],
-      color: "bg-gray-100 text-gray-800",
+      icon: ShoppingBag,
+      label: "E-commerce",
+      hasSubmenu: true,
+      submenu: [
+        {
+          icon: Package,
+          label: "Products",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: PlusCircle,
+              label: "Add Product",
+              path: "/ecommerce/products/add",
+            },
+            { icon: Eye, label: "View All", path: "/ecommerce/products/all" },
+            {
+              icon: Tag,
+              label: "Categories",
+              path: "/ecommerce/products/categories",
+            },
+            {
+              icon: Star,
+              label: "Featured Products",
+              path: "/ecommerce/products/featured",
+            },
+            {
+              icon: Percent,
+              label: "Discounts",
+              path: "/ecommerce/products/discounts",
+            },
+          ],
+        },
+        {
+          icon: ShoppingCart,
+          label: "Orders",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: CheckCircle,
+              label: "Completed Orders",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: Receipt,
+                  label: "Order Details",
+                  path: "/ecommerce/orders/completed/details",
+                },
+                {
+                  icon: Download,
+                  label: "Export Orders",
+                  path: "/ecommerce/orders/completed/export",
+                },
+                {
+                  icon: FileText,
+                  label: "Invoice Generation",
+                  path: "/ecommerce/orders/completed/invoices",
+                },
+              ],
+            },
+            {
+              icon: Clock,
+              label: "Pending Orders",
+              path: "/ecommerce/orders/pending",
+            },
+            {
+              icon: XCircle,
+              label: "Cancelled Orders",
+              path: "/ecommerce/orders/cancelled",
+            },
+            {
+              icon: Truck,
+              label: "Shipping Status",
+              path: "/ecommerce/orders/shipping",
+            },
+          ],
+        },
+        {
+          icon: Package2,
+          label: "Inventory",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: Eye,
+              label: "Stock Levels",
+              path: "/ecommerce/inventory/stock",
+            },
+            {
+              icon: AlertCircle,
+              label: "Low Stock Alerts",
+              path: "/ecommerce/inventory/alerts",
+            },
+            {
+              icon: Upload,
+              label: "Stock Updates",
+              path: "/ecommerce/inventory/updates",
+            },
+            {
+              icon: Archive,
+              label: "Warehouse Management",
+              path: "/ecommerce/inventory/warehouse",
+            },
+          ],
+        },
+      ],
     },
-  ]);
-
-  const allPermissions = [
-    "read",
-    "write",
-    "delete",
-    "manage_users",
-    "manage_roles",
-    "moderate",
-    "analytics",
-    "settings",
+    {
+      icon: FileText,
+      label: "Documents",
+      hasSubmenu: true,
+      submenu: [
+        {
+          icon: FileCheck,
+          label: "Invoices",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: PlusCircle,
+              label: "Create Invoice",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: User,
+                  label: "Customer Invoice",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: FileText,
+                      label: "Standard Invoice",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: DollarSign,
+                          label: "Product Invoice",
+                          path: "/documents/invoices/create/customer/standard/product",
+                        },
+                        {
+                          icon: Clock,
+                          label: "Service Invoice",
+                          path: "/documents/invoices/create/customer/standard/service",
+                        },
+                        {
+                          icon: Percent,
+                          label: "Discount Invoice",
+                          path: "/documents/invoices/create/customer/standard/discount",
+                        },
+                        {
+                          icon: CreditCard,
+                          label: "Recurring Invoice",
+                          path: "/documents/invoices/create/customer/standard/recurring",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Star,
+                      label: "Premium Invoice",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: Building,
+                          label: "Corporate Template",
+                          path: "/documents/invoices/create/customer/premium/corporate",
+                        },
+                        {
+                          icon: Globe,
+                          label: "International Template",
+                          path: "/documents/invoices/create/customer/premium/international",
+                        },
+                        {
+                          icon: Shield,
+                          label: "Legal Template",
+                          path: "/documents/invoices/create/customer/premium/legal",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Calculator,
+                      label: "Tax Invoice",
+                      path: "/documents/invoices/create/customer/tax",
+                    },
+                    {
+                      icon: AlertCircle,
+                      label: "Overdue Invoice",
+                      path: "/documents/invoices/create/customer/overdue",
+                    },
+                  ],
+                },
+                {
+                  icon: Building,
+                  label: "Business Invoice",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: FileSpreadsheet,
+                      label: "B2B Invoice",
+                      path: "/documents/invoices/create/business/b2b",
+                    },
+                    {
+                      icon: Truck,
+                      label: "Wholesale Invoice",
+                      path: "/documents/invoices/create/business/wholesale",
+                    },
+                    {
+                      icon: Globe,
+                      label: "Export Invoice",
+                      path: "/documents/invoices/create/business/export",
+                    },
+                    {
+                      icon: Archive,
+                      label: "Bulk Order Invoice",
+                      path: "/documents/invoices/create/business/bulk",
+                    },
+                  ],
+                },
+                {
+                  icon: FileSpreadsheet,
+                  label: "Bulk Invoice",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Upload,
+                      label: "CSV Import",
+                      path: "/documents/invoices/create/bulk/csv",
+                    },
+                    {
+                      icon: Database,
+                      label: "Database Import",
+                      path: "/documents/invoices/create/bulk/database",
+                    },
+                    {
+                      icon: Link,
+                      label: "API Import",
+                      path: "/documents/invoices/create/bulk/api",
+                    },
+                  ],
+                },
+                {
+                  icon: Copy,
+                  label: "Duplicate Invoice",
+                  path: "/documents/invoices/create/duplicate",
+                },
+              ],
+            },
+            {
+              icon: Search,
+              label: "Manage Invoices",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: CheckCircle,
+                  label: "Paid Invoices",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Calendar,
+                      label: "This Month",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: Eye,
+                          label: "View All",
+                          path: "/documents/invoices/paid/month/all",
+                        },
+                        {
+                          icon: Download,
+                          label: "Export PDF",
+                          path: "/documents/invoices/paid/month/pdf",
+                        },
+                        {
+                          icon: FileSpreadsheet,
+                          label: "Export Excel",
+                          path: "/documents/invoices/paid/month/excel",
+                        },
+                        {
+                          icon: Mail,
+                          label: "Email Summary",
+                          path: "/documents/invoices/paid/month/email",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Archive,
+                      label: "Last Quarter",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: BarChart3,
+                          label: "Quarterly Report",
+                          path: "/documents/invoices/paid/quarter/report",
+                        },
+                        {
+                          icon: TrendingUp,
+                          label: "Growth Analysis",
+                          path: "/documents/invoices/paid/quarter/growth",
+                        },
+                        {
+                          icon: PieChart,
+                          label: "Revenue Breakdown",
+                          path: "/documents/invoices/paid/quarter/breakdown",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Folder,
+                      label: "Annual Archive",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: Calendar,
+                          label: "2024 Archive",
+                          path: "/documents/invoices/paid/annual/2024",
+                        },
+                        {
+                          icon: Calendar,
+                          label: "2023 Archive",
+                          path: "/documents/invoices/paid/annual/2023",
+                        },
+                        {
+                          icon: Calendar,
+                          label: "2022 Archive",
+                          path: "/documents/invoices/paid/annual/2022",
+                        },
+                        {
+                          icon: Archive,
+                          label: "Older Archives",
+                          path: "/documents/invoices/paid/annual/older",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Download,
+                      label: "Export Paid",
+                      path: "/documents/invoices/paid/export",
+                    },
+                  ],
+                },
+                {
+                  icon: Clock,
+                  label: "Pending Invoices",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: AlertCircle,
+                      label: "Overdue",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: Flag,
+                          label: "30+ Days Overdue",
+                          path: "/documents/invoices/pending/overdue/30plus",
+                        },
+                        {
+                          icon: AlertCircle,
+                          label: "60+ Days Overdue",
+                          path: "/documents/invoices/pending/overdue/60plus",
+                        },
+                        {
+                          icon: XCircle,
+                          label: "90+ Days Overdue",
+                          path: "/documents/invoices/paid/quarter/breakdown",
+                        },
+                        {
+                          icon: Trash,
+                          label: "Bad Debt",
+                          path: "/documents/invoices/pending/overdue/baddebt",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Bell,
+                      label: "Reminders",
+                      hasSubmenu: true,
+                      submenu: [
+                        {
+                          icon: Send,
+                          label: "Send Reminder",
+                          path: "/documents/invoices/pending/reminders/send",
+                        },
+                        {
+                          icon: Calendar,
+                          label: "Schedule Reminder",
+                          path: "/documents/invoices/pending/reminders/schedule",
+                        },
+                        {
+                          icon: Mail,
+                          label: "Email Templates",
+                          path: "/documents/invoices/pending/reminders/templates",
+                        },
+                        {
+                          icon: Phone,
+                          label: "Call List",
+                          path: "/documents/invoices/pending/reminders/calls",
+                        },
+                      ],
+                    },
+                    {
+                      icon: Send,
+                      label: "Send Invoice",
+                      path: "/documents/invoices/pending/send",
+                    },
+                    {
+                      icon: Edit,
+                      label: "Edit Invoice",
+                      path: "/documents/invoices/pending/edit",
+                    },
+                  ],
+                },
+                {
+                  icon: XCircle,
+                  label: "Cancelled Invoices",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Eye,
+                      label: "View Cancelled",
+                      path: "/documents/invoices/cancelled/view",
+                    },
+                    {
+                      icon: FileText,
+                      label: "Cancellation Reports",
+                      path: "/documents/invoices/cancelled/reports",
+                    },
+                    {
+                      icon: Archive,
+                      label: "Archive Cancelled",
+                      path: "/documents/invoices/cancelled/archive",
+                    },
+                  ],
+                },
+                {
+                  icon: Flag,
+                  label: "Disputed Invoices",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: AlertCircle,
+                      label: "Active Disputes",
+                      path: "/documents/invoices/disputed/active",
+                    },
+                    {
+                      icon: CheckCircle,
+                      label: "Resolved Disputes",
+                      path: "/documents/invoices/disputed/resolved",
+                    },
+                    {
+                      icon: Users,
+                      label: "Mediation Cases",
+                      path: "/documents/invoices/disputed/mediation",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              icon: Settings,
+              label: "Invoice Settings",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: FileText,
+                  label: "Templates",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Building,
+                      label: "Corporate Templates",
+                      path: "/documents/invoices/settings/templates/corporate",
+                    },
+                    {
+                      icon: Star,
+                      label: "Premium Templates",
+                      path: "/documents/invoices/settings/templates/premium",
+                    },
+                    {
+                      icon: Globe,
+                      label: "International Templates",
+                      path: "/documents/invoices/settings/templates/international",
+                    },
+                    {
+                      icon: Edit,
+                      label: "Custom Templates",
+                      path: "/documents/invoices/settings/templates/custom",
+                    },
+                  ],
+                },
+                {
+                  icon: Hash,
+                  label: "Numbering",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Calculator,
+                      label: "Auto Numbering",
+                      path: "/documents/invoices/settings/numbering/auto",
+                    },
+                    {
+                      icon: Edit,
+                      label: "Custom Format",
+                      path: "/documents/invoices/settings/numbering/custom",
+                    },
+                    {
+                      icon: Archive,
+                      label: "Number Series",
+                      path: "/documents/invoices/settings/numbering/series",
+                    },
+                  ],
+                },
+                {
+                  icon: CreditCard,
+                  label: "Payment Methods",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: CreditCard,
+                      label: "Credit Cards",
+                      path: "/documents/invoices/settings/payments/cards",
+                    },
+                    {
+                      icon: Building,
+                      label: "Bank Transfer",
+                      path: "/documents/invoices/settings/payments/bank",
+                    },
+                    {
+                      icon: Globe,
+                      label: "PayPal",
+                      path: "/documents/invoices/settings/payments/paypal",
+                    },
+                    {
+                      icon: DollarSign,
+                      label: "Cash Payments",
+                      path: "/documents/invoices/settings/payments/cash",
+                    },
+                  ],
+                },
+                {
+                  icon: Mail,
+                  label: "Email Templates",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Send,
+                      label: "Invoice Email",
+                      path: "/documents/invoices/settings/email/invoice",
+                    },
+                    {
+                      icon: Bell,
+                      label: "Reminder Email",
+                      path: "/documents/invoices/settings/email/reminder",
+                    },
+                    {
+                      icon: CheckCircle,
+                      label: "Payment Confirmation",
+                      path: "/documents/invoices/settings/email/confirmation",
+                    },
+                    {
+                      icon: AlertCircle,
+                      label: "Overdue Notice",
+                      path: "/documents/invoices/settings/email/overdue",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          icon: ClipboardList,
+          label: "Contracts",
+          hasSubmenu: true,
+          submenu: [
+            {
+              icon: PlusCircle,
+              label: "Create Contract",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: FileText,
+                  label: "Service Contract",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Clock,
+                      label: "Hourly Service",
+                      path: "/documents/contracts/create/service/hourly",
+                    },
+                    {
+                      icon: Package,
+                      label: "Project Based",
+                      path: "/documents/contracts/create/service/project",
+                    },
+                    {
+                      icon: Calendar,
+                      label: "Monthly Retainer",
+                      path: "/documents/contracts/create/service/retainer",
+                    },
+                    {
+                      icon: Shield,
+                      label: "Maintenance Contract",
+                      path: "/documents/contracts/create/service/maintenance",
+                    },
+                  ],
+                },
+                {
+                  icon: Building,
+                  label: "Vendor Contract",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Truck,
+                      label: "Supply Contract",
+                      path: "/documents/contracts/create/vendor/supply",
+                    },
+                    {
+                      icon: Globe,
+                      label: "Distribution Agreement",
+                      path: "/documents/contracts/create/vendor/distribution",
+                    },
+                    {
+                      icon: Shield,
+                      label: "Exclusive Partnership",
+                      path: "/documents/contracts/create/vendor/exclusive",
+                    },
+                  ],
+                },
+                {
+                  icon: Users,
+                  label: "Employment Contract",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: User,
+                      label: "Full-time Employee",
+                      path: "/documents/contracts/create/employment/fulltime",
+                    },
+                    {
+                      icon: Clock,
+                      label: "Part-time Employee",
+                      path: "/documents/contracts/create/employment/parttime",
+                    },
+                    {
+                      icon: FileText,
+                      label: "Contractor Agreement",
+                      path: "/documents/contracts/create/employment/contractor",
+                    },
+                    {
+                      icon: Calendar,
+                      label: "Internship Contract",
+                      path: "/documents/contracts/create/employment/internship",
+                    },
+                  ],
+                },
+                {
+                  icon: Shield,
+                  label: "NDA Contract",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: User,
+                      label: "Employee NDA",
+                      path: "/documents/contracts/create/nda/employee",
+                    },
+                    {
+                      icon: Building,
+                      label: "Business NDA",
+                      path: "/documents/contracts/create/nda/business",
+                    },
+                    {
+                      icon: Users,
+                      label: "Mutual NDA",
+                      path: "/documents/contracts/create/nda/mutual",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              icon: Folder,
+              label: "Contract Management",
+              hasSubmenu: true,
+              submenu: [
+                {
+                  icon: CheckCircle,
+                  label: "Active Contracts",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Eye,
+                      label: "View All",
+                      path: "/documents/contracts/active/view",
+                    },
+                    {
+                      icon: Search,
+                      label: "Search Contracts",
+                      path: "/documents/contracts/active/search",
+                    },
+                    {
+                      icon: Filter,
+                      label: "Filter Contracts",
+                      path: "/documents/contracts/active/filter",
+                    },
+                  ],
+                },
+                {
+                  icon: Clock,
+                  label: "Pending Contracts",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Send,
+                      label: "Send for Review",
+                      path: "/documents/contracts/pending/review",
+                    },
+                    {
+                      icon: Edit,
+                      label: "Edit Drafts",
+                      path: "/documents/contracts/pending/edit",
+                    },
+                    {
+                      icon: AlertCircle,
+                      label: "Expiring Soon",
+                      path: "/documents/contracts/pending/expiring",
+                    },
+                  ],
+                },
+                {
+                  icon: Archive,
+                  label: "Archived Contracts",
+                  hasSubmenu: true,
+                  submenu: [
+                    {
+                      icon: Calendar,
+                      label: "2024 Archive",
+                      path: "/documents/contracts/archive/2024",
+                    },
+                    {
+                      icon: Calendar,
+                      label: "2023 Archive",
+                      path: "/documents/contracts/archive/2023",
+                    },
+                    {
+                      icon: Archive,
+                      label: "Older Archives",
+                      path: "/documents/contracts/archive/older",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      hasSubmenu: true,
+      submenu: [
+        { icon: Cog, label: "General Settings", path: "/settings/general" },
+        { icon: Lock, label: "Security Settings", path: "/settings/security" },
+        { icon: Database, label: "Data Management", path: "/settings/data" },
+        { icon: Zap, label: "Integrations", path: "/settings/integrations" },
+      ],
+    },
+    {
+      icon: LogOut,
+      label: "Logout",
+      path: "/logout",
+    },
   ];
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole === "all" || user.role === selectedRole;
-    return matchesSearch && matchesRole;
-  });
+  const toggleSection = (index) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
-  const UserModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 className="text-lg font-semibold mb-4">Add New User</h3>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option>Select Role</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.name}>
-                {role.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex justify-end space-x-2 mt-6">
-          <button
-            onClick={() => setShowUserModal(false)}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => setShowUserModal(false)}
-            className="px-4 py-2 bg-yellow-400 text-black rounded-md"
-          >
-            Add User
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  const toggleSubSection = (sectionIndex, subIndex) => {
+    setExpandedSubSections((prev) => ({
+      ...prev,
+      [`${sectionIndex}-${subIndex}`]: !prev[`${sectionIndex}-${subIndex}`],
+    }));
+  };
 
-  const RoleModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-lg w-full p-6">
-        <h3 className="text-lg font-semibold mb-4">Create New Role</h3>
-        <div className="space-y-4">
-          <input
-            type="text"
-            placeholder="Role Name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Permissions
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {allPermissions.map((permission) => (
-                <label key={permission} className="flex items-center space-x-2">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm capitalize">
-                    {permission.replace("_", " ")}
-                  </span>
-                </label>
-              ))}
+  const toggleSubSubSection = (sectionIndex, subIndex, subSubIndex) => {
+    setExpandedSubSubSections((prev) => ({
+      ...prev,
+      [`${sectionIndex}-${subIndex}-${subSubIndex}`]:
+        !prev[`${sectionIndex}-${subIndex}-${subSubIndex}`],
+    }));
+  };
+
+  const toggleSubSubSubSection = (
+    sectionIndex,
+    subIndex,
+    subSubIndex,
+    subSubSubIndex
+  ) => {
+    setExpandedSubSubSubSections((prev) => ({
+      ...prev,
+      [`${sectionIndex}-${subIndex}-${subSubIndex}-${subSubSubIndex}`]:
+        !prev[`${sectionIndex}-${subIndex}-${subSubIndex}-${subSubSubIndex}`],
+    }));
+  };
+
+  const renderMenuItem = (item, index, level = 0, parentIndices = []) => {
+    const Icon = item.icon;
+    const isSectionExpanded =
+      level === 0
+        ? expandedSections[index]
+        : level === 1
+        ? expandedSubSections[`${parentIndices[0]}-${index}`]
+        : level === 2
+        ? expandedSubSubSections[
+            `${parentIndices[0]}-${parentIndices[1]}-${index}`
+          ]
+        : expandedSubSubSubSections[
+            `${parentIndices[0]}-${parentIndices[1]}-${parentIndices[2]}-${index}`
+          ];
+
+    return (
+      <div
+        key={`${parentIndices.join("-")}-${index}`}
+        className={`ml-${level * 4}`}
+      >
+        <div
+          className={`flex items-center p-3 rounded-xl hover:bg-white/10 cursor-pointer transition-all duration-200 ${
+            item.active ? "bg-white/20 text-white" : "text-gray-800"
+          }`}
+          onClick={() => {
+            if (item.hasSubmenu) {
+              if (level === 0) toggleSection(index);
+              else if (level === 1) toggleSubSection(parentIndices[0], index);
+              else if (level === 2)
+                toggleSubSubSection(parentIndices[0], parentIndices[1], index);
+              else if (level === 3)
+                toggleSubSubSubSection(
+                  parentIndices[0],
+                  parentIndices[1],
+                  parentIndices[2],
+                  index
+                );
+            }
+          }}
+        >
+          <Icon className="w-5 h-5 mr-3 text-gray-800" />
+          <span className={`${isExpanded ? "font-medium" : "hidden"}`}>
+            {item.label}
+          </span>
+          {item.hasSubmenu && (
+            <div className="ml-auto">
+              {isSectionExpanded ? (
+                <ChevronDown className="w-4 h-4 text-gray-800" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-800" />
+              )}
             </div>
+          )}
+        </div>
+        {item.hasSubmenu && isSectionExpanded && (
+          <div className="ml-4">
+            {item.submenu.map((subItem, subIndex) =>
+              renderMenuItem(subItem, subIndex, level + 1, [
+                ...parentIndices,
+                index,
+              ])
+            )}
           </div>
-        </div>
-        <div className="flex justify-end space-x-2 mt-6">
-          <button
-            onClick={() => setShowRoleModal(false)}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => setShowRoleModal(false)}
-            className="px-4 py-2 bg-yellow-400 text-black rounded-md"
-          >
-            Create Role
-          </button>
-        </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-8">
-          <button
-            onClick={() => setActiveTab("users")}
-            className={`px-4 py-2 rounded-md font-medium transition-colors ${
-              activeTab === "users"
-                ? "bg-yellow-400 text-black"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            }`}
-          >
-            <Users className="h-4 w-4 inline mr-2" />
-            Users
-          </button>
-          <button
-            onClick={() => setActiveTab("roles")}
-            className={`px-4 py-2 rounded-md font-medium transition-colors ${
-              activeTab === "roles"
-                ? "bg-yellow-400 text-black"
-                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-            }`}
-          >
-            <Settings className="h-4 w-4 inline mr-2" />
-            Roles
-          </button>
+    <nav
+      className={`bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-200 h-screen transition-all duration-300 ${
+        isExpanded ? "w-72" : "w-20"
+      } shadow-xl rounded-r-2xl border-r border-gray-200/50 flex flex-col`}
+    >
+      <div className="p-6 flex items-center justify-between">
+        <div
+          className={`flex items-center space-x-3 ${
+            isExpanded ? "" : "hidden"
+          }`}
+        >
+          <img
+            src="/logo-placeholder.png"
+            alt="Admin Logo"
+            className="h-10 w-10 rounded-full shadow-md"
+          />
+          <span className="font-bold text-lg text-gray-800">Admin</span>
         </div>
-
-        {/* Users Tab */}
-        {activeTab === "users" && (
-          <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Total Users
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {users.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Users className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Active Users
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {users.filter((u) => u.status === "Active").length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Shield className="h-6 w-6 text-yellow-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Admins</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {users.filter((u) => u.role === "Admin").length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="flex items-center">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Settings className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Total Roles
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {roles.length}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-                  <div className="relative">
-                    <Search className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search users..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
-                    />
-                  </div>
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="all">All Roles</option>
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.name}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  onClick={() => setShowUserModal(true)}
-                  className="flex items-center space-x-2 bg-yellow-400 text-black px-4 py-2 rounded-md transition-colors"
-                >
-                  <Plus className="w-3 h-3 lg:h-4 lg:w-4" />
-                  <span>Add User</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Users Table */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Role
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Last Login
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredUsers.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                              <span className="text-blue-600 font-medium text-sm">
-                                {user.name
-                                  .split(" ")
-                                  .map((n) => n[0])
-                                  .join("")
-                                  .toUpperCase()}
-                              </span>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {user.name}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {user.email}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              roles.find((r) => r.name === user.role)?.color ||
-                              "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {user.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              user.status === "Active"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {user.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.lastLogin}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button className="text-blue-600 hover:text-blue-900">
-                              <Eye className="h-4 w-4" />
-                            </button>
-                            <button className="text-yellow-600 hover:text-yellow-900">
-                              <Edit className="h-4 w-4" />
-                            </button>
-                            <button className="text-red-600 hover:text-red-900">
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Roles Tab */}
-        {activeTab === "roles" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-[1.1rem] lg:text-xl font-semibold text-gray-900">
-                Role Management
-              </h2>
-              <button
-                onClick={() => setShowRoleModal(true)}
-                className="flex items-center space-x-2 bg-yellow-400 text-black px-4 py-2 rounded-md transition-colors"
-              >
-                <Plus className="w-3 h-3 lg:h-4 lg:w-4" />
-                <span className="text-sm">Create Role</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {roles.map((role) => (
-                <div
-                  key={role.id}
-                  className="bg-white p-6 rounded-lg shadow-sm border"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {role.name}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {role.users} user{role.users !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      <button className="text-yellow-600 hover:text-yellow-900">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      Permissions
-                    </h4>
-                    <div className="flex flex-wrap gap-1">
-                      {role.permissions.map((permission) => (
-                        <span
-                          key={permission}
-                          className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded"
-                        >
-                          {permission.replace("_", " ")}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-2 rounded-full hover:bg-white/20 transition-colors"
+        >
+          <ChevronRight
+            className={`w-6 h-6 text-gray-800 transform ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </div>
-
-      {/* Modals */}
-      {showUserModal && <UserModal />}
-      {showRoleModal && <RoleModal />}
-    </div>
+      <div className="px-3 flex-1 overflow-y-auto">
+        {menuItems.map((item, index) => renderMenuItem(item, index))}
+      </div>
+    </nav>
   );
 };
 
-export default Permissions;
+export default Permission;

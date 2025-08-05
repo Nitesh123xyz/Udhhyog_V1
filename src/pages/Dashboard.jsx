@@ -122,7 +122,7 @@ const EmployeeDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-100">
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-200">
       {/* Header */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

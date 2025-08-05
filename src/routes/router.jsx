@@ -7,6 +7,7 @@ import UpdateUser from "../pages/UpdateUser";
 import ForgotPassword from "../pages/ForgotPassword";
 import Permissions from "../pages/Permission";
 import PageNotFound from "../pages/PageNotFound";
+import Seo from "../pages/Seo";
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: "/permission",
         element: <Permissions />,
+      },
+      {
+        path: "/seo",
+        element: <Seo />,
       },
       {
         path: "*",

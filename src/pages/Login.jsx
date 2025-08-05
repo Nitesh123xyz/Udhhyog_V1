@@ -4,8 +4,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
 import Animation from "../components/Animation";
-import { useGetUsersQuery } from "../features/api/authSlice";
+// import { useGetUsersQuery } from "../features/api/authSlice";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setTheme, toggleTheme } from "../features/theme/themeSlice";
 
 // Zod Schema
 const loginSchema = z.object({
@@ -16,6 +18,10 @@ const loginSchema = z.object({
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const Theme = useSelector((state) => state.theme.ThemeMode);
+  const dispatch = useDispatch();
+  console.log(Theme);
 
   // ------------------------------------------------------
 
@@ -35,6 +41,9 @@ const Login = () => {
 
   const handleUserLogin = (data) => {
     console.log("Form submitted with:", data);
+    // dispatch(toggleTheme());
+    dispatch(setTheme(!Theme));
+    dispatch(toggleTheme());
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -45,7 +54,7 @@ const Login = () => {
   // ------------------------------------------------------
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-center justify-center px-4 py-9 sm:px-6 lg:px-8">
       {/* Background Animation */}
       <div className="absolute inset-0 opacity-30">
         <Animation />
@@ -53,7 +62,7 @@ const Login = () => {
 
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         {/* Logo */}
-        <div className="flex justify-center relative z-20 mb-2">
+        <div className="flex justify-center relative z-20">
           <div className="ring-2 ring-gray-200 rounded-full">
             <img
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full"
@@ -63,10 +72,10 @@ const Login = () => {
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/5 relative -mt-6 sm:-mt-8">
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 mt-2 md:mt-0">
               Welcome
             </h1>
             <p className="text-gray-100 text-sm sm:text-base">
@@ -85,7 +94,7 @@ const Login = () => {
               </div>
               <input
                 type="text"
-                placeholder="Username"
+                placeholder="Phone, username or email"
                 className="w-full pl-10 sm:pl-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors"
                 {...LoginUser("username")}
               />
@@ -97,7 +106,7 @@ const Login = () => {
             </div>
 
             {/* Password Field */}
-            <div className="relative mb-8">
+            <div className="relative mb-5">
               <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>

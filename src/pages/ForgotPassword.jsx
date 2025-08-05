@@ -1,161 +1,130 @@
 import React, { useState } from "react";
-import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CircleUser, ArrowLeft } from "lucide-react";
+import Animation from "../components/Animation";
+import { Link } from "react-router-dom";
 
-// Simple animation component since we can't import the external Animation component
-const SimpleAnimation = () => {
-  return (
-    <div className="absolute inset-0">
-      <div className="absolute top-10 left-10 w-16 h-16 border-2 border-purple-500/20 rounded-full animate-spin"></div>
-      <div className="absolute top-32 right-20 w-8 h-8 border-2 border-blue-500/20 rounded-full animate-ping"></div>
-      <div className="absolute bottom-20 left-32 w-12 h-12 border-2 border-pink-500/20 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-32 right-16 w-6 h-6 border-2 border-green-500/20 rounded-full animate-bounce"></div>
-      <div className="absolute top-1/2 left-1/4 w-10 h-10 border-2 border-yellow-500/20 rounded-full animate-spin"></div>
-      <div className="absolute top-1/3 right-1/3 w-14 h-14 border-2 border-indigo-500/20 rounded-full animate-pulse"></div>
-    </div>
-  );
-};
+// Zod Schema
+const loginSchema = z.object({
+  username: z.string().nonempty("Email is required"),
+});
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isEmailSent, setIsEmailSent] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // ------------------------------------------------------
+
+  const {
+    register: LoginUser,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  // ------------------------------------------------------
+
+  const handleUserLogin = (data) => {
+    console.log("Form submitted with:", data);
     setIsLoading(true);
-
-    // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      setIsEmailSent(true);
+      alert("Login successful!");
     }, 2000);
   };
 
-  const handleBackToLogin = () => {
-    // In a real app, this would navigate back to login
-    window.history.back();
-  };
-
-  if (isEmailSent) {
-    return (
-      <div className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center p-4">
-        {/* Animated Background */}
-        <div className="absolute inset-0 opacity-30">
-          <SimpleAnimation />
-        </div>
-
-        {/* Success Card */}
-        <div className="relative z-10 w-full max-w-md">
-          <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/5 text-center">
-            {/* Success Icon */}
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6">
-              <CheckCircle className="w-8 h-8 text-green-400" />
-            </div>
-
-            {/* Success Message */}
-            <h1 className="text-2xl font-bold text-white mb-4">
-              Check Your Email
-            </h1>
-            <p className="text-gray-300 mb-2">
-              We've sent a password reset link to:
-            </p>
-            <p className="text-purple-400 font-medium mb-6">{email}</p>
-            <p className="text-gray-400 text-sm mb-8">
-              Click the link in the email to reset your password. If you don't
-              see it, check your spam folder.
-            </p>
-
-            {/* Back to Login Button */}
-            <button
-              onClick={handleBackToLogin}
-              className="w-full py-4 border border-white/20 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 mb-4"
-            >
-              Back to Login
-            </button>
-
-            {/* Resend Email */}
-            <button
-              onClick={() => setIsEmailSent(false)}
-              className="text-gray-400 hover:text-white transition-colors text-sm"
-            >
-              Didn't receive an email? Try again
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // ------------------------------------------------------
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center p-4">
-      {/* Animated Background */}
+    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-centers justify-center px-4 py-[4rem]  sm:px-6 lg:px-8">
+      {/* Background Animation */}
       <div className="absolute inset-0 opacity-30">
-        <SimpleAnimation />
+        <Animation />
       </div>
 
-      {/* Main Forgot Password Card */}
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/5">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center relative z-20">
+          <div className="ring-2 ring-gray-200 rounded-full">
+            <img
+              className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full"
+              src="/logo.png"
+              alt="Logo"
+            />
+          </div>
+        </div>
+
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 shadow-lg">
-              <img
-                className="w-12 h-12"
-                src="https://udhhyog.com/img/favicon.ico?1717493245"
-                alt="logo"
-              />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              Forgot Password?
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+              Forgot Password
             </h1>
-            <p className="text-gray-300">
+            <p className="text-gray-100 text-[10px] lg:text-sm sm:text-base">
               Enter your email address and we'll send you a link to reset your
-              password.
+              password
             </p>
           </div>
 
-          {/* Forgot Password Form */}
-          <div className="space-y-6">
-            {/* Email Field */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Mail className="w-5 h-5 text-gray-400" />
+          <form
+            onSubmit={handleSubmit(handleUserLogin)}
+            className="space-y-5 sm:space-y-6"
+          >
+            {/* Username Field */}
+            <div className="relative mb-8 sm:mb-10">
+              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <CircleUser className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>
               <input
-                type="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="w-full pl-12 py-4 bg-white/1 border border-white/20 rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 backdrop-blur-sm"
+                type="text"
+                placeholder="Phone, username or email"
+                className="w-full pl-10 sm:pl-12 py-3 sm:py-4  bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 placeholder:text-[11px] md:placeholder:text-[16px] focus:outline-none backdrop-blur-sm text-xs md:text-md sm:text-base focus:border-white/40 transition-colors"
+                {...LoginUser("username")}
               />
+              {errors.username && (
+                <p className="text-red-400 text-[10px] sm:text-sm mt-1 pl-2 absolute -bottom-6 sm:-bottom-7">
+                  {errors.username.message}
+                </p>
+              )}
             </div>
 
-            {/* Send Reset Link Button */}
             <button
-              onClick={handleSubmit}
-              disabled={isLoading || !email}
-              className="w-full py-4 border border-white/20 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Sending...
+                  <div className="w-4  h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  <span>Sending...</span>
                 </div>
               ) : (
-                "Send Reset Link"
+                <span className="text-[11px] md:text-[16px]">
+                  Send Reset Link
+                </span>
               )}
             </button>
 
-            {/* Back to Login */}
-            <button
-              onClick={handleBackToLogin}
-              className="w-full flex items-center justify-center py-3 text-gray-400 hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Login
-            </button>
-          </div>
+            <div className="text-center pt-2 sm:pt-4">
+              <p className="text-gray-100 text-sm sm:text-lg font-medium">
+                UDHHYOG.COM V1
+              </p>
+            </div>
+
+            <div className="text-center">
+              <Link
+                to="/"
+                className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
+              >
+                <ArrowLeft size={14} className="inline sm:w-4 sm:h-4" />
+                <span className="text-yellow-400 text-[11px] md:text-[15px]">
+                  Back to Login
+                </span>
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
     </div>
