@@ -122,12 +122,12 @@ const EmployeeDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-200">
+    <>
       {/* Header */}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-0 py-[4rem_0rem]">
         {/* Title and Stats */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <h1 className="text-4xl font-light text-gray-900 mb-6">People</h1>
 
           <div className="flex flex-wrap items-center gap-6 mb-6">
@@ -154,7 +154,7 @@ const EmployeeDashboard = () => {
               <span className="text-sm font-medium">14%</span>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Controls */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-white/20 overflow-hidden">
@@ -176,8 +176,10 @@ const EmployeeDashboard = () => {
               </div>
               <div className="flex items-center space-x-3">
                 <Link to="add-user">
-                  <button className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-yellow-500 rounded-full
-                   shadow-sm hover:shadow-md duration-300 transition-all">
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 cursor-pointer bg-yellow-500 rounded-full
+                   shadow-sm hover:shadow-md duration-300 transition-all"
+                  >
                     <span>Add</span>
                     <Plus className="w-4 h-4" />
                   </button>
@@ -398,7 +400,7 @@ const EmployeeDashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
