@@ -9,7 +9,6 @@ import Permissions from "../pages/Permission";
 import PageNotFound from "../pages/PageNotFound";
 import Seo from "../pages/Seo";
 import AdminLayout from "../components/commonLayout";
-import Comman from "../components/Comman";
 
 const router = createBrowserRouter([
   {
@@ -46,10 +45,6 @@ const router = createBrowserRouter([
       {
         path: "/common",
         element: <AdminLayout />,
-      },
-      {
-        path: "/con",
-        element: <Comman />,
       },
       {
         path: "*",

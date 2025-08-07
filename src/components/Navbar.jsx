@@ -76,8 +76,8 @@ import {
   Coffee,
 } from "lucide-react";
 
-const Navbar = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const Navbar = ({ isExpanded, setIsExpanded }) => {
+  // const [isExpanded, setIsExpanded] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
   const [expandedSubSections, setExpandedSubSections] = useState({});
   const [expandedSubSubSections, setExpandedSubSubSections] = useState({});
@@ -1206,7 +1206,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-200 fixed z-[999] h-screen transition-all duration-300 ${
+      className={`bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-100 fixed z-[999] h-screen transition-all duration-300 ${
         isExpanded ? "w-72" : "w-20"
       } shadow-xl  border-r border-gray-200/50 flex flex-col`}
     >
