@@ -21,12 +21,20 @@ const App = () => {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-purple-100 via-blue-200 to-yellow-200">
-        <ICMBrowserLayout>
-          <main className="flex-1 overflow-auto">
-            <Outlet />
-          </main>
-        </ICMBrowserLayout>
+      <div className="flex-1 flex flex-col bg-gradient-to-br from-[#e3e4e7] via-[#e7e7e7] to-[#f7eec4]">
+        {!HideNavbar ? (
+          <ICMBrowserLayout>
+            <main className="flex-1 overflow-auto">
+              <Outlet />
+            </main>
+          </ICMBrowserLayout>
+        ) : (
+          <>
+            <main className="flex-1 overflow-auto">
+              <Outlet />
+            </main>
+          </>
+        )}
       </div>
     </div>
   );

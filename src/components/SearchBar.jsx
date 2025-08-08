@@ -5,7 +5,7 @@ const SearchBar = () => {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <>
-      <div className="flex items-center gap-2 relative shadow-sm p-2.5 bg-white/50 rounded-xl">
+      <div className="flex items-center gap-2 relative shadow-sm p-2.5 bg-white/50 rounded-full">
         <input
           type="text"
           placeholder="Search..."

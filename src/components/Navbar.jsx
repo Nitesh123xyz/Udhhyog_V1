@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Home,
   Users,
@@ -77,13 +77,30 @@ import {
 } from "lucide-react";
 
 const Navbar = ({ isExpanded, setIsExpanded }) => {
-  // const [isExpanded, setIsExpanded] = useState(false);
+  const leaveTimer = useRef(null);
   const [expandedSections, setExpandedSections] = useState({});
   const [expandedSubSections, setExpandedSubSections] = useState({});
   const [expandedSubSubSections, setExpandedSubSubSections] = useState({});
   const [expandedSubSubSubSections, setExpandedSubSubSubSections] = useState(
     {}
   );
+
+  const handleMouseEnter = () => {
+    // Cancel pending close
+    if (leaveTimer.current) {
+      clearTimeout(leaveTimer.current);
+      leaveTimer.current = null;
+    }
+    setIsExpanded(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Start 10s delay before closing
+    leaveTimer.current = setTimeout(() => {
+      setIsExpanded(false);
+      leaveTimer.current = null;
+    }, 800);
+  };
 
   // Reset all expanded states when navbar is collapsed
   useEffect(() => {
@@ -93,6 +110,12 @@ const Navbar = ({ isExpanded, setIsExpanded }) => {
       setExpandedSubSubSections({});
       setExpandedSubSubSubSections({});
     }
+
+    return () => {
+      if (leaveTimer.current) {
+        clearTimeout(leaveTimer.current);
+      }
+    };
   }, [isExpanded]);
 
   const menuItems = [
@@ -1206,41 +1229,45 @@ const Navbar = ({ isExpanded, setIsExpanded }) => {
 
   return (
     <nav
-      className={`bg-gradient-to-br from-purple-100 via-blue-50 to-yellow-100 fixed z-[999] h-screen transition-all duration-300 ${
-        isExpanded ? "w-72" : "w-20"
-      } shadow-xl  border-r border-gray-200/50 flex flex-col`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`bg-white/10 backdrop-blur-lg border-white/40 fixed z-[999] h-screen 
+              shadow-xl border-r  flex flex-col
+              transition-all duration-300
+              ${isExpanded ? "w-72 delay-[3ms]" : "w-20 delay-[300ms]"}`}
     >
-      <div className="p-6 pb-4 bg-white/10 backdrop-blur-2xl flex items-center justify-between">
-        {/* <div
-          className={`flex items-center space-x-3 ${
-            isExpanded ? "" : "hidden"
-          }`}
-        >
-          <span className="font-bold text-lg text-gray-800">Admin</span>
-        </div> */}
-
+      <div className="p-4 pb-4 bg-white/10 backdrop-blur-2xl flex items-center gap-5">
         <img
           src="/logo.png"
           alt="company_logo"
           className={`rounded-full shadow-md transition-all duration-200 ease-in ${
-            isExpanded ? "h-[40px] w-[40px]" : "h-[28px] w-[28px]"
+            isExpanded ? "h-[40px] w-[40px]" : "h-[40px] w-[40px]"
           }`}
         />
-
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="p-1 rounded-full hover:bg-white/20 transition-colors"
+        <span
+          className={`font-bold text-3xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text ${
+            isExpanded ? "" : "hidden"
+          }`}
         >
-          <ChevronRight
-            className={`text-gray-800 transform ${
-              isExpanded ? "rotate-180 w-6 h-6" : "w-5 h-5"
-            }`}
-          />
-        </button>
+          UDHHYOG
+        </span>
       </div>
       <div className="px-3 flex-1 overflow-y-auto">
         {menuItems.map((item, index) => renderMenuItem(item, index))}
       </div>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`p-1 rounded-full flex ${
+          isExpanded ? "justify-end" : "justify-center"
+        }   mr-2 mb-2`}
+      >
+        {}
+        <ChevronRight
+          className={`text-gray-800 bg-yellow-400 w-7 h-7 transform p-1 rounded-full ${
+            isExpanded ? "rotate-180" : ""
+          }`}
+        />
+      </button>
     </nav>
   );
 };

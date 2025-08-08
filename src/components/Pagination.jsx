@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 
-const Pagination = () => {
+const Pagination = ({
+  MainData,
+  currentPage,
+  setCurrentPage,
+  itemsPerPage,
+  startIndex,
+  endIndex,
+}) => {
+  const totalPages = Math.ceil(MainData.length / itemsPerPage);
+
   return (
     <>
-      {/* Pagination */}
       <div className="px-6 py-4 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            Showing {startIndex + 1} to {Math.min(endIndex, employees.length)}{" "}
-            of {employees.length} results
+            Showing {startIndex + 1} to {Math.min(endIndex, MainData.length)} of{" "}
+            {MainData.length} results
           </div>
           <div className="flex items-center space-x-2">
             <button

@@ -37,13 +37,13 @@ export default function ICMBrowserLayout({ children }) {
             {/* Browser window */}
 
             <div
-              className="bg-white/30 rounded-2xl p-[0.8rem_0px_0px_0px]"
+              className="bg-white/20 rounded-2xl p-[0.8rem_0px_0px_0px]"
               style={{
                 clipPath:
                   "polygon(0 0, 85% 0, 85% 15px, calc(85% + 40px) 50px, 100% 50px, 100% 100%, 0 100%)",
               }}
             >
-              <div className=" bg-white/50 backdrop-blur-md border border-blue-100 rounded-sm ml-5 w-[80%] flex items-center justify-between px-6 py-3 transition-all duration-300">
+              <div className=" bg-white/50 backdrop-blur-md border border-blue-100 rounded-full ml-5 w-[80%] flex items-center justify-between px-6 py-3 transition-all duration-300">
                 {/* Left Side - Logo */}
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold text-sm shadow-sm">
