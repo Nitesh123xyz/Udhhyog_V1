@@ -123,13 +123,13 @@ const Permission = () => {
               </h2>
               <table className="w-full text-sm border-separate border-spacing-y-3">
                 <thead>
-                  <tr className="text-left text-[0.8rem] text-black  md:text-sm dark:text-white sticky top-0 z-30 bg-white dark:bg-gray-800 border-2 border-gray-600">
-                    <th className="px-2 py-3 first:rounded-l-lg ">Name</th>
-                    <th className="px-2 py-3 ">All</th>
-                    <th className="px-2 py-3 ">View</th>
-                    <th className="px-2 py-3 ">Edit</th>
-                    <th className="px-2 py-3 ">Add</th>
-                    <th className="px-2 py-3 last:rounded-r-lg ">Delete</th>
+                  <tr className="text-left text-0 text-black  md:text-sm dark:text-white sticky top-0 z-30 bg-white dark:bg-gray-800 border-2 border-gray-600">
+                    <th className="px-1 py-3 first:rounded-l-lg ">Name</th>
+                    <th className="px-1 py-3 ">All</th>
+                    <th className="px-1 py-3 ">View</th>
+                    <th className="px-1 py-3 ">Edit</th>
+                    <th className="px-1 py-3 ">Add</th>
+                    <th className="px-1 py-3 last:rounded-r-lg ">Delete</th>
                   </tr>
                 </thead>
                 <tbody>

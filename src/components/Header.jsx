@@ -61,7 +61,7 @@ const Header = ({ rows, setRows }) => {
         <div
           className={`flex items-center gap-2 ${
             HideHeader ? "mr-0" : "mr-2"
-          } relative shadow-sm p-1 border-1 border-white dark:border-gray-600 bg-white/50 dark:bg-gray-800 rounded-full`}
+          } relative p-1 lg:border-1 lg:dark:border-gray-600 lg:border-gray-300 bg-white/50 dark:bg-gray-800 rounded-full ${openSearch ? "border-1 dark:border-gray-600 border-gray-300" : "border-0"}`}
         >
           <input
             type="text"
@@ -73,9 +73,9 @@ const Header = ({ rows, setRows }) => {
             className={`bg-transparent text-sm text-black dark:text-white outline-0 placeholder:text-gray-400 px-1 transition-all duration-300
               ${
                 isFocused
-                  ? "w-[5.6rem] md:w-[20rem] lg:w-[35rem]"
+                  ? "w-[5.5rem] md:w-[20rem] lg:w-[35rem]"
                   : `${
-                      openSearch ? "w-[5.6rem]" : "hidden md:block"
+                      openSearch ? "w-[5.5rem]" : "w-0 md:block"
                     } md:w-[12rem] lg:w-[20rem]`
               }`}
           />

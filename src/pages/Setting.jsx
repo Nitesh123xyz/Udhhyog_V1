@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { User, Settings, Palette, Shield } from "lucide-react";
-
+import { ActiveTheme } from "../utils/ReuseData";
+import { toggleTheme } from "../utils/theme";
+import { useDispatch } from "react-redux";
 const Setting = () => {
   const [activeTab, setActiveTab] = useState("account");
   const [isOpen, setIsOpen] = useState(true);
+  const [activeMode, setActiveMode] = useState("Light");
+  const [themeMode, setThemeMode] = useState(ActiveTheme);
+  const dispatch = useDispatch();
+
+  const handleTabClick = (Info) => {
+    console.log(Info);
+    dispatch(toggleTheme());
+    setActiveMode(Info.label);
+  };
 
   const navigationItems = [
     {
@@ -163,15 +174,34 @@ const Setting = () => {
           <div className="space-y-6">
             <div>
               <h3 className="font-medium text-gray-900 mb-4">Appearance</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="border-2 border-blue-500 rounded-lg p-4 cursor-pointer bg-blue-50">
-                  <div className="w-full h-20 bg-white rounded mb-2 border"></div>
-                  <p className="text-sm font-medium text-center">Light</p>
-                </div>
-                <div className="border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-gray-300">
-                  <div className="w-full h-20 bg-gray-800 rounded mb-2"></div>
-                  <p className="text-sm font-medium text-center">Dark</p>
-                </div>
+              <div className="grid grid-cols-5 gap-4">
+                {ActiveTheme.map((item, index) => (
+                  <>
+                    <div
+                      onClick={() => handleTabClick(item)}
+                      className={`${
+                        item.label === activeMode
+                          ? "dark:border-gray-600 border-gray-300 border-2"
+                          : ""
+                      }  rounded-lg p-4 cursor-pointer text-black dark:text-white bg-white dark:bg-gray-800 shadow-md`}
+                    >
+                      <div
+                        className={`w-full h-20 ${
+                          item.color === "white" ? "bg-white border-gray-600" : "bg-black border-gray-600"
+                        } rounded-lg mb-2 border`}
+                      ></div>
+                      <p className="text-sm font-medium text-center">
+                        {item.label}
+                      </p>
+                    </div>
+                    {/* <div
+                      className={`border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-gray-300`}
+                    >
+                      <div className="w-full h-20 bg-gray-800 rounded mb-2"></div>
+                      <p className="text-sm font-medium text-center">Dark</p>
+                    </div> */}
+                  </>
+                ))}
               </div>
             </div>
           </div>
