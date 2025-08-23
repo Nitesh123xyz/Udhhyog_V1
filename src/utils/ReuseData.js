@@ -537,6 +537,6 @@ export const menuItems = [
 // Theme Mode
 
 export const ActiveTheme = [
-  { label: "Light", value: true, color: "white" },
-  { label: "Dark", value: false, color: "black" },
+  { label: "light", value: true, color: "white" },
+  { label: "dark", value: false, color: "black" },
 ];

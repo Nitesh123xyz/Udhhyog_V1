@@ -4,33 +4,30 @@ import { Link } from "react-router-dom";
 
 const PageNotFound = () => {
   return (
-    <div className="min-h-screen rounded-2xl bg-white dark:bg-gray-800 text-yellow-400 flex  justify-center">
-      <div className="text-center mt-20">
-        {/* 404 Text */}
-        <h1 className="text-6xl md:text-[10rem] font-bold text-yellow-400 mb-4">
-          404
-        </h1>
-
-        {/* Message */}
-        <p className="text-xl md:text-2xl text-yellow-300 mb-8">
-          Page Not Found
-        </p>
+    <div className="h-[calc(100vh-62px)] rounded-2xl bg-[var(--background)] text-yellow-400 flex justify-center items-start">
+      <div className="text-center px-4">
+        {/* Centered Image */}
+        <img
+          src="/404.png" // replace with your image path
+          alt="Page Not Found"
+          className="mx-auto w-full max-w-[30rem] lg:max-w-[35rem]"
+        />
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-row gap-4 justify-center mt-5 md:mt-0">
           <Link
-            to="/"
-            className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 flex items-center justify-center space-x-2"
+            to="/Dashboard"
+            className="bg-[var(--icon_bg)] px-6 py-3 rounded-lg font-semibold flex items-center justify-center space-x-2"
           >
-            <Home className="w-5 h-5" />
-            <span>Home</span>
+            <Home className="w-5 h-5 text-[var(--icon_text)]" />
+            <span className="text-[var(--icon_text)]">Home</span>
           </Link>
           <Link
-            to="/"
-            className="border-2 border-yellow-400 text-yellow-400 px-6 py-3 rounded-lg font-semibold  flex items-center justify-center space-x-2"
+            to="/Dashboard"
+            className="border-2 bg-[var(--icon_bg)] border-yellow-400 text-yellow-400 px-6 py-3 rounded-lg font-semibold flex items-center justify-center space-x-2"
           >
-            <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
+            <ArrowLeft className="w-5 h-5 text-[var(--icon_text)]" />
+            <span className="text-[var(--icon_text)]">Back</span>
           </Link>
         </div>
       </div>

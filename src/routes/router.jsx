@@ -30,7 +30,7 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: "/login",
+        path: "/",
         element: <LoginPage />,
       },
       {
@@ -38,7 +38,7 @@ const router = createBrowserRouter([
         element: <ForgotPassword />,
       },
       {
-        path: "/",
+        path: "/Dashboard",
         element: <Dashboard />,
       },
       {

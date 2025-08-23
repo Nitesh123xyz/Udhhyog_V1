@@ -140,7 +140,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
         >
           <div className="flex items-center w-full">
             <Icon
-              className={`w-5 h-5 dark:text-white text-gray-800 ${
+              className={`w-5 h-5 text-[var(--text)] ${
                 isExpanded ? "mr-3" : "mr-0"
               }`}
             />
@@ -153,7 +153,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
               }
               className={`${
                 isExpanded ? "font-medium" : "hidden"
-              } dark:text-white`}
+              } text-[var(--text)]`}
             >
               {item.clickable ? (
                 <Link to={item.path}>
@@ -185,13 +185,9 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
           {item.hasSubmenu && (
             <div className={`ml-auto ${isExpanded ? "block" : "hidden"}`}>
               {isSectionExpanded ? (
-                <ChevronDown
-                  className={`w-4 h-4 text-gray-800 dark:text-white`}
-                />
+                <ChevronDown className={`w-4 h-4 text-[var(--text)]`} />
               ) : (
-                <ChevronRight
-                  className={`w-4 h-4 text-gray-800 dark:text-white`}
-                />
+                <ChevronRight className={`w-4 h-4 text-[var(--text)]`} />
               )}
             </div>
           )}
@@ -214,7 +210,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
     <nav
       onClick={() => setIsExpanded(true)}
       onMouseLeave={handleMouseLeave}
-      className={`bg-white/10 dark:bg-gray-800 backdrop-blur-md w-20 fixed z-[999] h-screen 
+      className={`bg-[var(--letSideNavbarBg)] backdrop-blur-md w-20 fixed z-[999] h-screen 
       shadow-xl flex flex-col 
       transition-all duration-300
       ${MobileNav ? "w-full" : "w-20"}

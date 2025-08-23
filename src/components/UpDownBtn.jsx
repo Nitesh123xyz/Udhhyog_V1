@@ -25,11 +25,11 @@ const UpDownBtn = () => {
     <>
       <div
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className={`fixed bottom-4 right-4 cursor-pointer bg-amber-400 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-linear ${
+        className={`fixed bottom-4 right-4 cursor-pointer bg-[var(--icon_bg)] w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-linear ${
           show ? "" : "hidden"
         }`}
       >
-        <ArrowUp size={22} />
+        <ArrowUp size={22} className="text-[var(--icon_text)]" />
       </div>
     </>
   );

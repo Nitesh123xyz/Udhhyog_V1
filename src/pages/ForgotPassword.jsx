@@ -41,7 +41,7 @@ const ForgotPassword = () => {
   // ------------------------------------------------------
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-centers justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
+    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-center justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
       <div className="absolute inset-0 opacity-30">
         <Animation />
@@ -50,7 +50,7 @@ const ForgotPassword = () => {
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         {/* Logo */}
         <div className="flex justify-center relative z-20">
-          <div className="ring-2 ring-gray-200 rounded-full">
+          <div className="outline-4 outline-gray-200 rounded-full">
             <img
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full"
               src="/logo.png"
@@ -62,7 +62,7 @@ const ForgotPassword = () => {
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+            <h1 className="text-[1.3rem] sm:text-[2rem] font-bold text-white mb-4">
               Forgot Password
             </h1>
             <p className="text-gray-100 text-[10px] lg:text-sm sm:text-base">
@@ -112,13 +112,13 @@ const ForgotPassword = () => {
 
             <div className="text-center pt-2 sm:pt-4">
               <p className="text-gray-100 text-sm sm:text-lg font-medium">
-                UDHHYOG.COM V1
+                UDHHYOG CRM V1
               </p>
             </div>
 
             <div className="text-center">
               <Link
-                to="/"
+                to="/login"
                 className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
               >
                 <ArrowLeft size={14} className="inline sm:w-4 sm:h-4" />

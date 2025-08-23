@@ -48,7 +48,7 @@ const Header = ({ rows, setRows }) => {
   };
 
   return (
-    <div className="bg-white/50 dark:bg-gray-800 backdrop-blur-md border border-white dark:border-gray-600 rounded-full w-full flex items-center justify-between px-2 lg:px-3 py-1.5 transition-all duration-300">
+    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-full w-full flex items-center justify-between px-2 lg:px-3 py-1.5 transition-all duration-300">
       {/* Left Side - Label */}
       <div className="flex items-center gap-4">
         <div className="bg-blue-100 px-2 py-3 uppercase rounded-2xl font-bold text-[0.8rem] md:text-md lg:text-[1rem] shadow-xs">
@@ -61,7 +61,9 @@ const Header = ({ rows, setRows }) => {
         <div
           className={`flex items-center gap-2 ${
             HideHeader ? "mr-0" : "mr-2"
-          } relative p-1 lg:border-1 lg:dark:border-gray-600 lg:border-gray-300 bg-white/50 dark:bg-gray-800 rounded-full ${openSearch ? "border-1 dark:border-gray-600 border-gray-300" : "border-0"}`}
+          } relative p-1 lg:border-1 lg:border-[var(--border)] bg-[var(--background)] rounded-full ${
+            openSearch ? "border-1 border-[var(--border)]" : "border-0"
+          }`}
         >
           <input
             type="text"
@@ -70,7 +72,7 @@ const Header = ({ rows, setRows }) => {
             onChange={handleSearch}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className={`bg-transparent text-sm text-black dark:text-white outline-0 placeholder:text-gray-400 px-1 transition-all duration-300
+            className={`bg-transparent text-sm text-[var(--text)] outline-0 placeholder:text-gray-400 px-1 transition-all duration-300
               ${
                 isFocused
                   ? "w-[5.5rem] md:w-[20rem] lg:w-[35rem]"

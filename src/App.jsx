@@ -7,22 +7,39 @@ const TopNavbar = lazy(() => import("./components/TopNavbar"));
 const LeftNavbar = lazy(() => import("./components/LeftNavbar"));
 const App = () => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login", "/forgot-password"];
+  const hideNavbarPaths = ["/", "/forgot-password"];
   const HideNavbar = hideNavbarPaths.includes(location.pathname);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // -------------------------------------------------------------------
 
   const [checkUser, { data, isLoading, isSuccess, error }] =
     useCheckingUserMutation();
 
   const { PinBar } = useSelector((state) => state.ExpendNavbar);
   const { MobileNav } = useSelector((state) => state.ExpendNavbar);
-
   const theme = useSelector((state) => state.theme.ThemeMode);
+
+  // -------------------------------------------------------------------
+
+  // Initiating Api Calling
+
+  const InitiateCalling = () => {
+    checkUser({ token: localStorage.getItem("token") });
+  };
+
+  useEffect(() => {
+    InitiateCalling();
+  }, []);
+
+  // -------------------------------------------------------------------
 
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
-    } else {
+      document.documentElement.classList.remove("light");
+    } else if (theme === "light") {
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);

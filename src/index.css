@@ -1,6 +1,45 @@
 @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+/* @custom-variant dark (&:where(.dark, .dark *)); */
 body {
   font-family: "Outfit", sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --text: #000;
+  --different_background: rgba(255, 255, 255, 0.5);
+  --letSideNavbarBg: rgba(255, 255, 255, 0.1);
+  --border: #d1d5db;
+  --foreground: #000000;
+  --transparent-50: #80ffffff;
+  --divide: #eeeeee;
+  --icon: #000;
+  --icon_text: #000;
+  --icon_bg: #facc15;
+  --hoverTable: #facc15;
+  --permissionTable: #f3f4f6;
+  --header_left: #dbeafe;
+  --header_right: #dbeafe;
+  --activeBg:  #f3f4f6;
+  --activeText: #000;
+}
+.dark {
+  --background: #1e2939; /* gray-600 */
+  --text: #fff;
+  --different_background: #1e2939;
+  --letSideNavbarBg: #1e2939;
+  --border: #4b5563;
+  --foreground: #f9fafb;
+  --transparent-50: #000;
+  --divide: #757575;
+  --icon: #fff;
+  --icon_text: #000;
+  --icon_bg: #facc15;
+  --hoverTable: rgba(255, 255, 255, 0.1);
+  --permissionTable: rgba(255, 255, 255, 0.1);
+  --header_left: #dbeafe;
+  --header_right: #dbeafe;
+  --activeBg:  rgba(255, 255, 255, 0.1);
+  --activeText: #ffffff;
 }

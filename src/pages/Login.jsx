@@ -45,7 +45,7 @@ const Login = () => {
   // ------------------------------------------------------
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-center justify-center px-4 py-9 sm:px-6 lg:px-8">
+    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
       <div className="absolute inset-0 opacity-30">
         <Animation />
@@ -54,7 +54,7 @@ const Login = () => {
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         {/* Logo */}
         <div className="flex justify-center relative z-20">
-          <div className="ring-2 ring-gray-200 rounded-full">
+          <div className="outline-4 outline-gray-200 rounded-full">
             <img
               className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-full"
               src="/logo.png"
@@ -65,11 +65,11 @@ const Login = () => {
 
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
-          <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 mt-2 md:mt-0">
-              Welcome
+          <div className="text-center mb-6 sm:mb-6">
+            <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
+              UDHHYOG CRM V1
             </h1>
-            <p className="text-gray-100 text-sm sm:text-base">
+            <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
               Log in to your account
             </p>
           </div>
@@ -79,7 +79,7 @@ const Login = () => {
             className="space-y-5 sm:space-y-6"
           >
             {/* Username Field */}
-            <div className="relative mb-8 sm:mb-10">
+            <div className="relative mb-8 sm:mb-8">
               <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <CircleUser className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>
@@ -97,7 +97,7 @@ const Login = () => {
             </div>
 
             {/* Password Field */}
-            <div className="relative mb-5">
+            <div className="relative mb-3">
               <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>
@@ -129,8 +129,7 @@ const Login = () => {
               )}
             </div>
 
-            {/* Forgot Password Link */}
-            <div className="flex items-end justify-end text-xs sm:text-sm">
+            <div className="flex mb-3 mt-0 items-end justify-end text-xs sm:text-sm">
               <Link
                 to="/forgot-password"
                 className="text-gray-100 hover:text-white transition-colors"
@@ -139,7 +138,6 @@ const Login = () => {
               </Link>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -155,21 +153,11 @@ const Login = () => {
               )}
             </button>
 
-            {/* Version Text */}
-            <div className="text-center pt-2 sm:pt-4">
-              <p className="text-gray-100 text-sm sm:text-lg font-medium">
-                UDHHYOG.COM V1
-              </p>
-            </div>
-
-            {/* Back Link */}
-            <div className="text-center pt-2">
+            <div className="text-center">
               <Link
                 to="/"
                 className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
               >
-                <span className="text-yellow-400">Back to</span>
-                <ArrowRight size={14} className="inline sm:w-4 sm:h-4" />
                 <span className="break-words">
                   Udhhyog - One Stop Shop for All Industrial Needs
                 </span>
