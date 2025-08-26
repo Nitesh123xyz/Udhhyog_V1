@@ -219,7 +219,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
       <div
         className={`transition-all duration-300 flex items-center justify-between md:justify-normal p-[0.5rem_0.9rem_1rem_0.9rem] md:p-[0.5rem_0.6rem_1rem_0.6rem]`}
       >
-        <Link to={"/"}>
+        <Link to={"/dashboard"}>
           <img
             src="/logo.png"
             alt="company_logo"

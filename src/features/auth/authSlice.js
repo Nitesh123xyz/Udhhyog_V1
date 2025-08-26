@@ -1,40 +1,43 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
 export const authSlice = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://api.udhhyog.com/v1" }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_BASE_URL }),
   endpoints: (builder) => ({
-    // get user profile
-    getUsers: builder.query({
-      query: () => "/test",
-    }),
-
-    checkingUser: builder.mutation({
-      query: (credentials) => ({
-        url: "/initiate",
-        method: "POST",
-        body: credentials,
-      }),
-    }),
     loginUser: builder.mutation({
-      query: (credentials) => ({
+      query: (credential) => ({
         url: "/login",
         method: "POST",
-        body: credentials,
+        body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
       }),
     }),
-
-    // 👇 Another GET endpoint
-    getProfile: builder.query({
-      query: () => "/profile",
+    forgotPassword: builder.mutation({
+      query: (credential) => ({
+        url: "/forget-password",
+        method: "POST",
+        body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
+      }),
+    }),
+    OTPVerification: builder.mutation({
+      query: (credential) => ({
+        url: "/verify-otp",
+        method: "POST",
+        body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
+      }),
+    }),
+    ChangePassword: builder.mutation({
+      query: (credential) => ({
+        url: "/change-password",
+        method: "POST",
+        body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
+      }),
     }),
   }),
 });
 
 // Export hooks
 export const {
-  useGetUsersQuery,
-  useGetProfileQuery,
-  useCheckingUserMutation,
   useLoginUserMutation,
+  useForgotPasswordMutation,
+  useOTPVerificationMutation,
+  useChangePasswordMutation,
 } = authSlice;

@@ -301,7 +301,7 @@ const Dashboard = () => {
 
   return (
     <div
-      className={`min-h-screen p-2 dark:bg-gray-800 bg-white/80 backdrop-blur-sm rounded-2xl`}
+      className={`min-h-screen p-2 bg-[var(--background)] backdrop-blur-sm rounded-2xl`}
     >
       <div className="mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
