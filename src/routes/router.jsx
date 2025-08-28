@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import App from "../App";
 import AddUser from "../pages/AddUser";
 import UpdateUser from "../pages/UpdateUser";
@@ -22,7 +22,17 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <LoginPage />,
+        element: (
+          <Suspense
+            fallback={
+              <div className="flex h-screen items-center justify-center font-bold text-[5rem]">
+                Loading...
+              </div>
+            }
+          >
+            <LoginPage />,
+          </Suspense>
+        ),
       },
       {
         path: "/reset-password",

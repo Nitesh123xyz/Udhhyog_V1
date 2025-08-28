@@ -1,6 +1,6 @@
 import React, { lazy, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { email, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -41,17 +41,20 @@ const Login = () => {
 
   // ------------------------------------------------------
 
-  const [login, { isLoading, isError, error }] = useLoginUserMutation();
+  const [login, { isLoading }] = useLoginUserMutation();
   const handleUserLogin = async (data) => {
     try {
-      const response = await login(data).unwrap();
-      setToken(response?.token);
-      if (response?.token) {
+      const { status, body } = await login(data).unwrap();
+      setToken(body?.token);
+      if (status === 200 && body?.token) {
         navigate("/dashboard", { replace: true });
       }
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.data?.status);
+    } catch (error) {
+      if (error?.status === 401) {
+        toast.error("Invalid Credentials");
+      } else {
+        toast.error("Something went wrong! Please try again.");
+      }
     }
   };
 

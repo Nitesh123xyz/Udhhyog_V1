@@ -2,9 +2,17 @@ import React, { lazy, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Footprints, Lock } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  Circle,
+  ShieldCheck,
+  Lock,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useChangePasswordMutation } from "../features/auth/authSlice";
+import toast from "react-hot-toast";
 // -------------------------------------------------------
 
 const Animation = lazy(() => import("../components/Animation"));
@@ -12,8 +20,13 @@ const Animation = lazy(() => import("../components/Animation"));
 
 // Zod Schema
 const PasswordChangeSchema = z.object({
-  password: z.string().nonempty("Password is required"),
-  // confirm_password: z.string().nonempty("Confirm Password is required"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(20, "Password must not exceed 20 characters")
+    .regex(/[A-Z]/, "Must include at least one uppercase letter")
+    .regex(/\d/, "Must include at least one number")
+    .regex(/[^\w\s]/, "Must include at least one special character (!@#$...)"),
 });
 
 const ChangePassword = ({ sharing_otp }) => {
@@ -29,28 +42,54 @@ const ChangePassword = ({ sharing_otp }) => {
   const {
     register: ResetPassword,
     handleSubmit,
-    formState: { errors },
+    watch,
+    formState: { errors, isValid, isSubmitting },
   } = useForm({
     resolver: zodResolver(PasswordChangeSchema),
+    mode: "onChange",
   });
+
+  const pwd = watch("password", "");
+
+  const requirements = [
+    {
+      id: "len",
+      label: "8–20 characters",
+      test: pwd.length >= 8 && pwd.length <= 20,
+    },
+    { id: "upper", label: "1 uppercase (A–Z)", test: /[A-Z]/.test(pwd) },
+    { id: "num", label: "1 number (0–9)", test: /\d/.test(pwd) },
+    {
+      id: "spec",
+      label: "1 special character (!@#$…)",
+      test: /[^\w\s]/.test(pwd),
+    },
+  ];
+
+  const passedCount = requirements.filter((r) => r.test).length;
+  const allPassed = passedCount === requirements.length;
+  const strengthPct = Math.round((passedCount / requirements.length) * 100);
 
   // ------------------------------------------------------
 
-  const [ChangePassword, { isLoading, isError, error }] =
-    useChangePasswordMutation();
+  const [ChangePassword, { isLoading }] = useChangePasswordMutation();
   const handlePasswordReset = async (data) => {
+    if (!sharing_otp) {
+      toast.error("OTP is missing. Please try again.");
+      return;
+    }
     try {
-      const response = await ChangePassword({
+      const { status } = await ChangePassword({
         ...data,
         otp: sharing_otp,
-      });
-      // console.log(response);
-      // console.log(response.ok);
-      navigate("/", { replace: true });
-    } catch (err) {
-      console.log(err);
-      // console.error(err);
-      // toast.error(err?.data?.status);
+      }).unwrap();
+      console.log(status);
+      if (status === 202) {
+        toast.success("Password Changed Successfully");
+        navigate("/", { replace: true });
+      }
+    } catch (error) {
+      toast.error(error.message || "Something went wrong! Please try again.");
     }
   };
 
@@ -92,25 +131,31 @@ const ChangePassword = ({ sharing_otp }) => {
             className="space-y-5 sm:space-y-6"
           >
             <div className="relative mb-10">
-              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+              <div className="absolute top-0 translate-y-[90%] left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>
 
               <input
                 type={showPassword.input1 ? "text" : "password"}
                 placeholder="Password"
-                autoComplete="off"
+                autoComplete="new-password"
                 className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
                   errors.password ? "border-red-500" : ""
                 }`}
                 {...ResetPassword("password")}
+                aria-describedby="password-help requirements"
               />
+
+              {/* Show/Hide button */}
               <button
                 type="button"
                 onClick={() =>
                   setShowPassword((pre) => ({ ...pre, input1: !pre.input1 }))
                 }
-                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                aria-label={
+                  showPassword.input1 ? "Hide password" : "Show password"
+                }
               >
                 {showPassword.input1 ? (
                   <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -118,51 +163,96 @@ const ChangePassword = ({ sharing_otp }) => {
                   <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </button>
+
+              {/* Inline error (from zod) */}
               {errors.password && (
                 <p className="absolute text-red-400 text-xs sm:text-sm mt-1 pl-2 -bottom-6 sm:-bottom-7">
                   {errors.password.message}
                 </p>
               )}
-            </div>
 
-            {/* <div className="relative mb-10">
-              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+              {/* Strength line */}
+              <div className="mt-3">
+                <div
+                  className={`w-full rounded-full transition-all duration-300 ${
+                    allPassed ? "h-2 bg-green-500/30" : "h-1.5 bg-white/10"
+                  }`}
+                >
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${
+                      allPassed ? "bg-green-500" : "bg-white/30"
+                    }`}
+                    style={{ width: `${strengthPct}%` }}
+                    aria-hidden
+                  />
+                </div>
+
+                {/* Strength badge */}
+                <div className="mt-2 flex items-center gap-2">
+                  <ShieldCheck
+                    className={`w-4 h-4 ${
+                      allPassed ? "text-green-400" : "text-gray-400"
+                    }`}
+                  />
+                  <span
+                    className={`text-xs ${
+                      allPassed ? "text-green-400" : "text-gray-300"
+                    }`}
+                  >
+                    Strength: {strengthPct}%
+                  </span>
+                </div>
               </div>
 
-              <input
-                type={showPassword.input2 ? "text" : "password"}
-                placeholder="Confirm Password"
-                autoComplete="off"
-                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
-                  errors.confirm_password ? "border-red-500" : ""
-                }`}
-                {...ResetPassword("confirm_password")}
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  setShowPassword((pre) => ({ ...pre, input2: !pre.input2 }))
-                }
-                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+              {/* Requirement checklist */}
+              <ul
+                id="requirements"
+                className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4"
+                aria-live="polite"
               >
-                {showPassword.input2 ? (
-                  <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
-              {errors.confirm_password && (
-                <p className="absolute text-red-400 text-xs sm:text-sm mt-1 pl-2 -bottom-6 sm:-bottom-7">
-                  {errors.confirm_password.message}
-                </p>
-              )}
-            </div> */}
+                {requirements.map((r) => (
+                  <li key={r.id} className="flex items-center gap-2">
+                    {r.test ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-gray-400" />
+                    )}
+                    <span
+                      className={`text-xs ${
+                        r.test ? "text-green-300" : "text-gray-300"
+                      }`}
+                    >
+                      {r.label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-            <button
+            {/* <button
               type="submit"
               disabled={isLoading}
               className="w-full py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  Reset...
+                </div>
+              ) : (
+                "Reset Password"
+              )}
+            </button> */}
+
+            <button
+              type="submit"
+              disabled={isLoading || !allPassed || !isValid || isSubmitting}
+              className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl text-white backdrop-blur-sm text-sm sm:text-base font-medium transition-all
+              ${
+                isLoading || !allPassed || !isValid || isSubmitting
+                  ? "bg-white/5 border border-white/10 cursor-not-allowed opacity-60"
+                  : "bg-white/1 border border-white/20 hover:bg-white/10 hover:border-white/30"
+              }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

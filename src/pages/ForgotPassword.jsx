@@ -1,4 +1,4 @@
-import React, { lazy, useState } from "react";
+import React, { lazy } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,14 +33,17 @@ const ForgotPassword = ({ setStep }) => {
     useForgotPasswordMutation();
   const handlePasswordReset = async (data) => {
     try {
-      const response = await ForgotPasswordRequest(data);
-      // console.log(response);
-      // console.log(response.ok);
-      setStep(2);
-    } catch (err) {
-      console.log(err);
-      // console.error(err);
-      // toast.error(err?.data?.status);
+      const { status } = await ForgotPasswordRequest(data).unwrap();
+      if (status === 202) {
+        toast.success("OTP sent to your email");
+        setStep(2);
+      }
+    } catch (error) {
+      if (error?.status === 401) {
+        toast.error("Invalid Email");
+      } else {
+        toast.error("Something went wrong! Please try again.");
+      }
     }
   };
 

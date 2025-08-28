@@ -7,7 +7,7 @@ import { useOTPVerificationMutation } from "../features/auth/authSlice";
 const Animation = lazy(() => import("../components/Animation"));
 
 const Otp = ({ setStep, setSharingOtp }) => {
-  const [otp, setOtp] = useState(Array(6).fill(""));
+  const [otpInput, setOtpInput] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
   const [time, setTime] = useState(1 * 60);
   const intervalRef = useRef(null);
@@ -20,7 +20,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
     clearErrors,
   } = useForm({
     defaultValues: {
-      otpString: "",
+      otp: "",
     },
     mode: "onSubmit",
   });
@@ -28,8 +28,8 @@ const Otp = ({ setStep, setSharingOtp }) => {
   // Keep hidden otpString in sync with visible boxes
   const syncOtpString = (arr) => {
     const joined = arr.join("");
-    setValue("otpString", joined, { shouldValidate: true });
-    if (joined.length === 6) clearErrors("otpString");
+    setValue("otp", joined, { shouldValidate: true });
+    if (joined.length === 6) clearErrors("otp");
   };
 
   // Handle normal typing (digits only, auto-advance)
@@ -37,9 +37,9 @@ const Otp = ({ setStep, setSharingOtp }) => {
     const raw = event.target.value;
     const value = raw.replace(/\D/g, "").slice(0, 1); // one digit max
 
-    const next = [...otp];
+    const next = [...otpInput];
     next[index] = value;
-    setOtp(next);
+    setOtpInput(next);
     syncOtpString(next);
 
     if (value && inputRefs.current[index + 1]) {
@@ -51,11 +51,11 @@ const Otp = ({ setStep, setSharingOtp }) => {
   const handleKeyDown = (index) => (event) => {
     if (event.key === "Backspace") {
       event.preventDefault();
-      const next = [...otp];
+      const next = [...otpInput];
 
       if (next[index]) {
         next[index] = "";
-        setOtp(next);
+        setOtpInput(next);
         syncOtpString(next);
         return;
       }
@@ -63,7 +63,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
       if (inputRefs.current[index - 1]) {
         inputRefs.current[index - 1].focus();
         next[index - 1] = "";
-        setOtp(next);
+        setOtpInput(next);
         syncOtpString(next);
       }
     }
@@ -75,11 +75,11 @@ const Otp = ({ setStep, setSharingOtp }) => {
     const pasteData = event.clipboardData.getData("text").replace(/\D/g, "");
     if (!pasteData) return;
 
-    const next = [...otp];
+    const next = [...otpInput];
     for (let i = 0; i < next.length; i++) {
       next[i] = pasteData[i] || "";
     }
-    setOtp(next);
+    setOtpInput(next);
     syncOtpString(next);
 
     // Focus last filled input
@@ -92,21 +92,21 @@ const Otp = ({ setStep, setSharingOtp }) => {
   const [OTPVerification, { isLoading, isError, error }] =
     useOTPVerificationMutation();
   const handleOTPVerification = async (data) => {
-    if (!data.otpString || data.otpString.length !== 6) return;
+    if (!data.otp || data.otp.length !== 6) return;
 
     try {
-      const response = await OTPVerification({
-        ...data,
-        otp: data.otpString,
-      });
-      // console.log(response);
-      // console.log(response.ok);
-      setStep(3);
-      setSharingOtp(data.otpString);
-    } catch (err) {
-      console.log(err);
-      // console.error(err);
-      // toast.error(err?.data?.status);
+      const { status } = await OTPVerification(data).unwrap();
+      if (status === 202) {
+        toast.success("OTP Verified");
+        setSharingOtp(data.otp);
+        setStep(3);
+      }
+    } catch (error) {
+      if (error?.status === 401) {
+        toast.error("Invalid OTP");
+      } else {
+        toast.error("Something went wrong! Please try again.");
+      }
     }
   };
 
@@ -172,7 +172,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
             >
               <input
                 type="hidden"
-                {...OtpVerify("otpString", {
+                {...OtpVerify("otp", {
                   validate: (v) =>
                     v && v.length === 6
                       ? true
@@ -181,7 +181,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
               />
 
               <div className="flex gap-2 sm:gap-4 justify-center items-center">
-                {otp.map((val, index) => (
+                {otpInput?.map((val, index) => (
                   <input
                     key={index}
                     type="text"
@@ -202,7 +202,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
               </div>
 
               <div className="text-red-400 flex  my-5">
-                {errors.otpString && <span>{errors.otpString.message}</span>}
+                {errors.otp && <span>{errors.otp.message}</span>}
                 {time > 0 ? (
                   <span className="ml-auto">{formattedTime}</span>
                 ) : (
