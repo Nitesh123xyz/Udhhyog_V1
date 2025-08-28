@@ -9,7 +9,7 @@ const Animation = lazy(() => import("../components/Animation"));
 const Otp = ({ setStep, setSharingOtp }) => {
   const [otpInput, setOtpInput] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
-  const [time, setTime] = useState(1 * 60);
+  const [time, setTime] = useState(60);
   const intervalRef = useRef(null);
 
   const {
@@ -120,22 +120,27 @@ const Otp = ({ setStep, setSharingOtp }) => {
     }
 
     intervalRef.current = setInterval(() => {
-      setTime((time) => Math.max(0, time - 1));
+      setTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(intervalRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [time]);
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
-  // Format the time for display
+  // ------------------------------------------------------
+
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
   const formattedTime = `${String(minutes).padStart(2, "0")}:${String(
     seconds
   ).padStart(2, "0")}`;
+
+  // --------------------------------------------------------
 
   return (
     <>
@@ -207,7 +212,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
                   <span className="ml-auto">{formattedTime}</span>
                 ) : (
                   <span
-                    onClick={setTime(60)}
+                    onClick={() => setTime(60)}
                     className="ml-auto cursor-pointer"
                   >
                     Send OTP

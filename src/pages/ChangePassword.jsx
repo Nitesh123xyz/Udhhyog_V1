@@ -26,7 +26,7 @@ const PasswordChangeSchema = z.object({
     .max(20, "Password must not exceed 20 characters")
     .regex(/[A-Z]/, "Must include at least one uppercase letter")
     .regex(/\d/, "Must include at least one number")
-    .regex(/[^\w\s]/, "Must include at least one special character (!@#$...)"),
+    .regex(/[^\w\s]/, "Must include at least one special character"),
 });
 
 const ChangePassword = ({ sharing_otp }) => {
@@ -83,13 +83,17 @@ const ChangePassword = ({ sharing_otp }) => {
         ...data,
         otp: sharing_otp,
       }).unwrap();
-      console.log(status);
+
       if (status === 202) {
         toast.success("Password Changed Successfully");
         navigate("/", { replace: true });
       }
     } catch (error) {
-      toast.error(error.message || "Something went wrong! Please try again.");
+      if (error?.status === 401) {
+        toast.error("OTP Expired or Invalid OTP Please Refresh the Page");
+      } else {
+        toast.error("Something went wrong! Please try again.");
+      }
     }
   };
 
@@ -228,21 +232,6 @@ const ChangePassword = ({ sharing_otp }) => {
                 ))}
               </ul>
             </div>
-
-            {/* <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Reset...
-                </div>
-              ) : (
-                "Reset Password"
-              )}
-            </button> */}
 
             <button
               type="submit"

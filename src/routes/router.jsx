@@ -25,12 +25,12 @@ const router = createBrowserRouter([
         element: (
           <Suspense
             fallback={
-              <div className="flex h-screen items-center justify-center font-bold text-[5rem]">
+              <div className="flex h-screen items-center justify-center font-bold text-sm lg:text-[5rem]">
                 Loading...
               </div>
             }
           >
-            <LoginPage />,
+            <LoginPage />
           </Suspense>
         ),
       },

@@ -10,9 +10,6 @@ const Permission = () => {
   // ----------------------------------------------
 
   const ToggleSwitch = ({ enabled, onChange }) => {
-    {
-      // console.log(enabled);
-    }
     return (
       <label
         className={`inline-flex items-center cursor-pointer ${
@@ -99,8 +96,6 @@ const Permission = () => {
       })
     );
   };
-
-  console.log(users);
 
   return (
     <>

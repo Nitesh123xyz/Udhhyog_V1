@@ -22,8 +22,7 @@ export const authSlice = createApi({
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,
-        headers: meta?.response?.headers,
-        body, // original backend payload (may be null)
+        body,
       }),
     }),
     forgotPassword: builder.mutation({
@@ -33,8 +32,7 @@ export const authSlice = createApi({
         body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
       }),
       transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0, // ✅ 202 here
-        requestId: meta?.response?.headers?.get("x-request-id") ?? null,
+        status: meta?.response?.status ?? 0,
         body,
       }),
     }),

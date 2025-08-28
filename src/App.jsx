@@ -75,7 +75,7 @@ const App = () => {
         </div>
       )}
 
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-[#e3e4e7] via-[#e7e7e7] to-[#f7eec4]">
+      <div className="flex-1 flex flex-col">
         <>
           <main className="flex-1 overflow-auto">
             {!HideNavbar && isPathExists && (

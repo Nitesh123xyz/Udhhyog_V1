@@ -99,8 +99,6 @@ const AddUser = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // console.log("Form Data:", formData);
-      // Encrypt and submit logic here
       setTimeout(() => {
         alert("Registration submitted successfully!");
         setIsSubmitting(false);

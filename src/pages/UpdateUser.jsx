@@ -71,8 +71,6 @@ export default function UpdateUser() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // console.log("Update Form Data:", formData);
-      // Update logic here
       setTimeout(() => {
         alert("Profile updated successfully!");
         setIsSubmitting(false);
