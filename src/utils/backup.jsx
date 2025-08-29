@@ -149,7 +149,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
     return (
       <div
         key={`${parentIndices.join("-")}-${index}`}
-        className={`ml-${level * 2}`}
+        className={`ml-${level * 4}`}
       >
         <div
           className={`flex items-center py-4 rounded-xl hover:bg-white/10 cursor-pointer transition-all duration-200 ${

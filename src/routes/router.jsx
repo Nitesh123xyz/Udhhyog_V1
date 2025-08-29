@@ -69,7 +69,7 @@ const router = createBrowserRouter([
         caseSensitive: true,
       },
       {
-        path: "/settings",
+        path: "/settings/profile",
         element: (
           <ProtectedRoute>
             <Setting />
