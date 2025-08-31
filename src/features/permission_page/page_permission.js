@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getToken } from "../../utils/AuthToken";
 
-export const utilsSlice = createApi({
-  reducerPath: "utilsApi",
+export const pagePermissionSlice = createApi({
+  reducerPath: "PagePermissionApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
     responseHandler: async (response) => {
@@ -15,11 +15,22 @@ export const utilsSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
-    leftSideNavigationMenu: builder.mutation({
+    pagePermissionList: builder.mutation({
       query: () => ({
-        url: "/main-menu",
+        url: "/page-permission",
         method: "POST",
-        body: { token: getToken() },
+        body: { token: getToken(), from_page: "dashboard" },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    UpdatePagePermission: builder.mutation({
+      query: (payload) => ({
+        url: "/page-permission/update",
+        method: "POST",
+        body: payload,
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,
@@ -29,4 +40,7 @@ export const utilsSlice = createApi({
   }),
 });
 
-export const { useLeftSideNavigationMenuMutation } = utilsSlice;
+export const {
+  usePagePermissionListMutation,
+  useUpdatePagePermissionMutation,
+} = pagePermissionSlice;

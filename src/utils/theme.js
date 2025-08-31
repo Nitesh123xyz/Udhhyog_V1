@@ -9,6 +9,7 @@ const themeSlice = createSlice({
   initialState,
   reducers: {
     toggleTheme: (state, action) => {
+      localStorage.setItem("ThemeMode", action.payload);
       state.ThemeMode = action.payload;
     },
   },

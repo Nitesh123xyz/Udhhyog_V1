@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronRight, ChevronDown, PinOff, Pin, X } from "lucide-react";
-import { menuItems } from "../utils/ReuseData";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -10,9 +9,9 @@ import {
 } from "../utils/ExpendNavbar";
 import "../css/commonLayout.css";
 import { useLeftSideNavigationMenuMutation } from "../features/utils/utilsSlice";
-import { getToken } from "../utils/AuthToken";
 import { setUserInfo } from "../utils/UserInfo";
-
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import transformMenu from "../utils/ReuseData";
 const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
   const [menuList, setMenuList] = useState([]);
   const leaveTimer = useRef(null);
@@ -35,21 +34,23 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
   const [LeftSideNavigationMenu, { isLoading }] =
     useLeftSideNavigationMenuMutation();
   const fetchMenu = async () => {
-    try {
-      const { status, body } = await LeftSideNavigationMenu({
-        token: getToken(),
-      }).unwrap();
-      if (status === 200) {
-        const { menu, emp_name, emp_profile } = body || {};
-        setMenuList(menu);
-        dispatch(setUserInfo({ emp_name, emp_profile }));
-      }
-    } catch (error) {
-      console.log(error);
+    const result = await fetchWithErrorHandling(() =>
+      LeftSideNavigationMenu().unwrap()
+    );
+
+    if (result.success) {
+      const { menu, emp_name, emp_profile } = result?.data || {};
+      const menuItems = transformMenu(menu);
+      console.log(menuItems);
+      setMenuList(menuItems);
+      console.log(menu);
+      dispatch(setUserInfo({ emp_name, emp_profile }));
+    } else {
+      console.log("Fetch failed:", result.error);
     }
   };
 
-  console.log(menuList);
+  // console.log(menuList);
 
   useEffect(() => {
     fetchMenu();
@@ -246,7 +247,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
       onClick={() => setIsExpanded(true)}
       onMouseLeave={handleMouseLeave}
       className={`bg-[var(--letSideNavbarBg)] backdrop-blur-md w-20 fixed z-[999] h-screen 
-      shadow-xl flex flex-col 
+      shadow-2xl flex flex-col 
       transition-all duration-300
       ${MobileNav ? "w-full" : "w-20"}
       ${isExpanded ? "w-[15rem]" : "w-20"}`}
@@ -283,7 +284,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
       </div>
 
       <div className="NavScroll px-3 flex-1 overflow-y-auto overflow-x-hidden">
-        {menuItems?.map((item, index) => renderMenuItem(item, index))}
+        {menuList?.map((item, index) => renderMenuItem(item, index))}
       </div>
 
       {!MobileNav && (
