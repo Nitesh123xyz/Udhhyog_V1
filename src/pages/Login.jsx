@@ -83,7 +83,7 @@ const Login = () => {
           {/* Header */}
           <div className="text-center mb-6 sm:mb-6">
             <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
-              UDHHYOG CRM V1
+              UDHHYOG CRM V1 Nitesh
             </h1>
             <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
               Log in to your account
