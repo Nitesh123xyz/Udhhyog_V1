@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { lazy, useEffect, useState } from "react";
+import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import { menuItems } from "./utils/ReuseData";
 // ---------------------------------------------------
@@ -22,7 +22,6 @@ const App = () => {
 
   const { PinBar } = useSelector((state) => state.ExpendNavbar);
   const { MobileNav } = useSelector((state) => state.ExpendNavbar);
-  const theme = useSelector((state) => state.theme.ThemeMode);
 
   // -------------------------------------------------------------------
 
@@ -46,16 +45,6 @@ const App = () => {
   const isPathExists = pathSet.has(location.pathname);
 
   // -------------------------------------------------------------------
-
-  useEffect(() => {
-    if (theme === "dark") {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else if (theme === "light") {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
-  }, [theme]);
 
   return (
     <div className="flex min-h-screen">
