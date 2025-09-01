@@ -8,16 +8,13 @@ import {
   Check,
 } from "lucide-react";
 import { ActiveTheme } from "../utils/ReuseData";
-import { toggleTheme } from "../utils/theme";
-import { useDispatch } from "react-redux";
+
 const Setting = () => {
   const [activeTab, setActiveTab] = useState("account");
   const [activeMode, setActiveMode] = useState("light");
   const [copy, setCopy] = useState(false);
-  const dispatch = useDispatch();
 
   const handleTabClick = (Info) => {
-    dispatch(toggleTheme(Info.label));
     setActiveMode(Info.label);
   };
 

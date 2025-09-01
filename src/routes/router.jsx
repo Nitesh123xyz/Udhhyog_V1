@@ -4,6 +4,7 @@ import App from "../App";
 import AddUser from "../pages/AddUser";
 import UpdateUser from "../pages/UpdateUser";
 import ProtectedRoute from "../components/ProtectedRoute";
+import SessionExpired from "../pages/SessionExpired";
 
 // ---------------------------------------------------
 
@@ -94,6 +95,10 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         caseSensitive: true,
+      },
+      {
+        path: "/session-expired",
+        element: <SessionExpired />,
       },
       {
         path: "*",

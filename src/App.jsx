@@ -1,10 +1,12 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
-import { menuItems } from "./utils/ReuseData";
+import { useMenu } from "./components/useMenu";
+
 // ---------------------------------------------------
 const TopNavbar = lazy(() => import("./components/TopNavbar"));
 const LeftNavbar = lazy(() => import("./components/LeftNavbar"));
+
 const App = () => {
   const location = useLocation();
   const hideNavbarPaths = [
@@ -14,43 +16,39 @@ const App = () => {
     "/reset-password",
     "/verify-otp",
     "/request-password-reset",
+    "/session-expired",
   ];
   const HideNavbar = hideNavbarPaths.includes(location.pathname);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { PinBar, MobileNav } = useSelector((state) => state.ExpendNavbar);
 
   // -------------------------------------------------------------------
-
-  const { PinBar } = useSelector((state) => state.ExpendNavbar);
-  const { MobileNav } = useSelector((state) => state.ExpendNavbar);
-
+  const { menuList } = useMenu(); // Custom hook to fetch Left Side Navigation Menu
   // -------------------------------------------------------------------
 
-  // LookUPPaths
-
-  const getAllPath = (items) => {
-    let paths = [];
+  const getAllPath = (items = []) => {
+    const paths = [];
     for (const item of items) {
-      if (item.path) {
-        paths.push(item.path);
-      }
-      if (item.submenu && item.submenu.length > 0) {
+      if (item?.path) paths.push(item.path);
+      if (Array.isArray(item?.submenu) && item.submenu.length > 0) {
         paths.push(...getAllPath(item.submenu));
       }
     }
     return paths;
   };
 
-  const allPaths = getAllPath(menuItems);
-  const pathSet = new Set(allPaths);
-  const isPathExists = pathSet.has(location.pathname);
+  const allPaths = getAllPath(menuList);
+  // If menu not loaded yet, don't hide content purely due to missing paths
+  const isPathExists =
+    allPaths.length > 0 ? new Set(allPaths).has(location.pathname) : true;
 
   // -------------------------------------------------------------------
 
   return (
     <div className="flex min-h-screen">
-      {!HideNavbar && isPathExists && (
+      {!HideNavbar && isPathExists && menuList.length > 0 && (
         <div
-          className={`transition-all duration-300  lg:block ${
+          className={`transition-all duration-300 lg:block ${
             PinBar
               ? "lg:w-[15rem]"
               : `${MobileNav ? "w-[15rem]" : "hidden"} lg:w-20`
@@ -60,28 +58,27 @@ const App = () => {
             MobileNav={MobileNav}
             isExpanded={isExpanded}
             setIsExpanded={setIsExpanded}
+            menuList={menuList}
           />
         </div>
       )}
 
       <div className="flex-1 flex flex-col">
-        <>
-          <main className="flex-1 overflow-auto">
-            {!HideNavbar && isPathExists && (
-              <div className="px-0 lg:px-[0.2rem]">
-                <TopNavbar setIsExpanded={setIsExpanded} />
-              </div>
-            )}
+        <main className="flex-1 overflow-auto">
+          {!HideNavbar && isPathExists && (
+            <div className="px-0 lg:px-[0.2rem]">
+              <TopNavbar setIsExpanded={setIsExpanded} />
+            </div>
+          )}
 
-            {!HideNavbar ? (
-              <div className="lg:px-1 py-[0.1rem]">
-                <Outlet />
-              </div>
-            ) : (
+          {!HideNavbar ? (
+            <div className="lg:px-1 py-[0.1rem]">
               <Outlet />
-            )}
-          </main>
-        </>
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </main>
       </div>
     </div>
   );

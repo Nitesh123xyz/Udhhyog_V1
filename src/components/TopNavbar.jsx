@@ -3,12 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavarMobileOpenClose } from "../utils/ExpendNavbar";
 import { useState } from "react";
 import ProfilePop from "./ProfilePop";
+import { getUserInfo } from "../utils/StoreSessionInfo";
 
 const TopNavbar = ({ setIsExpanded }) => {
   const dispatch = useDispatch();
   const width = window.innerWidth;
   const [openPopup, setOpenPopup] = useState(false);
-  const { emp_profile } = useSelector((state) => state?.user?.userInfo) || {};
+  const { emp_name, emp_profile } = getUserInfo() || {};
 
   const handleToggle = () => {
     if (width > 992) return;
@@ -36,7 +37,10 @@ const TopNavbar = ({ setIsExpanded }) => {
           onClick={() => setOpenPopup((popup) => !popup)}
           className="flex items-center gap-4"
         >
-          <p className="text-sm text-[var(--text)]">{emp_profile}</p>
+          <div className="flex flex-col">
+            <p className="text-sm text-[var(--text)]">{emp_profile}</p>
+            <p className="text-sm text-[var(--text)]">{emp_name}</p>
+          </div>
           <div className="w-10 h-10 bg-[var(--icon_bg)] rounded-full flex flex-col items-center justify-center text-xs font-semibold shadow-md hover:scale-105 transition-transform">
             <User size={16} className="text-[var(--icon_text)]" />
           </div>

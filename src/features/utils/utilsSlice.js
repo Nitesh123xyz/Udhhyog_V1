@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getToken } from "../../utils/AuthToken";
+import { getToken } from "../../utils/StoreSessionInfo";
 
 export const utilsSlice = createApi({
   reducerPath: "utilsApi",

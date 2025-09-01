@@ -7,13 +7,9 @@ import {
   PinBar,
   trackCurrentTabAndLink,
 } from "../utils/ExpendNavbar";
-import "../css/commonLayout.css";
-import { useLeftSideNavigationMenuMutation } from "../features/utils/utilsSlice";
-import { setUserInfo } from "../utils/UserInfo";
-import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import transformMenu from "../utils/ReuseData";
-const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
-  const [menuList, setMenuList] = useState([]);
+// import "../css/commonLayout.css";
+
+const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
   const leaveTimer = useRef(null);
   const [pineBar, setPineBar] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
@@ -25,36 +21,8 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav }) => {
 
   // ------------------------------------------------------------------
 
-  const dispatch = useDispatch();
-
   const width = window.innerWidth;
-
-  // ------------------------------------------------------------------
-
-  const [LeftSideNavigationMenu, { isLoading }] =
-    useLeftSideNavigationMenuMutation();
-  const fetchMenu = async () => {
-    const result = await fetchWithErrorHandling(() =>
-      LeftSideNavigationMenu().unwrap()
-    );
-
-    if (result.success) {
-      const { menu, emp_name, emp_profile } = result?.data || {};
-      const menuItems = transformMenu(menu);
-      console.log(menuItems);
-      setMenuList(menuItems);
-      console.log(menu);
-      dispatch(setUserInfo({ emp_name, emp_profile }));
-    } else {
-      console.log("Fetch failed:", result.error);
-    }
-  };
-
-  // console.log(menuList);
-
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  const dispatch = useDispatch();
 
   // ------------------------------------------------------------------
 

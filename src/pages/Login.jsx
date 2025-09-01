@@ -5,8 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../features/auth/authSlice";
-import toast from "react-hot-toast";
-import { getToken, setToken } from "../utils/AuthToken";
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import { getToken, setToken } from "../utils/StoreSessionInfo";
+
 // -------------------------------------------------------
 
 const Animation = lazy(() => import("../components/Animation"));
@@ -43,18 +44,13 @@ const Login = () => {
 
   const [login, { isLoading }] = useLoginUserMutation();
   const handleUserLogin = async (data) => {
-    try {
-      const { status, body } = await login(data).unwrap();
-      setToken(body?.token);
-      if (status === 200 && body?.token) {
-        navigate("/dashboard", { replace: true });
-      }
-    } catch (error) {
-      if (error?.status === 401) {
-        toast.error("Invalid Credentials");
-      } else {
-        toast.error("Something went wrong! Please try again.");
-      }
+    const result = await fetchWithErrorHandling(() => login(data).unwrap());
+    if (result.success) {
+      const { token } = result?.data || {};
+      setToken(token);
+      navigate("/dashboard", { replace: true });
+    } else {
+      console.log("Fetch failed:");
     }
   };
 
@@ -63,7 +59,7 @@ const Login = () => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
-      <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-60">
         <Animation />
       </div>
 

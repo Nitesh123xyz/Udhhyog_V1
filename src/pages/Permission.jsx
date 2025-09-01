@@ -5,6 +5,7 @@ import {
   usePagePermissionListMutation,
   useUpdatePagePermissionMutation,
 } from "../features/permission_page/page_permission";
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
 
 const clone = (x) => structuredClone(x); // deep clone utility
 
@@ -77,20 +78,19 @@ const Permission = () => {
   // --------------------- Fetch data --------------------
   useEffect(() => {
     (async () => {
-      try {
-        const { status, body } = await PagePermissionList().unwrap();
-        if (status === 200) {
-          const { permission = [] } = body || {};
-          // Expecting: [{page_id, page_name, view, edit, add, delete}, ...]
-          setRows(permission);
-          originalRef.current = clone(permission);
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load permissions.");
+      const result = await fetchWithErrorHandling(() =>
+        PagePermissionList().unwrap()
+      );
+
+      if (result.success) {
+        const { permission = [] } = result?.data || {};
+        // Expecting: [{page_id, page_name, view, edit, add, delete}, ...]
+        setRows(permission);
+        originalRef.current = clone(permission);
+      } else {
+        console.log("Fetch failed:", result.error);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalChanged = useMemo(

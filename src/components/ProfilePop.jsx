@@ -1,7 +1,7 @@
 import { User, HelpCircle, LogOut, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { setToken } from "../utils/AuthToken";
 import { useEffect, useRef, useState } from "react";
+import { clearSession } from "../utils/StoreSessionInfo";
 
 const ProfilePop = ({ openPopup, setOpenPopup }) => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const ProfilePop = ({ openPopup, setOpenPopup }) => {
     if (!item.clickable) return;
 
     if (item.isLogout) {
-      setToken(null);
+      clearSession();
       navigate("/");
     } else if (item.path) {
       navigate(item.path);
