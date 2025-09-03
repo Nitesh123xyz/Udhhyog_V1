@@ -1,9 +1,9 @@
 import { User, HelpCircle, LogOut, Sun, Moon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { clearSession } from "../utils/StoreSessionInfo";
+import { clearAllSession } from "../utils/StoreSessionInfo";
 
-const ProfilePop = ({ openPopup, setOpenPopup }) => {
+const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
   const navigate = useNavigate();
   const boxRef = useRef(null);
   const closeTimerRef = useRef(null);
@@ -17,7 +17,7 @@ const ProfilePop = ({ openPopup, setOpenPopup }) => {
     if (!item.clickable) return;
 
     if (item.isLogout) {
-      clearSession();
+      clearAllSession();
       navigate("/");
     } else if (item.path) {
       navigate(item.path);
@@ -160,4 +160,4 @@ const ProfilePop = ({ openPopup, setOpenPopup }) => {
   );
 };
 
-export default ProfilePop;
+export default DropDownProfileMenu;

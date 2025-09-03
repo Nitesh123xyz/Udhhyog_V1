@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useOTPVerificationMutation } from "../features/auth/authSlice";
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import { showCustomToast } from "../components/CustomToast";
 
 const Animation = lazy(() => import("../components/Animation"));
 
@@ -94,18 +96,17 @@ const Otp = ({ setStep, setSharingOtp }) => {
   const handleOTPVerification = async (data) => {
     if (!data.otp || data.otp.length !== 6) return;
 
-    try {
-      const { status } = await OTPVerification(data).unwrap();
-      if (status === 202) {
-        toast.success("OTP Verified");
-        setSharingOtp(data.otp);
-        setStep(3);
-      }
-    } catch (error) {
-      if (error?.status === 401) {
-        toast.error("Invalid OTP");
-      } else {
-        toast.error("Something went wrong! Please try again.");
+    const { success, status } = await fetchWithErrorHandling(() =>
+      OTPVerification(data).unwrap()
+    );
+
+    if (success) {
+      showCustomToast("OTP Verified Successfully", "/success.gif", "Success");
+      setSharingOtp(data.otp);
+      setStep(3);
+    } else {
+      if (status === 401) {
+        showCustomToast("Invalid OTP Try Again", "/error.gif", "Error");
       }
     }
   };

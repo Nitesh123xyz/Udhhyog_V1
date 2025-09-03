@@ -13,31 +13,35 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useChangePasswordMutation } from "../features/auth/authSlice";
 import toast from "react-hot-toast";
-// -------------------------------------------------------
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import { showCustomToast } from "../components/CustomToast";
 
 const Animation = lazy(() => import("../components/Animation"));
-// -------------------------------------------------------
 
-// Zod Schema
-const PasswordChangeSchema = z.object({
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(20, "Password must not exceed 20 characters")
-    .regex(/[A-Z]/, "Must include at least one uppercase letter")
-    .regex(/\d/, "Must include at least one number")
-    .regex(/[^\w\s]/, "Must include at least one special character"),
-});
+// ---------------- Zod Schema ----------------
+const PasswordChangeSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(20, "Password must not exceed 20 characters")
+      .regex(/[A-Z]/, "Must include at least one uppercase letter")
+      .regex(/\d/, "Must include at least one number")
+      .regex(/[^\w\s]/, "Must include at least one special character"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords not matching",
+  });
 
 const ChangePassword = ({ sharing_otp }) => {
   const [showPassword, setShowPassword] = useState({
-    input1: false,
-    input2: false,
+    input1: false, // password
+    input2: false, // confirm password
   });
 
   const navigate = useNavigate();
-
-  // ------------------------------------------------------
 
   const {
     register: ResetPassword,
@@ -47,10 +51,14 @@ const ChangePassword = ({ sharing_otp }) => {
   } = useForm({
     resolver: zodResolver(PasswordChangeSchema),
     mode: "onChange",
+    defaultValues: { password: "", confirmPassword: "" },
   });
 
   const pwd = watch("password", "");
+  const confirmPwd = watch("confirmPassword", "");
+  const passwordsMatch = !!confirmPwd && pwd === confirmPwd;
 
+  // Strength + requirements (based on password only)
   const requirements = [
     {
       id: "len",
@@ -65,39 +73,43 @@ const ChangePassword = ({ sharing_otp }) => {
       test: /[^\w\s]/.test(pwd),
     },
   ];
-
   const passedCount = requirements.filter((r) => r.test).length;
   const allPassed = passedCount === requirements.length;
   const strengthPct = Math.round((passedCount / requirements.length) * 100);
 
-  // ------------------------------------------------------
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
-  const [ChangePassword, { isLoading }] = useChangePasswordMutation();
   const handlePasswordReset = async (data) => {
     if (!sharing_otp) {
       toast.error("OTP is missing. Please try again.");
       return;
     }
-    try {
-      const { status } = await ChangePassword({
-        ...data,
-        otp: sharing_otp,
-      }).unwrap();
 
-      if (status === 202) {
-        toast.success("Password Changed Successfully");
-        navigate("/", { replace: true });
-      }
-    } catch (error) {
-      if (error?.status === 401) {
-        toast.error("OTP Expired or Invalid OTP Please Refresh the Page");
-      } else {
-        toast.error("Something went wrong! Please try again.");
-      }
+    const { success, status } = await fetchWithErrorHandling(() =>
+      changePassword({
+        ...data, // { password, confirmPassword }
+        otp: sharing_otp,
+      }).unwrap()
+    );
+
+    if (success) {
+      showCustomToast(
+        "Password Changed Successfully",
+        "/success.gif",
+        "Success"
+      );
+      navigate("/", { replace: true });
+    } else if (status === 401) {
+      showCustomToast(
+        "OTP Expired or Invalid. Please refresh the page",
+        "/error.gif",
+        "Error"
+      );
     }
   };
 
-  // ------------------------------------------------------
+  const canSubmit =
+    isValid && !isSubmitting && !isLoading && allPassed && passwordsMatch;
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
@@ -134,7 +146,8 @@ const ChangePassword = ({ sharing_otp }) => {
             onSubmit={handleSubmit(handlePasswordReset)}
             className="space-y-5 sm:space-y-6"
           >
-            <div className="relative mb-10">
+            {/* Password (Line 1) */}
+            <div className="relative">
               <div className="absolute top-0 translate-y-[90%] left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
               </div>
@@ -150,33 +163,103 @@ const ChangePassword = ({ sharing_otp }) => {
                 aria-describedby="password-help requirements"
               />
 
-              {/* Show/Hide button */}
-              <button
-                type="button"
-                onClick={() =>
-                  setShowPassword((pre) => ({ ...pre, input1: !pre.input1 }))
-                }
-                className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
-                aria-label={
-                  showPassword.input1 ? "Hide password" : "Show password"
-                }
-              >
-                {showPassword.input1 ? (
-                  <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
+              {passwordsMatch ? (
+                <span
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-green-400"
+                  aria-label="Passwords match"
+                >
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((pre) => ({ ...pre, input1: !pre.input1 }))
+                  }
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                  aria-label={
+                    showPassword.input1
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                >
+                  {showPassword.input1 ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
+                </button>
+              )}
 
-              {/* Inline error (from zod) */}
+              {/* Inline error */}
               {errors.password && (
-                <p className="absolute text-red-400 text-xs sm:text-sm mt-1 pl-2 -bottom-6 sm:-bottom-7">
+                <p className="absolute text-red-400 text-xs sm:text-sm inset-auto">
                   {errors.password.message}
                 </p>
               )}
+            </div>
 
-              {/* Strength line */}
-              <div className="mt-3">
+            {/* Confirm Password (Line 2) */}
+            <div className="relative">
+              <div className="absolute top-0 translate-y-[90%] left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+              </div>
+
+              <input
+                type={showPassword.input2 ? "text" : "password"}
+                placeholder="Confirm password"
+                autoComplete="new-password"
+                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
+                  errors.confirmPassword ? "border-red-500" : ""
+                }`}
+                {...ResetPassword("confirmPassword")}
+                aria-describedby="confirm-password-help"
+              />
+
+              {/* Right-side icon logic for Confirm:
+                  - If passwords match: show green check, no toggle.
+                  - Else: show Eye/EyeOff toggle.
+              */}
+              {passwordsMatch ? (
+                <span
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-green-400"
+                  aria-label="Passwords match"
+                >
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword((pre) => ({ ...pre, input2: !pre.input2 }))
+                  }
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                  aria-label={
+                    showPassword.input2
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                >
+                  {showPassword.input2 ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
+                  )}
+                </button>
+              )}
+
+              {/* Inline error for confirm */}
+              {errors.confirmPassword && (
+                <p className="absolute text-red-400 text-xs sm:text-sm inset-auto">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* Strength + Checklist (Below both fields) */}
+            <div className="space-y-3">
+              {/* Strength bar */}
+              <div>
                 <div
                   className={`w-full rounded-full transition-all duration-300 ${
                     allPassed ? "h-2 bg-green-500/30" : "h-1.5 bg-white/10"
@@ -211,7 +294,7 @@ const ChangePassword = ({ sharing_otp }) => {
               {/* Requirement checklist */}
               <ul
                 id="requirements"
-                className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4"
                 aria-live="polite"
               >
                 {requirements.map((r) => (
@@ -233,12 +316,13 @@ const ChangePassword = ({ sharing_otp }) => {
               </ul>
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
-              disabled={isLoading || !allPassed || !isValid || isSubmitting}
+              disabled={!canSubmit}
               className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl text-white backdrop-blur-sm text-sm sm:text-base font-medium transition-all
               ${
-                isLoading || !allPassed || !isValid || isSubmitting
+                !canSubmit
                   ? "bg-white/5 border border-white/10 cursor-not-allowed opacity-60"
                   : "bg-white/1 border border-white/20 hover:bg-white/10 hover:border-white/30"
               }`}

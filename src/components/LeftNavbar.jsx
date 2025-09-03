@@ -7,7 +7,7 @@ import {
   PinBar,
   trackCurrentTabAndLink,
 } from "../utils/ExpendNavbar";
-// import "../css/commonLayout.css";
+import "../css/commonLayout.css";
 
 const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
   const leaveTimer = useRef(null);

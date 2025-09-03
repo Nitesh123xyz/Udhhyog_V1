@@ -40,9 +40,23 @@ export const getSessionExpire = () =>
   JSON.parse(localStorage.getItem(SessionExpire)) || null;
 
 export const clearSession = () => {
+  const theme = localStorage.getItem("ThemeMode");
+  const expire = localStorage.getItem(SessionExpire);
   sessionStorage.clear();
-  localStorage.removeItem("CurrentLabel");
-  localStorage.removeItem(SessionExpire);
+  localStorage.clear();
+  if (theme) {
+    localStorage.setItem("ThemeMode", theme);
+    localStorage.setItem("SessionExpire", expire);
+  }
+};
+
+export const clearAllSession = () => {
+  const theme = localStorage.getItem("ThemeMode");
+  sessionStorage.clear();
+  localStorage.clear();
+  if (theme) {
+    localStorage.setItem("ThemeMode", theme);
+  }
 };
 
 // ------------------------------------------------------

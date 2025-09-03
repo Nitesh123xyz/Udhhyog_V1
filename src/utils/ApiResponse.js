@@ -1,30 +1,46 @@
-import toast from "react-hot-toast";
-import { UNSAFE_createBrowserHistory } from "react-router-dom";
 import { clearSession, setSessionExpire } from "./StoreSessionInfo";
+import { showCustomToast } from "../components/CustomToast";
 
-export const history = UNSAFE_createBrowserHistory();
-
-export const fetchWithErrorHandling = async (fetchFunction, options = {}) => {
+export const fetchWithErrorHandling = async (fetchFunction = () => {}) => {
   try {
     const { status, body } = await fetchFunction();
 
     if (status === 200) {
-      return { success: true, data: body };
+      return { success: true, status, ApiData: body };
+    } else if (status === 202) {
+      return { success: true, status };
     } else {
-      throw new Error(`Request failed with status ${status}`);
+      showCustomToast(
+        `Something went wrong! Please try again. status: ${status}`,
+        "/error.gif",
+        "Error"
+      );
     }
   } catch (error) {
     const { status } = error || {};
     if (status === 401) {
-      toast.error("Unauthorized Access Please Login Again");
+      return { success: false, status };
     } else if (status === 403) {
-      toast.error("Something went wrong Please Contact Technical Staff");
+      showCustomToast(
+        "Something went wrong Please Contact Technical Staff",
+        "/error.gif",
+        "Error"
+      );
     } else if (status === 406) {
-      toast.error("Session Expired Please Login Again");
+      showCustomToast(
+        "Session Expired Please Login Again",
+        "/error.gif",
+        "Error"
+      );
       setSessionExpire(true);
       clearSession();
       window.location.href = "/session-expired";
+    } else {
+      showCustomToast(
+        `Something went wrong! Please try again. status: ${status}`,
+        "/error.gif",
+        "Error"
+      );
     }
-    return { success: false, status: error?.status };
   }
 };

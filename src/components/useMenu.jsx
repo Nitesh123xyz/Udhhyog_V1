@@ -15,12 +15,12 @@ export const useMenu = () => {
   const [LeftSideNavigationMenu] = useLeftSideNavigationMenuMutation();
 
   const fetchMenu = async () => {
-    const result = await fetchWithErrorHandling(() =>
+    const { success, ApiData } = await fetchWithErrorHandling(() =>
       LeftSideNavigationMenu().unwrap()
     );
 
-    if (result.success) {
-      const { menu, emp_name, emp_profile } = result?.data || {};
+    if (success) {
+      const { menu, emp_name, emp_profile } = ApiData || {};
       setLeftSideNavigationMenu(Array.isArray(menu) ? menu : []);
       const menuItems = transformMenu(Array.isArray(menu) ? menu : []);
       setMenuList(menuItems);

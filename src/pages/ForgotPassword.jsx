@@ -5,7 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleUser, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useForgotPasswordMutation } from "../features/auth/authSlice";
-import toast from "react-hot-toast";
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import { showCustomToast } from "../components/CustomToast";
 
 // ----------------------------------------------------
 const Animation = lazy(() => import("../components/Animation"));
@@ -29,20 +30,21 @@ const ForgotPassword = ({ setStep }) => {
 
   // ------------------------------------------------------
 
-  const [ForgotPasswordRequest, { isLoading, isError, error }] =
-    useForgotPasswordMutation();
+  const [ForgotPasswordRequest, { isLoading }] = useForgotPasswordMutation();
   const handlePasswordReset = async (data) => {
-    try {
-      const { status } = await ForgotPasswordRequest(data).unwrap();
-      if (status === 202) {
-        toast.success("OTP sent to your email");
-        setStep(2);
-      }
-    } catch (error) {
-      if (error?.status === 401) {
-        toast.error("Invalid Email");
-      } else {
-        toast.error("Something went wrong! Please try again.");
+    const { success, status } = await fetchWithErrorHandling(() =>
+      ForgotPasswordRequest(data).unwrap()
+    );
+    if (success) {
+      showCustomToast(
+        "OTP Sent Successfully, Please check your email",
+        "/success.gif",
+        "Success"
+      );
+      setStep(2);
+    } else {
+      if (status === 401) {
+        showCustomToast("Invalid Email Address", "/error.gif", "Error");
       }
     }
   };

@@ -64,9 +64,15 @@ const App = () => {
       )}
 
       <div className="flex-1 flex flex-col">
-        <main className="flex-1 overflow-auto">
+        <main
+          className="flex-1 overflow-auto"
+          style={{
+            background:
+              "conic-gradient(from 180deg at 50% 50%, #4facfe, #00f2fe, #43e97b, #f8ffae, #4facfe)",
+          }}
+        >
           {!HideNavbar && isPathExists && (
-            <div className="px-0 lg:px-[0.2rem]">
+            <div className="px-0 lg:px-[0.3rem] sticky top-0 z-50">
               <TopNavbar setIsExpanded={setIsExpanded} />
             </div>
           )}

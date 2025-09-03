@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../utils/ApiResponse";
 import { getToken, setToken } from "../utils/StoreSessionInfo";
+import { showCustomToast } from "../components/CustomToast";
 
 // -------------------------------------------------------
 
@@ -44,13 +45,19 @@ const Login = () => {
 
   const [login, { isLoading }] = useLoginUserMutation();
   const handleUserLogin = async (data) => {
-    const result = await fetchWithErrorHandling(() => login(data).unwrap());
-    if (result.success) {
-      const { token } = result?.data || {};
-      setToken(token);
-      navigate("/dashboard", { replace: true });
+    const { success, status, ApiData } = await fetchWithErrorHandling(() =>
+      login(data).unwrap()
+    );
+    if (success && status === 200) {
+      const { token } = ApiData || {};
+      if (token) {
+        setToken(token);
+        navigate("/dashboard", { replace: true });
+      }
     } else {
-      console.log("Fetch failed:");
+      if (status === 401) {
+        showCustomToast("Invalid Credentials", "/error.gif", "Error");
+      }
     }
   };
 

@@ -6,6 +6,8 @@ import {
   useUpdatePagePermissionMutation,
 } from "../features/permission_page/page_permission";
 import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import PermissionSkeleton from "../components/Loaders/PermissionLoader";
+import { showCustomToast } from "../components/CustomToast";
 
 const clone = (x) => structuredClone(x); // deep clone utility
 
@@ -78,17 +80,20 @@ const Permission = () => {
   // --------------------- Fetch data --------------------
   useEffect(() => {
     (async () => {
-      const result = await fetchWithErrorHandling(() =>
+      const { success, status, ApiData } = await fetchWithErrorHandling(() =>
         PagePermissionList().unwrap()
       );
 
-      if (result.success) {
-        const { permission = [] } = result?.data || {};
-        // Expecting: [{page_id, page_name, view, edit, add, delete}, ...]
+      console.log(ApiData);
+
+      if (success) {
+        const { permission = [] } = ApiData || {};
         setRows(permission);
         originalRef.current = clone(permission);
       } else {
-        console.log("Fetch failed:", result.error);
+        if (status === 401) {
+          showCustomToast("Fetch failed", "/error.gif", "Error");
+        }
       }
     })();
   }, []);
@@ -156,33 +161,11 @@ const Permission = () => {
   };
 
   // --------------------- Save handlers -----------------
-  // Save a single row immediately when toggled (optional pattern)
-  const saveSingleImmediately = async (page_id) => {
-    const payload = changedMap[page_id];
-    console.log("Saving single:", payload);
-    if (!payload) return;
-
-    try {
-      await UpdatePagePermission(payload).unwrap();
-      // After success, merge into original snapshot and clear from changedMap
-      originalRef.current = originalRef.current.map((r) =>
-        r.page_id === page_id ? { ...r, ...payload } : r
-      );
-      setChangedMap((prev) => {
-        const copy = { ...prev };
-        delete copy[page_id];
-        return copy;
-      });
-      toast.success("Permissions updated.");
-    } catch (err) {
-      console.error(err);
-      toast.error("Update failed.");
-    }
-  };
 
   // Batch save all changed rows
   const saveAllChanges = async () => {
     const changes = Object.values(changedMap);
+    console.log("Saving all changes:", changes);
     if (changes.length === 0) {
       toast("No changes to save.");
       return;
@@ -208,149 +191,158 @@ const Permission = () => {
   };
 
   return (
-    <section className="bg-[var(--background)] backdrop-blur-md rounded-2xl h-[calc(100vh-62px)]">
-      {/* Header */}
-      <div className="px-2 pt-1">
-        <Header rows={rows} setRows={setRows} title="PAGE PERMISSIONS" />
-      </div>
+    <section className="bg-[var(--background)] backdrop-blur-md rounded-b-none lg:rounded-t-2xl h-[calc(100vh-62px)]">
+      {isListLoading ? (
+        <PermissionSkeleton />
+      ) : (
+        <>
+          {/* Header */}
+          <div className="px-2 pt-1">
+            <Header rows={rows} setRows={setRows} title="PAGE PERMISSIONS" />
+          </div>
 
-      <div className="bg-[var(--background)] backdrop-blur-md rounded-2xl mt-1 p-2 lg:px-2 lg:py-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-1">
-          {/* Left Column */}
-          <div className="rounded-2xl shadow-md p-2 border-[var(--border)] border-1">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-medium text-[var(--text)]">
-                <span className="relative">
-                  PERMISSION CONTROL
-                  <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                </span>
-              </h2>
+          <div className="bg-[var(--background)] backdrop-blur-md md:rounded-2xl mt-1 p-2 lg:px-2 lg:py-0">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-1">
+              {/* Left Column */}
+              <div className="rounded-2xl shadow-md p-1.5 md:p-2 border-[var(--border)] border-1">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm sm:text-base font-medium text-[var(--text)]">
+                    <span className="relative">
+                      PERMISSION CONTROL
+                      <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                    </span>
+                  </h2>
 
-              <button
-                disabled={
-                  isListLoading || isUpdateLoading || totalChanged === 0
-                }
-                onClick={saveAllChanges}
-                className={`px-3 py-1.5 rounded-md text-sm border ${
-                  totalChanged === 0
-                    ? "opacity-60 cursor-not-allowed"
-                    : "hover:opacity-90"
-                } border-[var(--border)] text-[var(--text)]`}
-              >
-                Save All Changes ({totalChanged})
-              </button>
-            </div>
+                  <button
+                    disabled={
+                      isListLoading || isUpdateLoading || totalChanged === 0
+                    }
+                    onClick={saveAllChanges}
+                    className={`px-3 py-1.5 rounded-md text-xs sm:text-sm border whitespace-nowrap ${
+                      totalChanged === 0
+                        ? "opacity-60 cursor-not-allowed"
+                        : "hover:opacity-90"
+                    } border-gray-400 text-[var(--text)]`}
+                  >
+                    Save All Changes ({totalChanged})
+                  </button>
+                </div>
 
-            <div className="overflow-y-auto-auto">
-              <table className="w-full text-sm border-separate border-spacing-y-3 min-w-[600px]">
-                <thead>
-                  <tr className="text-left text-0 md:text-sm text-[var(--text)] sticky top-0 z-30 bg-[var(--background)] border-2 border-[var(--border)]">
-                    <th className="px-1 py-3 first:rounded-l-lg">Page</th>
-                    <th className="px-1 py-3">All</th>
-                    <th className="px-1 py-3">View</th>
-                    <th className="px-1 py-3">Edit</th>
-                    <th className="px-1 py-3">Add</th>
-                    <th className="px-1 py-3 last:rounded-r-lg">Delete</th>
-                    <th className="px-1 py-3">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {rows?.map((row, idx) => {
-                    const allOn = isAllOn(row);
-                    const dirty = !!changedMap[row.page_id];
-
-                    return (
-                      <tr
-                        key={row.page_id}
-                        className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out ${
-                          dirty ? "outline-1 outline-[var(--border)]" : ""
-                        }`}
-                      >
-                        <td className="py-5 px-1 text-[0.75rem] md:text-sm font-medium rounded-l-lg text-[var(--text)]">
-                          {row.page_name}
-                        </td>
-
-                        {/* All (computed) */}
-                        <td className="px-0">
-                          <ToggleSwitch
-                            enabled={allOn}
-                            onChange={() => toggleOne(idx, "all")}
-                          />
-                        </td>
-
-                        {/* View / Edit / Add / Delete */}
-                        <td className="px-0">
-                          <ToggleSwitch
-                            enabled={!!row.view}
-                            onChange={() => toggleOne(idx, "view")}
-                          />
-                        </td>
-                        <td className="px-0">
-                          <ToggleSwitch
-                            enabled={!!row.edit}
-                            onChange={() => toggleOne(idx, "edit")}
-                          />
-                        </td>
-                        <td className="px-0">
-                          <ToggleSwitch
-                            enabled={!!row.add}
-                            onChange={() => toggleOne(idx, "add")}
-                          />
-                        </td>
-                        <td className="px-0">
-                          <ToggleSwitch
-                            enabled={!!row.delete}
-                            onChange={() => toggleOne(idx, "delete")}
-                          />
-                        </td>
-
-                        {/* Save single row immediately (optional) */}
-                        <td className="px-1 rounded-r-lg">
-                          <button
-                            disabled={!dirty || isUpdateLoading}
-                            onClick={() => saveSingleImmediately(row.page_id)}
-                            className={`px-2 py-1 text-xs rounded border ${
-                              !dirty
-                                ? "opacity-50 cursor-not-allowed"
-                                : "hover:opacity-90"
-                            } border-[var(--border)] text-[var(--text)]`}
-                          >
-                            Save
-                          </button>
-                        </td>
+                <div>
+                  <table className="w-full text-sm border-separate border-spacing-y-3">
+                    <thead>
+                      <tr className="text-left text-xs xl:text-sm text-[var(--text)] sticky top-[55px] z-30 bg-[var(--background)] border-2 border-[var(--border)]">
+                        <th className="px-0.5 md:px-2 py-3 first:rounded-l-lg">
+                          Page
+                        </th>
+                        <th className="px-0.5 md:px-2 py-3 text-center">All</th>
+                        <th className="px-0.5 md:px-2 py-3 text-center">
+                          View
+                        </th>
+                        <th className="px-0.5 md:px-2 py-3 text-center">
+                          Edit
+                        </th>
+                        <th className="px-0.5 md:px-2 py-3 text-center">Add</th>
+                        <th className="px-0.5 md:px-2 py-3 text-center last:rounded-r-lg">
+                          Delete
+                        </th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+
+                    <tbody>
+                      {rows?.map((row, idx) => {
+                        const allOn = isAllOn(row);
+
+                        return (
+                          <tr
+                            key={row.page_id}
+                            className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
+                          >
+                            <td className="py-4 px-1 md:px-2 text-xs xl:text-sm font-medium rounded-l-lg text-[var(--text)] truncate">
+                              <span
+                                title={row.page_name}
+                                className="text-wrap relative"
+                              >
+                                {row.page_name}
+                                <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                              </span>
+                            </td>
+
+                            {/* All (computed) */}
+                            <td className="px-1 md:px-2 text-center">
+                              <div className="flex justify-center">
+                                <ToggleSwitch
+                                  enabled={allOn}
+                                  onChange={() => toggleOne(idx, "all")}
+                                />
+                              </div>
+                            </td>
+
+                            <td className="px-1 md:px-2 text-center">
+                              <div className="flex justify-center">
+                                <ToggleSwitch
+                                  enabled={!!row.view}
+                                  onChange={() => toggleOne(idx, "view")}
+                                />
+                              </div>
+                            </td>
+                            <td className="px-1 md:px-2 text-center">
+                              <div className="flex justify-center">
+                                <ToggleSwitch
+                                  enabled={!!row.edit}
+                                  onChange={() => toggleOne(idx, "edit")}
+                                />
+                              </div>
+                            </td>
+                            <td className="px-1 md:px-2 text-center">
+                              <div className="flex justify-center">
+                                <ToggleSwitch
+                                  enabled={!!row.add}
+                                  onChange={() => toggleOne(idx, "add")}
+                                />
+                              </div>
+                            </td>
+                            <td className="px-1 md:px-2 text-center">
+                              <div className="flex justify-center">
+                                <ToggleSwitch
+                                  enabled={!!row.delete}
+                                  onChange={() => toggleOne(idx, "delete")}
+                                />
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {/* Right Column */}
+              <div className="rounded-2xl shadow-md p-3 lg:p-3 border-[var(--border)] border-1">
+                <h2 className="text-base font-medium mb-4 text-[var(--text)]">
+                  <span className="relative">
+                    SUMMARY / SETTINGS
+                    <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                  </span>
+                </h2>
+
+                <div className="p-2 lg:p-3 text-sm text-[var(--text)] leading-relaxed space-y-2">
+                  <p>
+                    ✔️ Total Pages: <strong>{rows.length}</strong>
+                  </p>
+                  <p>
+                    ✔️ Changes pending: <strong>{totalChanged}</strong>
+                  </p>
+                  <p>
+                    ✔️ Toggle “All” to enable/disable every permission in a row.
+                  </p>
+                  <p>✔️ Click “Save” for a single row or “Save All Changes”.</p>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Right Column */}
-          <div className="rounded-2xl shadow-md p-3 lg:p-3 border-[var(--border)] border-1">
-            <h2 className="text-base font-medium mb-4 text-[var(--text)]">
-              <span className="relative">
-                SUMMARY / SETTINGS
-                <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-              </span>
-            </h2>
-
-            <div className="p-2 lg:p-3 text-sm text-[var(--text)] leading-relaxed space-y-2">
-              <p>
-                ✔️ Total Pages: <strong>{rows.length}</strong>
-              </p>
-              <p>
-                ✔️ Changes pending: <strong>{totalChanged}</strong>
-              </p>
-              <p>
-                ✔️ Toggle “All” to enable/disable every permission in a row.
-              </p>
-              <p>✔️ Click “Save” for a single row or “Save All Changes”.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
     </section>
   );
 };
