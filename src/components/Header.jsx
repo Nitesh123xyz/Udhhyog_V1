@@ -48,7 +48,7 @@ const Header = ({ rows, setRows }) => {
   };
 
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-lg w-full flex items-center justify-between px-2 lg:px-3 py-1.5 transition-all duration-300">
+    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-lg w-full flex items-center justify-between px-1 lg:px-3 py-1.5 transition-all duration-300">
       {/* Left Side - Label */}
       <div className="flex items-center gap-4">
         <div className="bg-blue-100 px-1 py-2 uppercase rounded-lg font-bold text-[0.8rem] md:text-md lg:text-[1rem] shadow-xs">
@@ -61,7 +61,7 @@ const Header = ({ rows, setRows }) => {
         <div
           className={`flex items-center gap-2 ${
             HideHeader ? "mr-0" : "mr-2"
-          } relative p-1 lg:border-1 lg:border-[var(--border)] bg-[var(--background)] rounded-full ${
+          } relative p-1 md:border-1 md:border-[var(--border)] bg-[var(--background)] rounded-full ${
             openSearch ? "border-1 border-[var(--border)]" : "border-0"
           }`}
         >
@@ -75,9 +75,9 @@ const Header = ({ rows, setRows }) => {
             className={`bg-transparent text-sm text-[var(--text)] outline-0 placeholder:text-gray-400 px-1 transition-all duration-300
               ${
                 isFocused
-                  ? "w-[5.5rem] md:w-[20rem] lg:w-[35rem]"
+                  ? "w-[8rem] md:w-[20rem] lg:w-[35rem]"
                   : `${
-                      openSearch ? "w-[5.5rem]" : "w-0 md:block"
+                      openSearch ? "w-[8rem]" : "w-0 md:block"
                     } md:w-[12rem] lg:w-[20rem]`
               }`}
           />

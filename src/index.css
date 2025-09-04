@@ -1,8 +1,32 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
-/* @custom-variant dark (&:where(.dark, .dark *)); */
+
 body {
   font-family: "Outfit", sans-serif;
+  } */
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Old+Standard+TT:wght@400;700&display=swap");
+@import "tailwindcss";
+
+/* font classes (independent of theme) */
+.font-first {
+  --app-font: "Outfit";
+}
+.font-second {
+  --app-font: "Inter";
+}
+.font-third {
+  --app-font: "Poppins";
+}
+
+.font-fourth {
+  --app-font: "Old Standard TT";
+}
+
+/* apply the chosen font everywhere */
+body {
+  font-family: var(--app-font), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 :root {
@@ -21,8 +45,9 @@ body {
   --permissionTable: #f3f4f6;
   --header_left: #dbeafe;
   --header_right: #dbeafe;
-  --activeBg:  #f3f4f6;
+  --activeBg: #f3f4f6;
   --activeText: #000;
+  --logo_circle: #dfd8bb;
 }
 .dark {
   --background: #1e2939; /* gray-600 */
@@ -40,6 +65,7 @@ body {
   --permissionTable: rgba(255, 255, 255, 0.1);
   --header_left: #dbeafe;
   --header_right: #dbeafe;
-  --activeBg:  rgba(255, 255, 255, 0.1);
+  --activeBg: rgba(255, 255, 255, 0.1);
   --activeText: #ffffff;
+  --logo_circle: #4b5563;
 }

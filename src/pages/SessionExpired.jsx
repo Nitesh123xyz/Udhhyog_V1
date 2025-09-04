@@ -8,12 +8,15 @@ const Animation = lazy(() => import("../components/Animation"));
 const SessionExpired = () => {
   const navigate = useNavigate();
   const Expire = getSessionExpire();
-
+  console.log(Expire);
   useEffect(() => {
-    if (!Expire) navigate("/", { replace: true });
+    // if (!Expire) navigate("/", { replace: true });
+    if (!Expire) {
+      console.log("no expire");
+    }
   }, [Expire, navigate]);
 
-  if (!Expire) return null;
+  // if (!Expire) return null;
 
   // ------------------------------------------------------
 

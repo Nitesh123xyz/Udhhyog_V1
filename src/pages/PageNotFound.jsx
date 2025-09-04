@@ -4,11 +4,10 @@ import { Link } from "react-router-dom";
 
 const PageNotFound = () => {
   return (
-    <div className="h-[calc(100vh-5px)] rounded-2xl bg-[var(--background)] text-yellow-400 flex justify-center items-start">
+    <div className="h-[calc(100vh-5px)] rounded-lg bg-[var(--background)] text-yellow-400 flex justify-center items-start">
       <div className="text-center px-4">
-        {/* Centered Image */}
         <img
-          src="/404.png" // replace with your image path
+          src="/404.png"
           alt="Page Not Found"
           className="mx-auto w-full md:w-[80%] md:max-w-[35rem] 2xl:max-w-[50rem]"
         />

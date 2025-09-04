@@ -227,9 +227,10 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
           <img
             src="/logo.png"
             alt="company_logo"
-            className={`rounded-full shadow-md transition-all duration-300 ease-in ${
+            className={`rounded-full shadow-md transition-all duration-300 ring-4 ring-[var(--logo_circle)] ease-in ${
               isExpanded ? "h-[45px] w-[45px]" : `h-[60px] w-[60px]`
             }`}
+            style={{ imageRendering: "crisp-edges" }}
           />
         </Link>
 

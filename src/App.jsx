@@ -78,7 +78,7 @@ const App = () => {
           )}
 
           {!HideNavbar ? (
-            <div className="lg:px-1 py-[0.1rem]">
+            <div className="lg:px-1 pt-[0.2rem]">
               <Outlet />
             </div>
           ) : (

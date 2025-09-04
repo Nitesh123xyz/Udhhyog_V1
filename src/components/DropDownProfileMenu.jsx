@@ -1,7 +1,16 @@
-import { User, HelpCircle, LogOut, Sun, Moon } from "lucide-react";
+// DropDownProfileMenu.jsx
+import {
+  User,
+  HelpCircle,
+  LogOut,
+  Sun,
+  Moon,
+  Type as TypeIcon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { clearAllSession } from "../utils/StoreSessionInfo";
+import FontSwitch from "../components/FontSwitch"; // <-- update path if needed
 
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
   const navigate = useNavigate();
@@ -78,6 +87,12 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
       clickable: false,
     },
     {
+      icon: TypeIcon,
+      text: "Font",
+      hasFontSelect: true,
+      clickable: false,
+    },
+    {
       icon: HelpCircle,
       text: "Help",
       path: "/profile",
@@ -120,6 +135,7 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                     </span>
                   </div>
 
+                  {/* Theme toggle */}
                   {item.hasToggle && (
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input
@@ -131,7 +147,7 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       <div
                         className={`w-10 h-5 ${
                           themeMode === "dark" ? "bg-yellow-400" : "bg-gray-200"
-                        } rounded-full transition-colors peer-checked:bg-blue-600`}
+                        } rounded-full transition-colors`}
                       />
                       <div
                         className={`absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transform transition-transform ${
@@ -139,8 +155,19 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                             ? "translate-x-5"
                             : "translate-x-0"
                         }`}
-                      ></div>
+                      />
                     </label>
+                  )}
+
+                  {/* Font select */}
+                  {item.hasFontSelect && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="ml-3"
+                    >
+                      <FontSwitch />
+                    </div>
                   )}
                 </button>
 

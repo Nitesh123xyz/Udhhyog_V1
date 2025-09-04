@@ -23,12 +23,12 @@ const TopNavbar = ({ setIsExpanded }) => {
   return (
     <>
       <header
-        className={`bg-[var(--background)] backdrop-blur-md lg:rounded-2xl  flex items-center justify-between px-2 py-2 shadow-md max-w-screen md:max-w-full`}
+        className={`bg-[var(--background)] backdrop-blur-md rounded-lg flex items-center justify-between px-2 py-2 shadow-md max-w-screen md:max-w-full`}
       >
         <div className="flex items-center gap-4">
           <div
             onClick={handleToggle}
-            className={`bg-[var(--header_left)] px-4 py-2 uppercase rounded-2xl font-bold text-sm shadow-sm`}
+            className={`bg-[var(--header_left)] px-4 py-2 uppercase rounded-lg font-bold text-sm shadow-sm`}
           >
             {"Home" || CurrentLabel.ParentTabLabel || current.ParentTabLabel}
           </div>

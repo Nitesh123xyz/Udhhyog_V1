@@ -41,7 +41,7 @@ const Dashboard = () => {
 
     return (
       <div
-        className={`rounded-2xl p-8 shadow-xl border border-gray-100 h-full backdrop-blur-sm`}
+        className={`rounded-lg p-8 shadow-xl border border-gray-100 h-full backdrop-blur-sm`}
       >
         <h3 className="text-xl font-bold text-gray-900 mb-6">
           Unique Visitors
@@ -301,7 +301,7 @@ const Dashboard = () => {
 
   return (
     <div
-      className={`min-h-screen p-2 bg-[var(--background)] backdrop-blur-sm rounded-2xl`}
+      className={`min-h-screen p-2 bg-[var(--background)] backdrop-blur-sm rounded-t-lg`}
     >
       <div className="mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
