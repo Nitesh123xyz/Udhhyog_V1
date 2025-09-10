@@ -15,6 +15,28 @@ export const getLeftSideNavigationMenu = () =>
   JSON.parse(sessionStorage.getItem(MenuKey)) || [];
 
 // ------------------------------------------------------
+
+const FontWeightKey = "AppFontWeight";
+export const setAppFontWeight = (FontWeight) => {
+  FontWeight
+    ? localStorage.setItem(FontWeightKey, FontWeight)
+    : localStorage.removeItem(FontWeightKey);
+};
+export const getAppFontWeight = () =>
+  localStorage.getItem(FontWeightKey) || "font-default";
+
+// ------------------------------------------------------
+
+const ThemeKey = "ThemeMode";
+
+export const setThemeMode = (Theme) => {
+  Theme
+    ? localStorage.setItem(ThemeKey, Theme)
+    : localStorage.removeItem(ThemeKey);
+};
+export const getThemeMode = () => localStorage.getItem(ThemeKey) || "light";
+
+// ------------------------------------------------------
 const UserKey = "UserInfo";
 
 export const setUserInfo = (UserInfo) => {
@@ -28,25 +50,43 @@ export const getUserInfo = () =>
 
 // ------------------------------------------------------
 
-const SessionExpire = "Expire";
+const SessionExpire = "SessionExpire";
 
-export const setSessionExpire = (UserInfo) => {
-  UserInfo
-    ? localStorage.setItem(SessionExpire, JSON.stringify(UserInfo))
-    : localStorage.removeItem(SessionExpire);
+export const getSessionExpire = () => {
+  try {
+    return JSON.parse(localStorage.getItem(KEY) ?? "false");
+  } catch {
+    return false;
+  }
 };
 
-export const getSessionExpire = () =>
-  JSON.parse(localStorage.getItem(SessionExpire)) || null;
+export const setSessionExpire = (value) => {
+  if (typeof value === "boolean") {
+    localStorage.setItem(KEY, JSON.stringify(value));
+  } else {
+    localStorage.removeItem(KEY);
+  }
+
+  // notify this tab immediately
+  window.dispatchEvent(
+    new CustomEvent("session-expire-change", {
+      detail: { value: getSessionExpire() },
+    })
+  );
+};
+
+export const clearSessionExpire = () => {
+  sessionStorage.removeItem(SessionExpire);
+};
+
+// ------------------------------------------------------
 
 export const clearSession = () => {
   const theme = localStorage.getItem("ThemeMode");
-  const expire = localStorage.getItem(SessionExpire);
   sessionStorage.clear();
   localStorage.clear();
   if (theme) {
     localStorage.setItem("ThemeMode", theme);
-    localStorage.setItem("SessionExpire", expire);
   }
 };
 

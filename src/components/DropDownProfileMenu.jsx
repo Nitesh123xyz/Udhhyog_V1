@@ -1,4 +1,3 @@
-// DropDownProfileMenu.jsx
 import {
   User,
   HelpCircle,
@@ -7,18 +6,14 @@ import {
   Moon,
   Type as TypeIcon,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { clearAllSession } from "../utils/StoreSessionInfo";
-import FontSwitch from "../components/FontSwitch"; // <-- update path if needed
+import { clearAllSession, getThemeMode, setThemeMode } from "../utils/StoreSessionInfo";
+import FontSwitch from "../components/FontSwitch";
 
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
-  const navigate = useNavigate();
   const boxRef = useRef(null);
   const closeTimerRef = useRef(null);
-  const [themeMode, setThemeMode] = useState(
-    localStorage.getItem("ThemeMode") || "light"
-  );
+  const [themeMode, setTheme] = useState(getThemeMode());
 
   // -------------------------------------------------------
 
@@ -27,9 +22,9 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
 
     if (item.isLogout) {
       clearAllSession();
-      navigate("/");
+      window.location.href = "/";
     } else if (item.path) {
-      navigate(item.path);
+      window.location.href = item.path;
     }
   };
 
@@ -56,8 +51,8 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
 
   const handleToggleTheme = () => {
     const newMode = themeMode === "light" ? "dark" : "light";
+    setTheme(newMode);
     setThemeMode(newMode);
-    localStorage.setItem("ThemeMode", newMode);
   };
 
   useEffect(() => {
@@ -68,6 +63,11 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
       document.documentElement.classList.add("light");
       document.documentElement.classList.remove("dark");
     }
+
+    return () => {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove("light");
+    };
   }, [themeMode]);
 
   // -------------------------------------------------------
@@ -130,7 +130,7 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                 >
                   <div className="flex items-center space-x-3">
                     <Icon className="w-5 h-5 text-[var(--text)]" />
-                    <span className="text-sm font-medium truncate text-[var(--text)]">
+                    <span className="text-sm truncate text-[var(--text)]">
                       {item.text}
                     </span>
                   </div>
@@ -159,7 +159,6 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                     </label>
                   )}
 
-                  {/* Font select */}
                   {item.hasFontSelect && (
                     <div
                       onClick={(e) => e.stopPropagation()}

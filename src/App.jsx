@@ -1,12 +1,13 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { lazy, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useMenu } from "./components/useMenu";
+import SessionExpired from "./components/SessionExpired";
+import { getSessionExpire } from "./utils/StoreSessionInfo";
 
 // ---------------------------------------------------
 const TopNavbar = lazy(() => import("./components/TopNavbar"));
 const LeftNavbar = lazy(() => import("./components/LeftNavbar"));
-
 const App = () => {
   const location = useLocation();
   const hideNavbarPaths = [
@@ -21,9 +22,31 @@ const App = () => {
   const HideNavbar = hideNavbarPaths.includes(location.pathname);
   const [isExpanded, setIsExpanded] = useState(false);
   const { PinBar, MobileNav } = useSelector((state) => state.ExpendNavbar);
-
+  const [isSessionExpired, setIsSessionExpired] = useState(getSessionExpire());
   // -------------------------------------------------------------------
+
+  useEffect(() => {
+    const onCustom = (e) => {
+      console.log(e);
+      setIsSessionExpired(e.detail?.value ?? getSessionExpire());
+    };
+    const onStorage = (e) => {
+      console.log(e);
+      if (e.key === "SessionExpire") {
+        setIsSessionExpired(JSON.parse(e.newValue || "false"));
+      }
+    };
+
+    window.addEventListener("session-expire-change", onCustom);
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("session-expire-change", onCustom);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
   const { menuList } = useMenu(); // Custom hook to fetch Left Side Navigation Menu
+
   // -------------------------------------------------------------------
 
   const getAllPath = (items = []) => {
@@ -38,7 +61,6 @@ const App = () => {
   };
 
   const allPaths = getAllPath(menuList);
-  // If menu not loaded yet, don't hide content purely due to missing paths
   const isPathExists =
     allPaths.length > 0 ? new Set(allPaths).has(location.pathname) : true;
 
@@ -46,7 +68,7 @@ const App = () => {
 
   return (
     <div className="flex min-h-screen">
-      {!HideNavbar && isPathExists && menuList.length > 0 && (
+      {!HideNavbar && menuList.length > 0 && (
         <div
           className={`transition-all duration-300 lg:block ${
             PinBar
@@ -71,10 +93,17 @@ const App = () => {
               "conic-gradient(from 180deg at 50% 50%, #4facfe, #00f2fe, #43e97b, #f8ffae, #4facfe)",
           }}
         >
-          {!HideNavbar && isPathExists && (
+          {!HideNavbar && (
             <div className="px-0 lg:px-[0.3rem] sticky top-0 z-50">
               <TopNavbar setIsExpanded={setIsExpanded} />
             </div>
+          )}
+
+          {isSessionExpired && (
+            <SessionExpired
+              sessionExpire={isSessionExpired}
+              setIsSessionExpired={setIsSessionExpired}
+            />
           )}
 
           {!HideNavbar ? (

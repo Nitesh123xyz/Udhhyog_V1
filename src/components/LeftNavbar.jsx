@@ -155,9 +155,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
                   ? handleToggle
                   : undefined
               }
-              className={`${
-                isExpanded ? "font-medium" : "hidden"
-              } text-[var(--text)]`}
+              className={`${isExpanded ? "" : "hidden"} text-[var(--text)]`}
             >
               {item.clickable ? (
                 <Link to={item.path}>
@@ -230,12 +228,14 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
             className={`rounded-full shadow-md transition-all duration-300 ring-4 ring-[var(--logo_circle)] ease-in ${
               isExpanded ? "h-[45px] w-[45px]" : `h-[60px] w-[60px]`
             }`}
-            style={{ imageRendering: "crisp-edges" }}
+            style={{
+              filter: "drop-shadow(0.35rem 0.35rem 0.2rem rgba(0, 0, 0, 0.2))",
+            }}
           />
         </Link>
 
         <span
-          className={`font-bold ml-3 text-3xl bg-gradient-to-r from-pink-500 via-purple-500 to-blue-400 text-transparent bg-clip-text ${
+          className={`ml-3 text-3xl bg-gradient-to-r from-pink-500 via-purple-500 to-blue-400 text-transparent bg-clip-text ${
             isExpanded ? "" : "hidden"
           }`}
         >
@@ -245,7 +245,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
         {MobileNav && (
           <div
             onClick={handleToggle}
-            className="w-10 h-10 bg-yellow-400 md:absolute right-4 rounded-full flex flex-col items-center justify-center text-xs font-semibold"
+            className="w-10 h-10 bg-yellow-400 md:absolute right-4 rounded-full flex flex-col items-center justify-center text-xs"
           >
             <X size={16} className="text-gray-800" />
           </div>
@@ -257,7 +257,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
       </div>
 
       {!MobileNav && (
-        <div className="relative flex justify-end mr-6 mb-2 gap-2.5">
+        <div className="relative flex justify-end mr-3 mb-3 gap-2.5">
           {isExpanded && (
             <>
               <button

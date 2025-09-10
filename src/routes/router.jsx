@@ -4,8 +4,8 @@ import App from "../App";
 import AddUser from "../pages/AddUser";
 import UpdateUser from "../pages/UpdateUser";
 import ProtectedRoute from "../components/ProtectedRoute";
-import SessionExpired from "../pages/SessionExpired";
-
+import PermissionGate from "../Middlewares/PermissionGate";
+import MainLoader from "../components/Loader";
 // ---------------------------------------------------
 
 const EmployeeTable = lazy(() => import("../pages/EmployeeTable"));
@@ -24,13 +24,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: (
-          <Suspense
-            fallback={
-              <div className="flex h-screen items-center justify-center font-bold text-sm lg:text-[5rem]">
-                Loading...
-              </div>
-            }
-          >
+          <Suspense fallback={<MainLoader />}>
             <LoginPage />
           </Suspense>
         ),
@@ -44,7 +38,9 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: (
           <ProtectedRoute>
-            <Dashboard />
+            <PermissionGate>
+              <Dashboard />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
@@ -53,9 +49,11 @@ const router = createBrowserRouter([
         path: "/employees",
         element: (
           <ProtectedRoute>
-            <CommonLayout>
-              <EmployeeTable />
-            </CommonLayout>
+            <PermissionGate>
+              <CommonLayout>
+                <EmployeeTable />
+              </CommonLayout>
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
@@ -64,7 +62,9 @@ const router = createBrowserRouter([
         path: "/permission",
         element: (
           <ProtectedRoute>
-            <Permissions />
+            <PermissionGate>
+              <Permissions />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
@@ -73,7 +73,9 @@ const router = createBrowserRouter([
         path: "/profile",
         element: (
           <ProtectedRoute>
-            <Setting />
+            <PermissionGate>
+              <Setting />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
@@ -82,7 +84,9 @@ const router = createBrowserRouter([
         path: "/add-user",
         element: (
           <ProtectedRoute>
-            <AddUser />
+            <PermissionGate>
+              <AddUser />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
@@ -91,14 +95,12 @@ const router = createBrowserRouter([
         path: "/update-user",
         element: (
           <ProtectedRoute>
-            <UpdateUser />
+            <PermissionGate>
+              <UpdateUser />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,
-      },
-      {
-        path: "/session-expired",
-        element: <SessionExpired />,
       },
       {
         path: "*",

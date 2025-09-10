@@ -48,10 +48,10 @@ const Header = ({ rows, setRows }) => {
   };
 
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-lg w-full flex items-center justify-between px-1 lg:px-3 py-1.5 transition-all duration-300">
+    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-lg w-full flex items-center justify-between px-1 py-1.5 transition-all duration-300">
       {/* Left Side - Label */}
       <div className="flex items-center gap-4">
-        <div className="bg-blue-100 px-1 py-2 uppercase rounded-lg font-bold text-[0.8rem] md:text-md lg:text-[1rem] shadow-xs">
+        <div className="bg-blue-100 px-1 py-2 uppercase rounded-lg text-[0.8rem] md:text-md lg:text-[1rem] shadow-xs">
           {CurrentLabel?.ChildTabLabel || current?.ChildTabLabel || "Users"}
         </div>
       </div>

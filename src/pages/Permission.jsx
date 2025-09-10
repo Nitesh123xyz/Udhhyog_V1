@@ -6,8 +6,8 @@ import {
   useUpdatePagePermissionMutation,
 } from "../features/permission_page/page_permission";
 import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import PermissionSkeleton from "../components/Loaders/PermissionLoader";
 import { showCustomToast } from "../components/CustomToast";
+import { useSelector } from "react-redux";
 
 const clone = (x) => structuredClone(x); // deep clone utility
 
@@ -63,40 +63,19 @@ const ToggleSwitch = ({ enabled, onChange }) => {
 };
 
 const Permission = () => {
-  // --------------------- API hooks ---------------------
-  const [PagePermissionList, { isLoading: isListLoading }] =
-    usePagePermissionListMutation();
+  // ------------------------------------------
   const [UpdatePagePermission, { isLoading: isUpdateLoading }] =
     useUpdatePagePermissionMutation();
+  const permissionList = useSelector(
+    (state) => state.UtileSlice.permissionList
+  );
 
-  // --------------------- Local state -------------------
-  // rows = array of page permission rows from your new structure
-  const [rows, setRows] = useState([]);
-  // Keep the original snapshot to compute diffs
+  // ----------------------------------------
+  const [rows, setRows] = useState(permissionList);
   const originalRef = useRef([]);
-  // Track changed rows by page_id: { [page_id]: diffObject }
   const [changedMap, setChangedMap] = useState({});
-
-  // --------------------- Fetch data --------------------
-  useEffect(() => {
-    (async () => {
-      const { success, status, ApiData } = await fetchWithErrorHandling(() =>
-        PagePermissionList().unwrap()
-      );
-
-      console.log(ApiData);
-
-      if (success) {
-        const { permission = [] } = ApiData || {};
-        setRows(permission);
-        originalRef.current = clone(permission);
-      } else {
-        if (status === 401) {
-          showCustomToast("Fetch failed", "/error.gif", "Error");
-        }
-      }
-    })();
-  }, []);
+  originalRef.current = clone(rows);
+  // -----------------------------------------
 
   const totalChanged = useMemo(
     () => Object.keys(changedMap).length,
@@ -192,157 +171,144 @@ const Permission = () => {
 
   return (
     <section className="bg-[var(--background)] backdrop-blur-md rounded-lg h-[calc(100vh-62px)]">
-      {isListLoading ? (
-        <PermissionSkeleton />
-      ) : (
-        <>
-          {/* Header */}
-          <div className="px-1 pt-1">
-            <Header rows={rows} setRows={setRows} title="PAGE PERMISSIONS" />
-          </div>
+      <div className="px-1 pt-1">
+        <Header rows={rows} setRows={setRows} title="PAGE PERMISSIONS" />
+      </div>
 
-          <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-1">
-              {/* Left Column */}
-              <div className="rounded-lg shadow-md p-1.5 md:p-2 mb-1  border-[var(--border)] border-1">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-sm sm:text-base font-medium text-[var(--text)]">
-                    <span className="relative">
-                      PERMISSION CONTROL
-                      <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                    </span>
-                  </h2>
+      <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-1">
+          {/* Left Column */}
+          <div className="rounded-lg shadow-md p-1.5 md:p-2 mb-1  border-[var(--border)] border-1">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm sm:text-base text-[var(--text)]">
+                <span className="relative">
+                  PERMISSION CONTROL
+                  <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                </span>
+              </h2>
 
-                  <button
-                    disabled={
-                      isListLoading || isUpdateLoading || totalChanged === 0
-                    }
-                    onClick={saveAllChanges}
-                    className={`px-3 py-1.5 rounded-md text-xs sm:text-sm border whitespace-nowrap ${
-                      totalChanged === 0
-                        ? "opacity-60 cursor-not-allowed"
-                        : "hover:opacity-90"
-                    } border-gray-400 text-[var(--text)]`}
-                  >
-                    Save All Changes ({totalChanged})
-                  </button>
-                </div>
+              <button
+                disabled={isUpdateLoading || totalChanged === 0}
+                onClick={saveAllChanges}
+                className={`px-3 py-1.5 rounded-md text-xs sm:text-sm border whitespace-nowrap ${
+                  totalChanged === 0
+                    ? "opacity-60 cursor-not-allowed"
+                    : "hover:opacity-90"
+                } border-gray-400 text-[var(--text)]`}
+              >
+                Save All Changes ({totalChanged})
+              </button>
+            </div>
 
-                <div>
-                  <table className="w-full text-sm border-separate border-spacing-y-3">
-                    <thead>
-                      <tr className="text-left text-xs xl:text-sm text-[var(--text)] sticky top-[55px] z-30 bg-[var(--background)] border-2 border-[var(--border)]">
-                        <th className="px-0.5 md:px-2 py-3 first:rounded-l-lg">
-                          Page
-                        </th>
-                        <th className="px-0.5 md:px-2 py-3 text-center">All</th>
-                        <th className="px-0.5 md:px-2 py-3 text-center">
-                          View
-                        </th>
-                        <th className="px-0.5 md:px-2 py-3 text-center">
-                          Edit
-                        </th>
-                        <th className="px-0.5 md:px-2 py-3 text-center">Add</th>
-                        <th className="px-0.5 md:px-2 py-3 text-center last:rounded-r-lg">
-                          Delete
-                        </th>
-                      </tr>
-                    </thead>
+            <div>
+              <table className="w-full text-sm border-separate border-spacing-y-3">
+                <thead>
+                  <tr className="text-left text-xs xl:text-sm text-[var(--text)]  sticky top-[55px] z-30 bg-[var(--background)] border-2 border-[var(--border)]">
+                    <th className="px-0.5 md:px-2 py-3 first:rounded-l-lg">
+                      Page
+                    </th>
+                    <th className="px-0.5 md:px-2 py-3 text-center">All</th>
+                    <th className="px-0.5 md:px-2 py-3 text-center">View</th>
+                    <th className="px-0.5 md:px-2 py-3 text-center">Edit</th>
+                    <th className="px-0.5 md:px-2 py-3 text-center">Add</th>
+                    <th className="px-0.5 md:px-2 py-3 text-center last:rounded-r-lg">
+                      Delete
+                    </th>
+                  </tr>
+                </thead>
 
-                    <tbody>
-                      {rows?.map((row, idx) => {
-                        const allOn = isAllOn(row);
+                <tbody>
+                  {rows?.map((row, idx) => {
+                    const allOn = isAllOn(row);
 
-                        return (
-                          <tr
-                            key={row.page_id}
-                            className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
+                    return (
+                      <tr
+                        key={row.page_id}
+                        className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
+                      >
+                        <td className="py-4 px-1 md:px-2 text-xs xl:text-sm  rounded-l-lg text-[var(--text)] truncate">
+                          <span
+                            title={row.page_name}
+                            className="text-wrap relative"
                           >
-                            <td className="py-4 px-1 md:px-2 text-xs xl:text-sm font-medium rounded-l-lg text-[var(--text)] truncate">
-                              <span
-                                title={row.page_name}
-                                className="text-wrap relative"
-                              >
-                                {row.page_name}
-                                <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                              </span>
-                            </td>
+                            {row.page_name}
+                            <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                          </span>
+                        </td>
 
-                            {/* All (computed) */}
-                            <td className="px-1 md:px-2 text-center">
-                              <div className="flex justify-center">
-                                <ToggleSwitch
-                                  enabled={allOn}
-                                  onChange={() => toggleOne(idx, "all")}
-                                />
-                              </div>
-                            </td>
+                        {/* All (computed) */}
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={allOn}
+                              onChange={() => toggleOne(idx, "all")}
+                            />
+                          </div>
+                        </td>
 
-                            <td className="px-1 md:px-2 text-center">
-                              <div className="flex justify-center">
-                                <ToggleSwitch
-                                  enabled={!!row.view}
-                                  onChange={() => toggleOne(idx, "view")}
-                                />
-                              </div>
-                            </td>
-                            <td className="px-1 md:px-2 text-center">
-                              <div className="flex justify-center">
-                                <ToggleSwitch
-                                  enabled={!!row.edit}
-                                  onChange={() => toggleOne(idx, "edit")}
-                                />
-                              </div>
-                            </td>
-                            <td className="px-1 md:px-2 text-center">
-                              <div className="flex justify-center">
-                                <ToggleSwitch
-                                  enabled={!!row.add}
-                                  onChange={() => toggleOne(idx, "add")}
-                                />
-                              </div>
-                            </td>
-                            <td className="px-1 md:px-2 text-center">
-                              <div className="flex justify-center">
-                                <ToggleSwitch
-                                  enabled={!!row.delete}
-                                  onChange={() => toggleOne(idx, "delete")}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              {/* Right Column */}
-              <div className="rounded-lg shadow-md p-3 mb-1 lg:p-3 border-[var(--border)] border-1">
-                <h2 className="text-base font-medium mb-4 text-[var(--text)]">
-                  <span className="relative">
-                    SUMMARY / SETTINGS
-                    <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                  </span>
-                </h2>
-
-                <div className="p-2 lg:p-3 text-sm text-[var(--text)] leading-relaxed space-y-2">
-                  <p>
-                    ✔️ Total Pages: <strong>{rows.length}</strong>
-                  </p>
-                  <p>
-                    ✔️ Changes pending: <strong>{totalChanged}</strong>
-                  </p>
-                  <p>
-                    ✔️ Toggle “All” to enable/disable every permission in a row.
-                  </p>
-                  <p>✔️ Click “Save” for a single row or “Save All Changes”.</p>
-                </div>
-              </div>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.view}
+                              onChange={() => toggleOne(idx, "view")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.edit}
+                              onChange={() => toggleOne(idx, "edit")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.add}
+                              onChange={() => toggleOne(idx, "add")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.delete}
+                              onChange={() => toggleOne(idx, "delete")}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        </>
-      )}
+          {/* Right Column */}
+          <div className="rounded-lg shadow-md p-3 mb-1 lg:p-3 border-[var(--border)] border-1">
+            <h2 className="text-base  mb-4 text-[var(--text)]">
+              <span className="relative">
+                SUMMARY / SETTINGS
+                <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+              </span>
+            </h2>
+
+            <div className="p-2 lg:p-3 text-sm text-[var(--text)] leading-relaxed space-y-2">
+              <p>
+                ✔️ Total Pages: <strong>{rows.length}</strong>
+              </p>
+              <p>
+                ✔️ Changes pending: <strong>{totalChanged}</strong>
+              </p>
+              <p>
+                ✔️ Toggle “All” to enable/disable every permission in a row.
+              </p>
+              <p>✔️ Click “Save” for a single row or “Save All Changes”.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 };

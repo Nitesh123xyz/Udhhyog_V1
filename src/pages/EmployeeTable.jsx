@@ -41,7 +41,7 @@ const EmployeeTable = () => {
             <th
               key={index}
               onClick={() => handleSorting(item?.name, item.status)}
-              className={`px-3 py-5 text-left text-xs font-bold bg-[var(--background)] text-[var(--text)] uppercase tracking-wider ${
+              className={`px-3 py-5 text-left text-xs bg-[var(--background)] text-[var(--text)] uppercase tracking-wider ${
                 item.status === true ? "cursor-pointer" : "cursor-default"
               }`}
             >
@@ -91,7 +91,7 @@ const EmployeeTable = () => {
                           alt={employee.name}
                           className="w-8 h-8 rounded-full object-cover"
                         />
-                        <span className={`text-xs font-medium text-[var(--text)]`}>
+                        <span className={`text-xs text-[var(--text)]`}>
                           {employee.name}
                         </span>
                       </div>

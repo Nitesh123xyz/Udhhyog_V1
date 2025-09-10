@@ -1,32 +1,22 @@
-/* @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
+@import "animate.css";
+.font-default {
+  --app-font-weight: 500;
+}
+.font-first {
+  --app-font-weight: 300;
+}
+.font-second {
+  --app-font-weight: 600;
+}
+.font-third {
+  --app-font-weight: 800;
+}
 
 body {
   font-family: "Outfit", sans-serif;
-  } */
-
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Old+Standard+TT:wght@400;700&display=swap");
-@import "tailwindcss";
-
-/* font classes (independent of theme) */
-.font-first {
-  --app-font: "Outfit";
-}
-.font-second {
-  --app-font: "Inter";
-}
-.font-third {
-  --app-font: "Poppins";
-}
-
-.font-fourth {
-  --app-font: "Old Standard TT";
-}
-
-/* apply the chosen font everywhere */
-body {
-  font-family: var(--app-font), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: var(--app-font-weight);
 }
 
 :root {

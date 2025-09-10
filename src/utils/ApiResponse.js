@@ -1,14 +1,14 @@
-import { clearSession, setSessionExpire } from "./StoreSessionInfo";
+// import { useDispatch } from "react-redux";
 import { showCustomToast } from "../components/CustomToast";
+import { setSessionExpire } from "./StoreSessionInfo";
 
 export const fetchWithErrorHandling = async (fetchFunction = () => {}) => {
+  // const dispatch = useDispatch();
   try {
     const { status, body } = await fetchFunction();
 
     if (status === 200) {
       return { success: true, status, ApiData: body };
-    } else if (status === 202) {
-      return { success: true, status };
     } else {
       showCustomToast(
         `Something went wrong! Please try again. status: ${status}`,
@@ -26,18 +26,13 @@ export const fetchWithErrorHandling = async (fetchFunction = () => {}) => {
         "/error.gif",
         "Error"
       );
+      return { success: false, status };
     } else if (status === 406) {
-      showCustomToast(
-        "Session Expired Please Login Again",
-        "/error.gif",
-        "Error"
-      );
       setSessionExpire(true);
-      clearSession();
-      window.location.href = "/session-expired";
+      return { success: false, status };
     } else {
       showCustomToast(
-        `Something went wrong! Please try again. status: ${status}`,
+        `Something went wrong! Please try again later.`,
         "/error.gif",
         "Error"
       );

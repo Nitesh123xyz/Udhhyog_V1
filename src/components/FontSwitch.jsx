@@ -1,23 +1,22 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getAppFontWeight, setAppFontWeight } from "../utils/StoreSessionInfo";
 
 const FONT_CLASSES = {
-  Outfit: "font-first",
-  Inter: "font-second",
-  Poppins: "font-third",
-  "Old Standard TT": "font-fourth",
+  Default: "font-default",
+  Light: "font-first",
+  Medium: "font-second",
+  Bold: "font-third",
 };
 
 const FontSwitch = () => {
-  const [font, setFont] = useState(
-    () => localStorage.getItem("app-font") || "Outfit"
-  );
+  const [font, setFont] = useState(getAppFontWeight());
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.remove(...Object.values(FONT_CLASSES));
     root.classList.add(FONT_CLASSES[font]);
-    localStorage.setItem("app-font", font);
+    setAppFontWeight(font);
   }, [font]);
 
   return (
