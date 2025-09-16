@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { PencilLine, ArrowDownUp } from "lucide-react";
 import { Link } from "react-router-dom";
-import { employees, employeesHeading } from "../utils/DummyData";
-import { StatusBtn } from "../components/StatusBtn";
-import Pagination from "../components/Pagination";
-import Header from "../components/Header";
-import "../css/commonLayout.css";
+import { employees, employeesHeading } from "../../utils/DummyData";
+import { StatusBtn } from "../../components/StatusBtn";
+import Pagination from "../../components/Pagination";
+import Header from "../../components/Header";
+import "../../css/commonLayout.css";
 
-const EmployeeTable = () => {
+const Users = ({ setStep, setEmployeesId }) => {
   const [rows, setRows] = useState(() => [...employees]);
   const [order, setOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const itemsPerPage = 5;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentEmployees = rows.slice(startIndex, endIndex);
@@ -63,17 +63,13 @@ const EmployeeTable = () => {
 
   return (
     <>
-      {/* {page name and search bar} */}
-      <div className="px-2">
-        <Header rows={rows} setRows={setRows} title="EMPLOYEES" />
-      </div>
-      {/* {page name and search bar} */}
+      <Header rows={rows} setRows={setRows} title="EMPLOYEES" />
 
-      <section className="mt-1">
+      <section className="max-w-screen md:max-w-full">
         <div
-          className={`bg-[var(--background)] backdrop-blur-sm rounded-2xl overflow-hidden`}
+          className={`bg-[var(--background)] backdrop-blur-sm rounded-b-lg overflow-hidden`}
         >
-          <div className="overflow-x-auto px-2 h-[calc(100vh-186px)]  NavScroll">
+          <div className="overflow-x-auto px-2 max-h-screen lg:h-[calc(100vh-179px)]  NavScroll">
             <table className="w-full min-w-max table-auto">
               <thead className="sticky top-[-5px] lg:top-0 z-50">
                 <tr>{SortingFields()}</tr>
@@ -81,10 +77,14 @@ const EmployeeTable = () => {
               <tbody className="divide-y divide-x divide-[var(--divide)]">
                 {currentEmployees?.map((employee) => (
                   <tr
+                    onClick={() => {
+                      setStep(2);
+                      setEmployeesId(employee.id);
+                    }}
                     key={employee.id}
                     className="hover:bg-[var(--hoverTable)] rounded-2xl transition-colors duration-200"
                   >
-                    <td className="px-4 py-4 whitespace-nowrap rounded-l-2xl">
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-3">
                         <img
                           src={employee.avatar}
@@ -131,7 +131,7 @@ const EmployeeTable = () => {
                       <StatusBtn Status={employee.status} />
                     </td>
 
-                    <td className="px-10 py-4 whitespace-nowrap text-sm rounded-r-2xl">
+                    <td className="px-10 py-4 whitespace-nowrap text-sm">
                       <div className="flex">
                         <Link to="/update-user">
                           <PencilLine
@@ -161,4 +161,4 @@ const EmployeeTable = () => {
   );
 };
 
-export default EmployeeTable;
+export default Users;

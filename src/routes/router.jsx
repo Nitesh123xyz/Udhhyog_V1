@@ -3,19 +3,20 @@ import { lazy, Suspense } from "react";
 import App from "../App";
 import AddUser from "../pages/AddUser";
 import UpdateUser from "../pages/UpdateUser";
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
 // ---------------------------------------------------
 
-const EmployeeTable = lazy(() => import("../pages/EmployeeTable"));
+const UserTableInfo = lazy(() => import("../pages/user/User"));
 const Permissions = lazy(() => import("../pages/Permission"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const LoginPage = lazy(() => import("../pages/Login"));
-const ResetPassword = lazy(() => import("../pages/ResetPassword"));
+const ResetPassword = lazy(() =>
+  import("../pages/reset-password/ResetPassword")
+);
 const Setting = lazy(() => import("../pages/Setting"));
 const PageNotFound = lazy(() => import("../pages/PageNotFound"));
-const CommonLayout = lazy(() => import("../components/commonLayout"));
 
 const router = createBrowserRouter([
   {
@@ -46,13 +47,11 @@ const router = createBrowserRouter([
         caseSensitive: true,
       },
       {
-        path: "/employees",
+        path: "/users",
         element: (
           <ProtectedRoute>
             <PermissionGate>
-              <CommonLayout>
-                <EmployeeTable />
-              </CommonLayout>
+              <UserTableInfo />
             </PermissionGate>
           </ProtectedRoute>
         ),

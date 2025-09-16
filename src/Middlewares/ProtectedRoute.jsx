@@ -1,4 +1,3 @@
-// src/router/ProtectedRoute.tsx
 import { Navigate } from "react-router-dom";
 
 const hasToken = () => sessionStorage.getItem("token");

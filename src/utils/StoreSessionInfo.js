@@ -100,3 +100,8 @@ export const clearAllSession = () => {
 };
 
 // ------------------------------------------------------
+export const RefreshPage = () => {
+  sessionStorage.removeItem("leftSideNavigationMenu");
+};
+
+// ------------------------------------------------------

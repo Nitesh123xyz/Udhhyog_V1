@@ -4,10 +4,16 @@ import {
   LogOut,
   Sun,
   Moon,
+  RefreshCcw,
   Type as TypeIcon,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { clearAllSession, getThemeMode, setThemeMode } from "../utils/StoreSessionInfo";
+import {
+  clearAllSession,
+  getThemeMode,
+  RefreshPage,
+  setThemeMode,
+} from "../utils/StoreSessionInfo";
 import FontSwitch from "../components/FontSwitch";
 
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
@@ -23,6 +29,9 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
     if (item.isLogout) {
       clearAllSession();
       window.location.href = "/";
+    } else if (item.isRefresh) {
+      window.location.reload();
+      RefreshPage();
     } else if (item.path) {
       window.location.href = item.path;
     }
@@ -93,9 +102,9 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
       clickable: false,
     },
     {
-      icon: HelpCircle,
-      text: "Help",
-      path: "/profile",
+      icon: RefreshCcw,
+      text: "Refresh",
+      isRefresh: true,
       clickable: true,
     },
     {

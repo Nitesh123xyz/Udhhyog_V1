@@ -24,7 +24,7 @@ const Pagination = ({
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-xs md:text-sm text-[var(--text)] disabled:cursor-not-allowed"
+              className="px-3 py-1 text-xs md:text-sm text-[var(--text)] cursor-pointer disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -46,7 +46,7 @@ const Pagination = ({
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }
               disabled={currentPage === totalPages}
-              className="px-3 py-1 text-xs md:text-sm text-[var(--text)] disabled:cursor-not-allowed"
+              className="px-3 py-1 text-xs md:text-sm text-[var(--text)] cursor-pointer disabled:cursor-not-allowed"
             >
               Next
             </button>

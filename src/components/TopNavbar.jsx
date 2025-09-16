@@ -18,28 +18,27 @@ const TopNavbar = ({ setIsExpanded }) => {
   };
 
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
-  const current = JSON.parse(localStorage.getItem("CurrentLabel"));
-
+  // const current = JSON.parse(localStorage.getItem("CurrentLabel"));
   return (
     <>
       <header
         className={`bg-[var(--background)] backdrop-blur-md rounded-lg flex items-center justify-between px-2 py-2 shadow-md max-w-screen md:max-w-full`}
       >
-        <div className="flex items-center gap-4">
-          <div
-            onClick={handleToggle}
-            className={`bg-[var(--header_left)] px-4 py-2 uppercase rounded-lg text-sm shadow-sm`}
-          >
-            {"Home" || CurrentLabel.ParentTabLabel || current.ParentTabLabel}
-          </div>
-        </div>
+        <h2
+          onClick={handleToggle}
+          className={`text-[var(--text)] uppercase text-sm lg:text-lg ml-0.5`}
+        >
+          {CurrentLabel.ParentTabLabel !== ""
+            ? CurrentLabel.ParentTabLabel
+            : "Dashboard"}
+        </h2>
         <div
           onClick={() => setOpenPopup((popup) => !popup)}
-          className="flex items-center gap-4"
+          className="flex items-center gap-2"
         >
           <div className="flex flex-col">
             <p className="text-sm text-[var(--text)]">{emp_name}</p>
-            <p className="text-sm text-[var(--text)]">{emp_profile}</p>
+            <p className="text-sm text-end text-[var(--text)]">{emp_profile}</p>
           </div>
           <div className="w-10 h-10 bg-[var(--icon_bg)] rounded-full flex flex-col items-center justify-center text-xs shadow-md hover:scale-105 transition-transform">
             <User size={16} className="text-[var(--icon_text)]" />

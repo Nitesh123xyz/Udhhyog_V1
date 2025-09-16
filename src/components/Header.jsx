@@ -14,10 +14,8 @@ const Header = ({ rows, setRows }) => {
   const [query, setQuery] = useState("");
   const [openSearch, setOpenSearch] = useState(false);
 
-  // Keep a stable master (original list) to restore from when clearing search
   const masterRef = useRef([]);
 
-  // Update masterRef when parent updates rows and there is no active query
   useEffect(() => {
     if (!query) masterRef.current = Array.isArray(rows) ? [...rows] : [];
   }, [rows, query]);
@@ -27,9 +25,7 @@ const Header = ({ rows, setRows }) => {
   const HideHeader = hideHeaderOptions.includes(location.pathname);
 
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
-  const current = JSON.parse(localStorage.getItem("CurrentLabel") || "{}");
 
-  // NAME-ONLY search (no permissions/true logic)
   const handleSearch = (e) => {
     const raw = e.target.value;
     const q = normalize(raw);
@@ -48,15 +44,13 @@ const Header = ({ rows, setRows }) => {
   };
 
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-lg w-full flex items-center justify-between px-1 py-1.5 transition-all duration-300">
-      {/* Left Side - Label */}
-      <div className="flex items-center gap-4">
-        <div className="bg-blue-100 px-1 py-2 uppercase rounded-lg text-[0.8rem] md:text-md lg:text-[1rem] shadow-xs">
-          {CurrentLabel?.ChildTabLabel || current?.ChildTabLabel || "Users"}
-        </div>
-      </div>
+    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 transition-all duration-300">
+      <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg">
+        {CurrentLabel?.ChildTabLabel !== ""
+          ? CurrentLabel?.ChildTabLabel
+          : "Permission"}
+      </h2>
 
-      {/* Right Side - Search + Icons */}
       <div className="flex">
         <div
           className={`flex items-center gap-2 ${

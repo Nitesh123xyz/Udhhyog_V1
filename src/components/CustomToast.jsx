@@ -6,7 +6,7 @@ export const showCustomToast = (message, icon, title = "Notification") => {
     <div
       className={`${
         t.visible ? "animate-custom-enter" : "animate-custom-leave"
-      } max-w-xs w-full bg-white shadow-lg rounded-lg relative pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+      } max-w-xs w-full bg-[var(--background)] shadow-lg rounded-lg relative pointer-events-auto flex border border-[var(--border)]`}
     >
       <div className="flex-1 w-0 p-2 md:p-2">
         <div className="flex items-start">
@@ -24,15 +24,15 @@ export const showCustomToast = (message, icon, title = "Notification") => {
                 src={icon}
                 alt="company_logo"
               />
-              <p className="text-sm font-medium text-black">{title}</p>
+              <p className="text-sm font-medium text-[var(--text)]">{title}</p>
             </div>
-            <p className="mt-1 text-sm text-black">{message}</p>
+            <p className="mt-1 text-sm text-[var(--text)]">{message}</p>
           </div>
         </div>
       </div>
       <div
         onClick={() => toast.dismiss(t.id)}
-        className="absolute right-1.5 top-1 p-1 cursor-pointer rounded-full bg-red-400"
+        className="absolute right-1.5 top-1 p-1 cursor-pointer rounded-full bg-white/10"
       >
         <X className="text-white w-3 h-3" />
       </div>
