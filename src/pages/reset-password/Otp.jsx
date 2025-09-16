@@ -1,12 +1,11 @@
 import { lazy, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import { useOTPVerificationMutation } from "../features/auth/authSlice";
-import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import { showCustomToast } from "../components/CustomToast";
+import { useOTPVerificationMutation } from "../../features/auth/authSlice";
+import { fetchWithErrorHandling } from "../../utils/ApiResponse";
+import { showCustomToast } from "../../components/CustomToast";
 
-const Animation = lazy(() => import("../components/Animation"));
+const Animation = lazy(() => import("../../components/Animation"));
 
 const Otp = ({ setStep, setSharingOtp }) => {
   const [otpInput, setOtpInput] = useState(Array(6).fill(""));

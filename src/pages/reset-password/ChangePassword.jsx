@@ -11,12 +11,12 @@ import {
   Lock,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useChangePasswordMutation } from "../features/auth/authSlice";
+import { useChangePasswordMutation } from "../../features/auth/authSlice";
 import toast from "react-hot-toast";
-import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import { showCustomToast } from "../components/CustomToast";
+import { fetchWithErrorHandling } from "../../utils/ApiResponse";
+import { showCustomToast } from "../../components/CustomToast";
 
-const Animation = lazy(() => import("../components/Animation"));
+const Animation = lazy(() => import("../../components/Animation"));
 
 // ---------------- Zod Schema ----------------
 const PasswordChangeSchema = z

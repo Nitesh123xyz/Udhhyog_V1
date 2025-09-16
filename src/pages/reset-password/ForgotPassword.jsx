@@ -4,12 +4,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleUser, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useForgotPasswordMutation } from "../features/auth/authSlice";
-import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import { showCustomToast } from "../components/CustomToast";
+import { useForgotPasswordMutation } from "../../features/auth/authSlice";
+import { fetchWithErrorHandling } from "../../utils/ApiResponse";
+import { showCustomToast } from "../../components/CustomToast";
 
 // ----------------------------------------------------
-const Animation = lazy(() => import("../components/Animation"));
+const Animation = lazy(() => import("../../components/Animation"));
 // ----------------------------------------------------
 
 // Zod Schema
