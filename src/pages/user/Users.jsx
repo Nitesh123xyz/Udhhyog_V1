@@ -130,17 +130,6 @@ const Users = ({ setStep, setEmployeesId }) => {
                     <td className="px-3 py-4 whitespace-nowrap">
                       <StatusBtn Status={employee.status} />
                     </td>
-
-                    <td className="px-10 py-4 whitespace-nowrap text-sm">
-                      <div className="flex">
-                        <Link to="/update-user">
-                          <PencilLine
-                            size={14}
-                            className={`cursor-pointer text-[var(--icon)]`}
-                          />
-                        </Link>
-                      </div>
-                    </td>
                   </tr>
                 ))}
               </tbody>

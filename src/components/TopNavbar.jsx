@@ -40,7 +40,7 @@ const TopNavbar = ({ setIsExpanded }) => {
             <p className="text-sm text-[var(--text)]">{emp_name}</p>
             <p className="text-sm text-end text-[var(--text)]">{emp_profile}</p>
           </div>
-          <div className="w-10 h-10 bg-[var(--icon_bg)] rounded-full flex flex-col items-center justify-center text-xs shadow-md hover:scale-105 transition-transform">
+          <div className="w-10 h-10 bg-[var(--icon_bg)] rounded-full flex flex-col items-center justify-center text-xs shadow-md hover:scale-105 transition-transform cursor-pointer">
             <User size={16} className="text-[var(--icon_text)]" />
           </div>
         </div>
