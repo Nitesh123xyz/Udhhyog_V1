@@ -7,7 +7,7 @@ import Pagination from "../../components/Pagination";
 import Header from "../../components/Header";
 import "../../css/commonLayout.css";
 
-const Users = ({ setStep, setEmployeesId }) => {
+const Users = ({ step, setStep, setEmployeesId }) => {
   const [rows, setRows] = useState(() => [...employees]);
   const [order, setOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,18 +63,24 @@ const Users = ({ setStep, setEmployeesId }) => {
 
   return (
     <>
-      <Header rows={rows} setRows={setRows} title="EMPLOYEES" />
+      <Header
+        rows={rows}
+        step={step}
+        setRows={setRows}
+        setStep={setStep}
+        title="EMPLOYEES"
+      />
 
-      <section className="max-w-screen md:max-w-full">
+      <section className="max-w-screen">
         <div
-          className={`bg-[var(--background)] backdrop-blur-sm rounded-b-lg overflow-hidden`}
+          className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden rounded-b-lg`}
         >
-          <div className="overflow-x-auto px-2 max-h-screen lg:h-[calc(100vh-179px)]  NavScroll">
+          <div className="overflow-x-auto px-2 max-h-screen h-[calc(100vh-170px)] sm:h-[calc(100vh-176px)]  NavScroll">
             <table className="w-full min-w-max table-auto">
               <thead className="sticky top-[-5px] lg:top-0 z-50">
                 <tr>{SortingFields()}</tr>
               </thead>
-              <tbody className="divide-y divide-x divide-[var(--divide)]">
+              <tbody className="divide-y  divide-[var(--border)]">
                 {currentEmployees?.map((employee) => (
                   <tr
                     onClick={() => {
@@ -84,7 +90,7 @@ const Users = ({ setStep, setEmployeesId }) => {
                     key={employee.id}
                     className="hover:bg-[var(--hoverTable)] rounded-2xl transition-colors duration-200"
                   >
-                    <td className="px-4 py-4 whitespace-nowrap">
+                    <td className="px-4 py-4 whitespace-nowrap rounded-l-2xl">
                       <div className="flex items-center space-x-3">
                         <img
                           src={employee.avatar}
@@ -127,7 +133,7 @@ const Users = ({ setStep, setEmployeesId }) => {
                       {employee.lifecycle}
                     </td>
 
-                    <td className="px-3 py-4 whitespace-nowrap">
+                    <td className="px-3 py-4 whitespace-nowrap rounded-r-2xl">
                       <StatusBtn Status={employee.status} />
                     </td>
                   </tr>

@@ -1,6 +1,5 @@
 import {
   User,
-  HelpCircle,
   LogOut,
   Sun,
   Moon,
@@ -18,7 +17,6 @@ import FontSwitch from "../components/FontSwitch";
 
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
   const boxRef = useRef(null);
-  const closeTimerRef = useRef(null);
   const [themeMode, setTheme] = useState(getThemeMode());
 
   // -------------------------------------------------------
@@ -39,22 +37,18 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
 
   // -------------------------------------------------------
 
-  const scheduleClose = () => {
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = setTimeout(() => {
-      setOpenPopup(false);
-      closeTimerRef.current = null;
-    }, 600);
-  };
-
-  const cancelClose = () => {
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = null;
-  };
-
   useEffect(() => {
-    return () => clearTimeout(closeTimerRef.current);
-  }, []);
+    if (!openPopup) return;
+
+    const onPointerDown = (e) => {
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
+        setOpenPopup(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [openPopup, setOpenPopup]);
 
   // -------------------------------------------------------
 
@@ -122,8 +116,6 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
       }`}
     >
       <div
-        onMouseEnter={cancelClose}
-        onMouseLeave={scheduleClose}
         ref={boxRef}
         className="w-[18rem] sm:w-[20rem] bg-[var(--background)] border border-[var(--border)] rounded-lg shadow-lg overflow-hidden"
       >

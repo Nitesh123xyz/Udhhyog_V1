@@ -11,17 +11,14 @@ const ImageSlider = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/2 backdrop-blur-sm">
-        <div className="relative">
-          <button
-            onClick={() => setOpen(false)}
-            aria-label="Close"
-            className="cursor-pointer absolute top-1 right-1 z-30 bg-white/30 backdrop-blur-md transition-colors duration-300 p-2 rounded-full shadow-lg"
-          >
-            <X className="w-4 h-4 text-gray-800" />
-          </button>
-
-          <div className="flex items-center justify-center h-[70vh] bg-transparent rounded-lg overflow-hidden">
+      <div
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setOpen(false);
+        }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+      >
+        <div className="relative top-[-30%] sm:top-[-20%] lg:top-0  w-full  lg:max-w-[50%] px-1 sm:px-3 lg:px-0">
+          <div className="flex items-center justify-center bg-transparent rounded-lg overflow-hidden">
             <img
               src={images[selectedIndex].src}
               alt={images[selectedIndex].alt || `slide-${selectedIndex}`}
@@ -36,9 +33,9 @@ const ImageSlider = ({
               )
             }
             aria-label="Previous"
-            className="cursor-pointer absolute left-[-1.4rem] top-1/2 -translate-y-1/2 z-40 bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg"
+            className="cursor-pointer absolute left-[0rem] lg:left-[-1.4rem] top-1/2 -translate-y-1/2 z-40 bg-white/20 backdrop-blur-md p-2 sm:p-3 rounded-full shadow-lg"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
 
           <button
@@ -46,9 +43,9 @@ const ImageSlider = ({
               setSelectedIndex((selectedIndex + 1) % images.length)
             }
             aria-label="Next"
-            className="cursor-pointer absolute right-[-1.4rem] top-1/2 -translate-y-1/2 z-40 bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg"
+            className="cursor-pointer absolute right-[0rem] lg:right-[-1.4rem] top-1/2 -translate-y-1/2 z-40 bg-white/20 backdrop-blur-md p-2 sm:p-3 rounded-full shadow-lg"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
         </div>
       </div>

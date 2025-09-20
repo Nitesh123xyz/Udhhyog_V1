@@ -20,7 +20,7 @@ const Pagination = ({
             {startIndex + 1} to {Math.min(endIndex, MainData.length)} of{" "}
             {MainData.length} results
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 max-w-2xl">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}

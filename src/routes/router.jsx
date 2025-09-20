@@ -1,8 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import App from "../App";
-import AddUser from "../pages/AddUser";
-import UpdateUser from "../pages/UpdateUser";
 import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
@@ -79,28 +77,7 @@ const router = createBrowserRouter([
         ),
         caseSensitive: true,
       },
-      {
-        path: "/add-user",
-        element: (
-          <ProtectedRoute>
-            <PermissionGate>
-              <AddUser />
-            </PermissionGate>
-          </ProtectedRoute>
-        ),
-        caseSensitive: true,
-      },
-      {
-        path: "/update-user",
-        element: (
-          <ProtectedRoute>
-            <PermissionGate>
-              <UpdateUser />
-            </PermissionGate>
-          </ProtectedRoute>
-        ),
-        caseSensitive: true,
-      },
+
       {
         path: "*",
         element: <PageNotFound />,

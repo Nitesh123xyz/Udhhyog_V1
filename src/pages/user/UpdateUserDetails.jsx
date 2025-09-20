@@ -1,20 +1,113 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { employees } from "../../utils/DummyData";
+import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
 
-const emptyContact = {
-  email: "",
-  phone: "",
-  dob: "",
-  panCard: "",
-  maritalStatus: "",
-  bloodGroup: "",
-  address: "",
-};
+/* ---------------- ZOD SCHEMAS ---------------- */
+const contactSchema = z.object({
+  email: z
+    .string()
+    .email("Invalid email")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
+  phone: z.string().optional().or(z.literal("")).nullable(),
+  whatsapp: z.string().optional().or(z.literal("")).nullable(),
+  dob: z.string().optional().nullable(),
+  maritalStatus: z.string().optional().nullable(),
+  bloodGroup: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+});
 
-const UpdateUserDetails = ({ setStep, employeesId }) => {
-  const [employeeIndex, setEmployeeIndex] = useState(-1);
-  const [form, setForm] = useState({
-    // core profile
+const documentSchema = z.object({
+  type: z.string().min(1, "Type required"),
+  doc: z.string().min(1, "Doc required"),
+  url: z.string().url("Invalid URL").optional().or(z.literal("")).nullable(),
+});
+
+const educationSchema = z.object({
+  degree: z.string().optional().nullable(),
+  institute: z.string().optional().nullable(),
+  result: z.string().optional().nullable(),
+  year: z.union([z.string(), z.number()]).optional().nullable(),
+});
+
+const familySchema = z.object({
+  name: z.string().optional().nullable(),
+  relation: z.string().optional().nullable(),
+  dob: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
+  occupation: z.string().optional().nullable(),
+});
+
+const experienceSchema = z.object({
+  company: z.string().min(1, "Company required"),
+  role: z.string().min(1, "Role required"),
+  startDate: z.string().optional().nullable(),
+  endDate: z.string().optional().nullable(),
+  year: z.string().optional().nullable(),
+});
+
+const bankSchema = z.object({
+  accountHolder: z.string().optional().nullable(),
+  bankName: z.string().optional().nullable(),
+  accountNumber: z.string().optional().nullable(),
+  ifsc: z.string().optional().nullable(),
+  branch: z.string().optional().nullable(),
+  upi: z.string().optional().nullable(),
+});
+
+const formSchema = z
+  .object({
+    id: z.any().optional().nullable(),
+    name: z.string().min(1, "Name is required"),
+    jobTitle: z.string().optional().nullable(),
+    department: z.string().optional().nullable(),
+    site: z.string().optional().nullable(),
+    salary: z.string().optional().nullable(),
+    startDate: z.string().optional().nullable(),
+    lifecycle: z.string().optional().nullable(),
+    status: z.string().optional().nullable(),
+    avatar: z.string().optional().nullable(),
+    contact: contactSchema,
+    documents: z.array(documentSchema).optional().nullable(),
+    emergencyContacts: z
+      .array(
+        z.object({
+          name: z.string().optional().nullable(),
+          relation: z.string().optional().nullable(),
+          phone: z.string().optional().nullable(),
+        })
+      )
+      .optional()
+      .nullable(),
+    education: z.array(educationSchema).optional().nullable(),
+    family: z.array(familySchema).optional().nullable(),
+    bank: bankSchema.optional().nullable(),
+    experience: z.array(experienceSchema).optional().nullable(),
+  })
+  // ensure at least one contact (email / phone / whatsapp)
+  .refine(
+    (data) =>
+      !!(
+        data.contact &&
+        (data.contact.email?.toString().trim() ||
+          data.contact.phone?.toString().trim() ||
+          data.contact.whatsapp?.toString().trim())
+      ),
+    {
+      message: "Please provide at least one contact: email, phone or whatsapp",
+      path: ["contact"],
+    }
+  );
+
+/* ---------------- COMPONENT ---------------- */
+const UpdateUserDetails = ({ step, setStep, employeesId }) => {
+  const employee = employees.find((e) => e.id === employeesId);
+
+  const defaultValues = employee || {
     id: null,
     name: "",
     jobTitle: "",
@@ -25,611 +118,612 @@ const UpdateUserDetails = ({ setStep, employeesId }) => {
     lifecycle: "",
     status: "",
     avatar: "",
-    // nested / lists
-    contact: { ...emptyContact },
+    contact: {
+      email: "",
+      phone: "",
+      whatsapp: "",
+      dob: "",
+      maritalStatus: "",
+      bloodGroup: "",
+      address: "",
+    },
+    documents: [],
     emergencyContacts: [],
     education: [],
     family: [],
-    documents: [],
+    bank: {
+      accountHolder: "",
+      bankName: "",
+      accountNumber: "",
+      ifsc: "",
+      branch: "",
+      upi: "",
+    },
+    experience: [],
+  };
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues,
   });
 
-  // Find employee and set form
+  // field arrays
+  const docsField = useFieldArray({ control, name: "documents" });
+  const emField = useFieldArray({ control, name: "emergencyContacts" });
+  const eduField = useFieldArray({ control, name: "education" });
+  const famField = useFieldArray({ control, name: "family" });
+  const expField = useFieldArray({ control, name: "experience" });
+
   useEffect(() => {
+    // reset whenever employee changes (load)
+    reset(defaultValues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [employee]);
+
+  const onSubmit = (data) => {
+    // Mock update in imported array (same as your original behaviour)
     const idx = employees.findIndex((e) => e.id === employeesId);
-    setEmployeeIndex(idx);
-    if (idx !== -1) {
-      const emp = employees[idx];
-      setForm({
-        id: emp.id,
-        name: emp.name || "",
-        jobTitle: emp.jobTitle || "",
-        department: emp.department || "",
-        site: emp.site || "",
-        salary: emp.salary || "",
-        startDate: emp.startDate || "",
-        lifecycle: emp.lifecycle || "",
-        status: emp.status || "",
-        avatar: emp.avatar || "",
-        contact: { ...emptyContact, ...(emp.contact || {}) },
-        emergencyContacts: Array.isArray(emp.emergencyContacts)
-          ? emp.emergencyContacts.map((c) => ({ ...c }))
-          : [],
-        education: Array.isArray(emp.education)
-          ? emp.education.map((e) => ({ ...e }))
-          : [],
-        family: Array.isArray(emp.family)
-          ? emp.family.map((f) => ({ ...f }))
-          : [],
-        documents: Array.isArray(emp.documents)
-          ? emp.documents.map((d) => ({ ...d }))
-          : [],
-      });
-    }
-  }, [employeesId]);
-
-  // Generic change handler for top-level fields
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((p) => ({ ...p, [name]: value }));
-  };
-
-  // Contact change
-  const handleContactChange = (e) => {
-    const { name, value } = e.target;
-    setForm((p) => ({ ...p, contact: { ...p.contact, [name]: value } }));
-  };
-
-  // Helpers for list fields
-  const handleListChange = (listName, index, field, value) => {
-    setForm((p) => {
-      const list = [...(p[listName] || [])];
-      list[index] = { ...list[index], [field]: value };
-      return { ...p, [listName]: list };
-    });
-  };
-
-  const addListItem = (listName, template = {}) => {
-    setForm((p) => ({ ...p, [listName]: [...(p[listName] || []), template] }));
-  };
-
-  const removeListItem = (listName, index) => {
-    setForm((p) => {
-      const list = [...(p[listName] || [])];
-      list.splice(index, 1);
-      return { ...p, [listName]: list };
-    });
-  };
-
-  const handleSave = () => {
-    if (employeeIndex === -1) {
+    if (idx === -1) {
       alert("Employee not found.");
       return;
     }
-    // Mock update in the imported array
-    employees[employeeIndex] = {
-      ...employees[employeeIndex],
-      id: form.id,
-      name: form.name,
-      jobTitle: form.jobTitle,
-      department: form.department,
-      site: form.site,
-      salary: form.salary,
-      startDate: form.startDate,
-      lifecycle: form.lifecycle,
-      status: form.status,
-      avatar: form.avatar,
-      contact: { ...form.contact },
-      emergencyContacts: form.emergencyContacts.map((c) => ({ ...c })),
-      education: form.education.map((e) => ({ ...e })),
-      family: form.family.map((f) => ({ ...f })),
-      documents: form.documents.map((d) => ({ ...d })),
-    };
-
+    employees[idx] = { ...employees[idx], ...data };
     alert("Employee updated (mock).");
-    setStep(1); // return to listing / details screen
-  };
-
-  // Minor validation example
-  const isValid = () => {
-    if (!form.name) return false;
-    if (!form.contact.email && !form.contact.phone) return false;
-    return true;
+    setStep(1);
   };
 
   return (
-    <section className="bg-[var(--background)] p-6 rounded-lg border border-[var(--border)] max-w-5xl mx-auto">
-      <h3 className="font-semibold text-lg mb-4 text-[var(--text)]">
+    <section className="bg-[var(--background)] px-6 py-6 rounded-lg border border-[var(--border)]">
+      <div className="flex justify-end gap-3 mb-3">
+        <UserAdditionalDetailsHeader step={step} setStep={setStep} />
+      </div>
+
+      <h3 className="font-semibold text-2xl mb-4 text-[var(--text)]">
         Update Employee
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Core profile */}
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Name
-          </label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Job Title
-          </label>
-          <input
-            name="jobTitle"
-            value={form.jobTitle}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Department
-          </label>
-          <input
-            name="department"
-            value={form.department}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Site
-          </label>
-          <input
-            name="site"
-            value={form.site}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Salary
-          </label>
-          <input
-            name="salary"
-            value={form.salary}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Start Date
-          </label>
-          <input
-            name="startDate"
-            value={form.startDate}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-            placeholder="e.g. Jan 01, 2020"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Lifecycle
-          </label>
-          <input
-            name="lifecycle"
-            value={form.lifecycle}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Status
-          </label>
-          <input
-            name="status"
-            value={form.status}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-[var(--text)]">
-            Avatar URL
-          </label>
-          <input
-            name="avatar"
-            value={form.avatar}
-            onChange={handleChange}
-            className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-          />
-        </div>
-      </div>
-
-      {/* Contact */}
-      <div className="mt-6 p-4 rounded-lg border border-[var(--border)]">
-        <h4 className="font-semibold mb-3 text-[var(--text)]">Contact</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm">Email</label>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Name *
+            </label>
             <input
-              name="email"
-              value={form.contact.email}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...register("name")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
             />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
+            )}
           </div>
+
           <div>
-            <label className="block text-sm">Phone</label>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Job Title
+            </label>
             <input
-              name="phone"
-              value={form.contact.phone}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm">DOB</label>
-            <input
-              name="dob"
-              value={form.contact.dob}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              placeholder="YYYY-MM-DD or MMM DD, YYYY"
-            />
-          </div>
-          <div>
-            <label className="block text-sm">PAN Card</label>
-            <input
-              name="panCard"
-              value={form.contact.panCard}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...register("jobTitle")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
             />
           </div>
 
           <div>
-            <label className="block text-sm">Marital Status</label>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Department
+            </label>
             <input
-              name="maritalStatus"
-              value={form.contact.maritalStatus}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...register("department")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
             />
           </div>
+
           <div>
-            <label className="block text-sm">Blood Group</label>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Site
+            </label>
             <input
-              name="bloodGroup"
-              value={form.contact.bloodGroup}
-              onChange={handleContactChange}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...register("site")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
             />
           </div>
 
-          <div className="sm:col-span-2">
-            <label className="block text-sm">Address</label>
-            <textarea
-              name="address"
-              value={form.contact.address}
-              onChange={handleContactChange}
-              rows={2}
-              className="w-full px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Salary
+            </label>
+            <input
+              {...register("salary")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Start Date
+            </label>
+            <input
+              {...register("startDate")}
+              placeholder="e.g. Mar 13, 2023"
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Lifecycle
+            </label>
+            <input
+              {...register("lifecycle")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Status
+            </label>
+            <input
+              {...register("status")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[var(--text)]">
+              Avatar URL
+            </label>
+            <input
+              {...register("avatar")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
             />
           </div>
         </div>
-      </div>
 
-      {/* Emergency Contacts */}
-      <div className="mt-6 p-4 rounded-lg border border-[var(--border)]">
-        <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-[var(--text)]">
-            Emergency Contacts
-          </h4>
-          <button
-            type="button"
-            onClick={() =>
-              addListItem("emergencyContacts", {
-                name: "",
-                relation: "",
-                phone: "",
-              })
-            }
-            className="text-sm px-2 py-1 rounded border border-[var(--border)]"
-          >
-            Add
-          </button>
-        </div>
-
-        <div className="mt-3 space-y-2">
-          {(form.emergencyContacts || []).map((c, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
-            >
+        {/* Contact */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <h4 className="font-semibold mb-3 text-[var(--text)]">Contact</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm">Email</label>
               <input
-                placeholder="Name"
-                value={c.name}
-                onChange={(e) =>
-                  handleListChange(
-                    "emergencyContacts",
-                    i,
-                    "name",
-                    e.target.value
-                  )
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...register("contact.email")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
               />
-              <input
-                placeholder="Relation"
-                value={c.relation}
-                onChange={(e) =>
-                  handleListChange(
-                    "emergencyContacts",
-                    i,
-                    "relation",
-                    e.target.value
-                  )
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="Phone"
-                value={c.phone}
-                onChange={(e) =>
-                  handleListChange(
-                    "emergencyContacts",
-                    i,
-                    "phone",
-                    e.target.value
-                  )
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => removeListItem("emergencyContacts", i)}
-                  className="px-2 py-1 rounded border border-red-500 text-red-500"
-                >
-                  Remove
-                </button>
-              </div>
+              {errors.contact?.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.contact.email.message}
+                </p>
+              )}
             </div>
-          ))}
-        </div>
-      </div>
+            <div>
+              <label className="block text-sm">Phone</label>
+              <input
+                {...register("contact.phone")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+              {errors.contact?.phone && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.contact.phone.message}
+                </p>
+              )}
+            </div>
 
-      {/* Education */}
-      <div className="mt-6 p-4 rounded-lg border border-[var(--border)]">
-        <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-[var(--text)]">Education</h4>
-          <button
-            type="button"
-            onClick={() =>
-              addListItem("education", {
-                degree: "",
-                institute: "",
-                result: "",
-                year: "",
-              })
-            }
-            className="text-sm px-2 py-1 rounded border border-[var(--border)]"
-          >
-            Add
-          </button>
+            <div>
+              <label className="block text-sm">WhatsApp</label>
+              <input
+                {...register("contact.whatsapp")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm">DOB</label>
+              <input
+                {...register("contact.dob")}
+                placeholder="YYYY-MM-DD"
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm">Marital Status</label>
+              <input
+                {...register("contact.maritalStatus")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm">Blood Group</label>
+              <input
+                {...register("contact.bloodGroup")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm">Address</label>
+              <textarea
+                {...register("contact.address")}
+                rows={2}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+
+            {/* show general contact error (refine) */}
+            {errors.contact && typeof errors.contact.message === "string" && (
+              <p className="text-red-500 text-xs mt-1 sm:col-span-2">
+                {errors.contact.message}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="mt-3 space-y-2">
-          {(form.education || []).map((ed, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+        {/* Documents */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-[var(--text)]">Documents</h4>
+            <button
+              type="button"
+              onClick={() => docsField.append({ type: "", doc: "", url: "" })}
+              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
             >
-              <input
-                placeholder="Degree"
-                value={ed.degree}
-                onChange={(e) =>
-                  handleListChange("education", i, "degree", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="Institute"
-                value={ed.institute}
-                onChange={(e) =>
-                  handleListChange("education", i, "institute", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="Result"
-                value={ed.result}
-                onChange={(e) =>
-                  handleListChange("education", i, "result", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <div className="flex gap-2 items-center">
+              Add
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-3">
+            {docsField.fields.map((d, i) => (
+              <div
+                key={d.id}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+              >
                 <input
-                  placeholder="Year"
-                  value={ed.year}
-                  onChange={(e) =>
-                    handleListChange("education", i, "year", e.target.value)
-                  }
-                  className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)] w-24"
+                  placeholder="Type (PAN/Aadhar)"
+                  {...register(`documents.${i}.type`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
                 />
-                <button
-                  onClick={() => removeListItem("education", i)}
-                  className="px-2 py-1 rounded border border-red-500 text-red-500"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Family */}
-      <div className="mt-6 p-4 rounded-lg border border-[var(--border)]">
-        <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-[var(--text)]">Family</h4>
-          <button
-            type="button"
-            onClick={() =>
-              addListItem("family", {
-                name: "",
-                relation: "",
-                dob: "",
-                occupation: "",
-              })
-            }
-            className="text-sm px-2 py-1 rounded border border-[var(--border)]"
-          >
-            Add
-          </button>
-        </div>
-
-        <div className="mt-3 space-y-2">
-          {(form.family || []).map((f, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
-            >
-              <input
-                placeholder="Name"
-                value={f.name}
-                onChange={(e) =>
-                  handleListChange("family", i, "name", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="Relation"
-                value={f.relation}
-                onChange={(e) =>
-                  handleListChange("family", i, "relation", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="DOB"
-                value={f.dob}
-                onChange={(e) =>
-                  handleListChange("family", i, "dob", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <div className="flex gap-2 items-center">
                 <input
-                  placeholder="Occupation"
-                  value={f.occupation}
-                  onChange={(e) =>
-                    handleListChange("family", i, "occupation", e.target.value)
-                  }
-                  className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  placeholder="Doc (number)"
+                  {...register(`documents.${i}.doc`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
                 />
-                <button
-                  onClick={() => removeListItem("family", i)}
-                  className="px-2 py-1 rounded border border-red-500 text-red-500"
-                >
-                  Remove
-                </button>
+                <input
+                  placeholder="URL (image)"
+                  {...register(`documents.${i}.url`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => docsField.remove(i)}
+                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+                {errors.documents?.[i] && (
+                  <p className="text-red-500 text-xs sm:col-span-4">
+                    {errors.documents[i].message}
+                  </p>
+                )}
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Documents */}
-      <div className="mt-6 p-4 rounded-lg border border-[var(--border)]">
-        <div className="flex items-center justify-between">
-          <h4 className="font-semibold text-[var(--text)]">Documents</h4>
+        {/* Emergency Contacts */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-[var(--text)]">
+              Emergency Contacts
+            </h4>
+            <button
+              type="button"
+              onClick={() =>
+                emField.append({ name: "", relation: "", phone: "" })
+              }
+              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {emField.fields.map((f, i) => (
+              <div
+                key={f.id}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+              >
+                <input
+                  placeholder="Name"
+                  {...register(`emergencyContacts.${i}.name`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Relation"
+                  {...register(`emergencyContacts.${i}.relation`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Phone"
+                  {...register(`emergencyContacts.${i}.phone`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => emField.remove(i)}
+                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Education */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-[var(--text)]">Education</h4>
+            <button
+              type="button"
+              onClick={() =>
+                eduField.append({
+                  degree: "",
+                  institute: "",
+                  result: "",
+                  year: "",
+                })
+              }
+              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {eduField.fields.map((e, i) => (
+              <div
+                key={e.id}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+              >
+                <input
+                  placeholder="Degree"
+                  {...register(`education.${i}.degree`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Institute"
+                  {...register(`education.${i}.institute`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Result"
+                  {...register(`education.${i}.result`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <div className="flex gap-2 items-center">
+                  <input
+                    placeholder="Year"
+                    {...register(`education.${i}.year`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] w-28"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => eduField.remove(i)}
+                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Family */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-[var(--text)]">Family</h4>
+            <button
+              type="button"
+              onClick={() =>
+                famField.append({
+                  name: "",
+                  relation: "",
+                  dob: "",
+                  phone: "",
+                  occupation: "",
+                })
+              }
+              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            {famField.fields.map((f, i) => (
+              <div
+                key={f.id}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+              >
+                <input
+                  placeholder="Name"
+                  {...register(`family.${i}.name`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Relation"
+                  {...register(`family.${i}.relation`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="DOB"
+                  {...register(`family.${i}.dob`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <div className="flex gap-2 items-center">
+                  <input
+                    placeholder="Occupation"
+                    {...register(`family.${i}.occupation`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => famField.remove(i)}
+                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bank */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <h4 className="font-semibold mb-3 text-[var(--text)]">Bank</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm">Account Holder</label>
+              <input
+                {...register("bank.accountHolder")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">Bank Name</label>
+              <input
+                {...register("bank.bankName")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">Account Number</label>
+              <input
+                {...register("bank.accountNumber")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">IFSC</label>
+              <input
+                {...register("bank.ifsc")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">Branch</label>
+              <input
+                {...register("bank.branch")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">UPI</label>
+              <input
+                {...register("bank.upi")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Experience */}
+        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-[var(--text)]">Experience</h4>
+            <button
+              type="button"
+              onClick={() =>
+                expField.append({
+                  company: "",
+                  role: "",
+                  startDate: "",
+                  endDate: "",
+                  year: "",
+                })
+              }
+              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="mt-3 space-y-3">
+            {expField.fields.map((e, i) => (
+              <div
+                key={e.id}
+                className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end"
+              >
+                <input
+                  placeholder="Company"
+                  {...register(`experience.${i}.company`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Role"
+                  {...register(`experience.${i}.role`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="Start"
+                  {...register(`experience.${i}.startDate`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <input
+                  placeholder="End"
+                  {...register(`experience.${i}.endDate`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                />
+                <div className="flex gap-2 items-center">
+                  <input
+                    placeholder="Years"
+                    {...register(`experience.${i}.year`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] w-28"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => expField.remove(i)}
+                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 mt-6">
           <button
             type="button"
-            onClick={() =>
-              addListItem("documents", { type: "", label: "View", url: "" })
-            }
-            className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+            onClick={() => setStep(1)}
+            className="px-4 py-2 rounded-md bg-gray-300 text-black border border-gray-400"
           >
-            Add
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-md bg-yellow-400 text-black border border-yellow-500"
+          >
+            Save Changes
           </button>
         </div>
-
-        <div className="mt-3 space-y-2">
-          {(form.documents || []).map((d, i) => (
-            <div
-              key={i}
-              className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
-            >
-              <input
-                placeholder="Type (e.g. PAN)"
-                value={d.type}
-                onChange={(e) =>
-                  handleListChange("documents", i, "type", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="Label"
-                value={d.label}
-                onChange={(e) =>
-                  handleListChange("documents", i, "label", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <input
-                placeholder="URL"
-                value={d.url}
-                onChange={(e) =>
-                  handleListChange("documents", i, "url", e.target.value)
-                }
-                className="px-2 py-1 rounded border border-[var(--border)] bg-transparent text-[var(--text)]"
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => removeListItem("documents", i)}
-                  className="px-2 py-1 rounded border border-red-500 text-red-500"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="flex justify-end gap-3 mt-6">
-        <button
-          onClick={() => setStep(1)}
-          className="px-4 py-2 rounded-md bg-gray-300 text-black border border-gray-400"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={() => {
-            if (!isValid()) {
-              alert(
-                "Please fill name and at least one contact (email or phone)."
-              );
-              return;
-            }
-            handleSave();
-          }}
-          className="px-4 py-2 rounded-md bg-yellow-400 text-black border border-yellow-500"
-        >
-          Save Changes
-        </button>
-      </div>
+      </form>
     </section>
   );
 };

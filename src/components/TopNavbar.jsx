@@ -1,4 +1,4 @@
-import { User } from "lucide-react";
+import { Menu, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavarMobileOpenClose } from "../utils/ExpendNavbar";
 import { useState } from "react";
@@ -24,14 +24,17 @@ const TopNavbar = ({ setIsExpanded }) => {
       <header
         className={`bg-[var(--background)] backdrop-blur-md rounded-lg flex items-center justify-between px-2 py-2 shadow-md max-w-screen md:max-w-full`}
       >
-        <h2
-          onClick={handleToggle}
-          className={`text-[var(--text)] uppercase text-sm lg:text-lg ml-0.5`}
-        >
-          {CurrentLabel.ParentTabLabel !== ""
-            ? CurrentLabel.ParentTabLabel
-            : "Dashboard"}
-        </h2>
+        <div className="flex gap-2 items-center">
+          <Menu onClick={handleToggle} className="w-6 h-6 text-[var(--text)] block lg:hidden" />
+
+          <h2
+            className={`text-[var(--text)] uppercase text-sm lg:text-lg ml-0.5`}
+          >
+            {CurrentLabel.ParentTabLabel !== ""
+              ? CurrentLabel.ParentTabLabel
+              : "Dashboard"}
+          </h2>
+        </div>
         <div
           onClick={() => setOpenPopup((popup) => !popup)}
           className="flex items-center gap-2"

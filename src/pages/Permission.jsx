@@ -270,7 +270,7 @@ const Permission = () => {
                             />
                           </div>
                         </td>
-                        <td className="px-1 md:px-2 text-center">
+                        <td className="px-1 md:px-2 text-center rounded-r-lg">
                           <div className="flex justify-center">
                             <ToggleSwitch
                               enabled={!!row.delete}

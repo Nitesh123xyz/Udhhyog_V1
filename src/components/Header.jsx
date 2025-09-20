@@ -9,7 +9,7 @@ const normalize = (s) =>
     .trim()
     .replace(/\s+/g, " ");
 
-const Header = ({ rows, setRows }) => {
+const Header = ({ rows, setRows, step, setStep }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const [openSearch, setOpenSearch] = useState(false);
@@ -44,8 +44,8 @@ const Header = ({ rows, setRows }) => {
   };
 
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 transition-all duration-300">
-      <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg">
+    <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 transition-all duration-300">
+      <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg ml-1">
         {CurrentLabel?.ChildTabLabel !== ""
           ? CurrentLabel?.ChildTabLabel
           : "Permission"}
@@ -86,12 +86,18 @@ const Header = ({ rows, setRows }) => {
 
         {!HideHeader && (
           <div className="flex space-x-2 py-1 px-0">
-            <div className="w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
-              <Plus size={15} className="text-gray-800" />
+            <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
+              <Plus
+                onClick={() => setStep(4)}
+                size={15}
+                className="text-gray-800"
+              />
             </div>
-            <div className="w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
-              <Download size={15} className="text-gray-800" />
-            </div>
+            {step !== 1 && (
+              <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
+                <Download size={15} className="text-gray-800" />
+              </div>
+            )}
           </div>
         )}
       </div>
