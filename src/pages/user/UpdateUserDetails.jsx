@@ -4,6 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { employees } from "../../utils/DummyData";
 import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
+import { Pencil, Plus, Save, X } from "lucide-react";
 
 /* ---------------- ZOD SCHEMAS ---------------- */
 const contactSchema = z.object({
@@ -143,7 +144,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
   };
 
   const {
-    register,
+    register: updateUserForm,
     handleSubmit,
     control,
     reset,
@@ -179,16 +180,12 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
   };
 
   return (
-    <section className="bg-[var(--background)] px-6 py-6 rounded-lg border border-[var(--border)]">
+    <section className="bg-[var(--background)] rounded-t-lg border border-[var(--border)]">
       <div className="flex justify-end gap-3 mb-3">
         <UserAdditionalDetailsHeader step={step} setStep={setStep} />
       </div>
 
-      <h3 className="font-semibold text-2xl mb-4 text-[var(--text)]">
-        Update Employee
-      </h3>
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 px-4 py-2">
         {/* Core profile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -196,8 +193,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Name *
             </label>
             <input
-              {...register("name")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("name")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
             {errors.name && (
               <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
@@ -209,8 +206,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Job Title
             </label>
             <input
-              {...register("jobTitle")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("jobTitle")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -219,8 +216,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Department
             </label>
             <input
-              {...register("department")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("department")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -229,8 +226,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Site
             </label>
             <input
-              {...register("site")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("site")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -239,8 +236,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Salary
             </label>
             <input
-              {...register("salary")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("salary")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -249,9 +246,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Start Date
             </label>
             <input
-              {...register("startDate")}
+              {...updateUserForm("startDate")}
               placeholder="e.g. Mar 13, 2023"
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -260,8 +257,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Lifecycle
             </label>
             <input
-              {...register("lifecycle")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("lifecycle")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -270,8 +267,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Status
             </label>
             <input
-              {...register("status")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("status")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
 
@@ -280,8 +277,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               Avatar URL
             </label>
             <input
-              {...register("avatar")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+              {...updateUserForm("avatar")}
+              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
             />
           </div>
         </div>
@@ -289,12 +286,12 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         {/* Contact */}
         <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
           <h4 className="font-semibold mb-3 text-[var(--text)]">Contact</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[var(--text)]">
             <div>
               <label className="block text-sm">Email</label>
               <input
-                {...register("contact.email")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("contact.email")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
               {errors.contact?.email && (
                 <p className="text-red-500 text-xs mt-1">
@@ -305,8 +302,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
             <div>
               <label className="block text-sm">Phone</label>
               <input
-                {...register("contact.phone")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("contact.phone")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
               {errors.contact?.phone && (
                 <p className="text-red-500 text-xs mt-1">
@@ -318,42 +315,42 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
             <div>
               <label className="block text-sm">WhatsApp</label>
               <input
-                {...register("contact.whatsapp")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("contact.whatsapp")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
               <label className="block text-sm">DOB</label>
               <input
-                {...register("contact.dob")}
+                {...updateUserForm("contact.dob")}
                 placeholder="YYYY-MM-DD"
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
               <label className="block text-sm">Marital Status</label>
               <input
-                {...register("contact.maritalStatus")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("contact.maritalStatus")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
               <label className="block text-sm">Blood Group</label>
               <input
-                {...register("contact.bloodGroup")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("contact.bloodGroup")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div className="sm:col-span-2">
               <label className="block text-sm">Address</label>
               <textarea
-                {...register("contact.address")}
+                {...updateUserForm("contact.address")}
                 rows={2}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
@@ -367,15 +364,15 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         </div>
 
         {/* Documents */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+        <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-[var(--text)]">Documents</h4>
             <button
               type="button"
               onClick={() => docsField.append({ type: "", doc: "", url: "" })}
-              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-[var(--icon_bg)]"
             >
-              Add
+              <Plus size={16} />
             </button>
           </div>
 
@@ -383,30 +380,30 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
             {docsField.fields.map((d, i) => (
               <div
                 key={d.id}
-                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+                className="grid grid-cols-1  sm:grid-cols-4 gap-2 items-center"
               >
                 <input
                   placeholder="Type (PAN/Aadhar)"
-                  {...register(`documents.${i}.type`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`documents.${i}.type`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Doc (number)"
-                  {...register(`documents.${i}.doc`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`documents.${i}.doc`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="URL (image)"
-                  {...register(`documents.${i}.url`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`documents.${i}.url`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => docsField.remove(i)}
-                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    Remove
+                    <X size={14} className="text-[var(--text)]" />
                   </button>
                 </div>
                 {errors.documents?.[i] && (
@@ -420,7 +417,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         </div>
 
         {/* Emergency Contacts */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+        <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-[var(--text)]">
               Emergency Contacts
@@ -430,9 +427,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               onClick={() =>
                 emField.append({ name: "", relation: "", phone: "" })
               }
-              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-[var(--icon_bg)]"
             >
-              Add
+              <Plus size={14} />
             </button>
           </div>
 
@@ -440,30 +437,30 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
             {emField.fields.map((f, i) => (
               <div
                 key={f.id}
-                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end"
+                className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-center"
               >
                 <input
                   placeholder="Name"
-                  {...register(`emergencyContacts.${i}.name`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`emergencyContacts.${i}.name`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Relation"
-                  {...register(`emergencyContacts.${i}.relation`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`emergencyContacts.${i}.relation`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Phone"
-                  {...register(`emergencyContacts.${i}.phone`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`emergencyContacts.${i}.phone`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => emField.remove(i)}
-                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    Remove
+                    <X size={14} className="text-[var(--text)]" />
                   </button>
                 </div>
               </div>
@@ -472,7 +469,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         </div>
 
         {/* Education */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+        <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-[var(--text)]">Education</h4>
             <button
@@ -485,9 +482,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   year: "",
                 })
               }
-              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-[var(--icon_bg)]"
             >
-              Add
+              <Plus size={14} />
             </button>
           </div>
 
@@ -499,31 +496,31 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               >
                 <input
                   placeholder="Degree"
-                  {...register(`education.${i}.degree`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`education.${i}.degree`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Institute"
-                  {...register(`education.${i}.institute`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`education.${i}.institute`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Result"
-                  {...register(`education.${i}.result`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`education.${i}.result`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <div className="flex gap-2 items-center">
                   <input
                     placeholder="Year"
-                    {...register(`education.${i}.year`)}
-                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] w-28"
+                    {...updateUserForm(`education.${i}.year`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] w-28 outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => eduField.remove(i)}
-                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    Remove
+                    <X size={14} className="text-[var(--text)]" />
                   </button>
                 </div>
               </div>
@@ -532,7 +529,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         </div>
 
         {/* Family */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+        <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-[var(--text)]">Family</h4>
             <button
@@ -546,9 +543,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   occupation: "",
                 })
               }
-              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-[var(--icon_bg)]"
             >
-              Add
+              <Plus size={14} />
             </button>
           </div>
 
@@ -560,31 +557,31 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               >
                 <input
                   placeholder="Name"
-                  {...register(`family.${i}.name`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`family.${i}.name`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Relation"
-                  {...register(`family.${i}.relation`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`family.${i}.relation`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="DOB"
-                  {...register(`family.${i}.dob`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`family.${i}.dob`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <div className="flex gap-2 items-center">
                   <input
                     placeholder="Occupation"
-                    {...register(`family.${i}.occupation`)}
-                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                    {...updateUserForm(`family.${i}.occupation`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none w-35"
                   />
                   <button
                     type="button"
                     onClick={() => famField.remove(i)}
-                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    Remove
+                    <X size={14} className="text-[var(--text)]" />
                   </button>
                 </div>
               </div>
@@ -595,54 +592,54 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         {/* Bank */}
         <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
           <h4 className="font-semibold mb-3 text-[var(--text)]">Bank</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[var(--text)]">
             <div>
               <label className="block text-sm">Account Holder</label>
               <input
-                {...register("bank.accountHolder")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.accountHolder")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
             <div>
               <label className="block text-sm">Bank Name</label>
               <input
-                {...register("bank.bankName")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.bankName")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
             <div>
               <label className="block text-sm">Account Number</label>
               <input
-                {...register("bank.accountNumber")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.accountNumber")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
             <div>
               <label className="block text-sm">IFSC</label>
               <input
-                {...register("bank.ifsc")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.ifsc")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
             <div>
               <label className="block text-sm">Branch</label>
               <input
-                {...register("bank.branch")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.branch")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
             <div>
               <label className="block text-sm">UPI</label>
               <input
-                {...register("bank.upi")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                {...updateUserForm("bank.upi")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
           </div>
         </div>
 
         {/* Experience */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
+        <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-[var(--text)]">Experience</h4>
             <button
@@ -656,9 +653,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   year: "",
                 })
               }
-              className="text-sm px-2 py-1 rounded border border-[var(--border)]"
+              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-[var(--icon_bg)]"
             >
-              Add
+              <Plus size={14} />
             </button>
           </div>
 
@@ -670,36 +667,37 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               >
                 <input
                   placeholder="Company"
-                  {...register(`experience.${i}.company`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`experience.${i}.company`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Role"
-                  {...register(`experience.${i}.role`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`experience.${i}.role`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="Start"
-                  {...register(`experience.${i}.startDate`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`experience.${i}.startDate`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="End"
-                  {...register(`experience.${i}.endDate`)}
-                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)]"
+                  {...updateUserForm(`experience.${i}.endDate`)}
+                  className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
-                <div className="flex gap-2 items-center">
+                <div className="flex gap-2 sm:gap-3 items-center">
                   <input
                     placeholder="Years"
-                    {...register(`experience.${i}.year`)}
-                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] w-28"
+                    {...updateUserForm(`experience.${i}.year`)}
+                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none w-25"
                   />
+
                   <button
                     type="button"
                     onClick={() => expField.remove(i)}
-                    className="px-2 py-1 rounded-md border border-red-500 text-red-500"
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    Remove
+                    <X size={14} className="text-[var(--text)]" />
                   </button>
                 </div>
               </div>
@@ -708,19 +706,20 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 justify-self-end gap-3">
           <button
             type="button"
             onClick={() => setStep(1)}
-            className="px-4 py-2 rounded-md bg-gray-300 text-black border border-gray-400"
+            className="px-4 py-2 rounded-md text-[var(--text)] border border-[var(--border)] bg-white/3 cursor-pointer hover:bg-red-100 transition-colors duration-300"
           >
             Cancel
           </button>
           <button
-            type="submit"
-            className="px-4 py-2 rounded-md bg-yellow-400 text-black border border-yellow-500"
+            type="button"
+            // onClick={saveDraft}
+            className="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2 px-2 py-3 sm:px-8 rounded-lg border border-[var(--border)] text-[var(--text)]"
           >
-            Save Changes
+            <Pencil size={20} /> Update
           </button>
         </div>
       </form>

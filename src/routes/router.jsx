@@ -4,12 +4,12 @@ import App from "../App";
 import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
+import MultilayerAuth from "../pages/2FA/MultilayerAuth";
 // ---------------------------------------------------
 
 const UserTableInfo = lazy(() => import("../pages/user/User"));
 const Permissions = lazy(() => import("../pages/Permission"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
-const LoginPage = lazy(() => import("../pages/Login"));
 const ResetPassword = lazy(() =>
   import("../pages/reset-password/ResetPassword")
 );
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
         path: "/",
         element: (
           <Suspense fallback={<MainLoader />}>
-            <LoginPage />
+            <MultilayerAuth />
           </Suspense>
         ),
       },

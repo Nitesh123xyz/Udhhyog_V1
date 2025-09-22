@@ -43,7 +43,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
 
   return (
     <>
-      <section className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-2 py-2">
+      <section className="bg-[var(--background)] backdrop-blur-md rounded-t-lg  lg:rounded-lg px-2 py-2">
         <div className="flex justify-end gap-3 mb-2">
           <UserAdditionalDetailsHeader
             step={step}
@@ -51,7 +51,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
             setOpenDialog={setOpenDialog}
           />
         </div>
-        <div className="mx-auto space-y-2 min-h-screen">
+        <div className="mx-auto space-y-2 min-h-screen lg:min-h-[calc(100vh-138px)]">
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-3">
             <div className="p-4 rounded-lg border border-[var(--border)]">
               <h3 className="font-semibold mb-2 text-[var(--text)] relative">

@@ -4,23 +4,23 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useLoginUserMutation } from "../features/auth/authSlice";
-import { fetchWithErrorHandling } from "../utils/ApiResponse";
-import { getToken, setToken } from "../utils/StoreSessionInfo";
-import { showCustomToast } from "../components/CustomToast";
+import { useLoginUserMutation } from "../../features/auth/authSlice";
+import { fetchWithErrorHandling } from "../../utils/ApiResponse";
+import { getToken, setToken } from "../../utils/StoreSessionInfo";
+import { showCustomToast } from "../../components/CustomToast";
+import { QRCodeSVG } from "qrcode.react";
 
 // -------------------------------------------------------
 
-const Animation = lazy(() => import("../components/Animation"));
+const Animation = lazy(() => import("../../components/Animation"));
 // -------------------------------------------------------
 
 // Zod Schema
 const loginSchema = z.object({
-  email: z.string().nonempty("Email is required"),
   password: z.string().nonempty("Password is required"),
 });
 
-const Login = () => {
+const Two_Factor_Authentication = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ const Login = () => {
   // ------------------------------------------------------
 
   const {
-    register: LoginUser,
+    register: AuthenticateUser,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -71,7 +71,6 @@ const Login = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
-        {/* Logo */}
         <div className="flex justify-center relative z-20">
           <div className="outline-4 outline-gray-200 rounded-full">
             <img
@@ -88,32 +87,28 @@ const Login = () => {
             <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
-            <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
-              Log in to your account
-            </p>
+            <div className="flex justify-center mt-2">
+              <div className="bg-white p-2 rounded-lg shadow-lg hover:scale-110 transition-scale duration-300 cursor-pointer">
+                <QRCodeSVG
+                  value={"https://udhhyog.com/"}
+                  size={150}
+                  bgColor="#fff"
+                  fgColor="#000"
+                  level="H"
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-gray-100 text-[0.8rem] sm:text-[0.9rem] my-4">
+                Scan QR Code to Login
+              </p>
+            </div>
           </div>
 
           <form
             onSubmit={handleSubmit(handleUserLogin)}
-            className="space-y-5 sm:space-y-6"
+            className="space-y-5 sm:space-y-3"
           >
-            <div className="relative mb-8 sm:mb-8">
-              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <CircleUser className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-              </div>
-              <input
-                type="text"
-                placeholder="Email"
-                className="w-full pl-10 sm:pl-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors"
-                {...LoginUser("email")}
-              />
-              {errors.email && (
-                <p className="text-red-400 text-xs sm:text-sm mt-1 pl-2 absolute -bottom-6 sm:-bottom-7">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-
             <div className="relative mb-3">
               <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
@@ -121,12 +116,12 @@ const Login = () => {
 
               <input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="Enter 2FA Code"
                 autoComplete="off"
                 className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
                   errors.password ? "border-red-500" : ""
                 }`}
-                {...LoginUser("password")}
+                {...AuthenticateUser("password")}
               />
               <button
                 type="button"
@@ -144,15 +139,6 @@ const Login = () => {
                   {errors.password.message}
                 </p>
               )}
-            </div>
-
-            <div className="flex mb-3 mt-0 items-end justify-end text-xs sm:text-sm">
-              <Link
-                to="/reset-password"
-                className="text-gray-100 hover:text-white transition-colors"
-              >
-                Forgot password?
-              </Link>
             </div>
 
             <button
@@ -187,4 +173,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Two_Factor_Authentication;

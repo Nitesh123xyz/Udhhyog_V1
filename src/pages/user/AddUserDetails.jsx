@@ -460,7 +460,7 @@ const AddUserDetails = ({ step, setStep }) => {
 
   /* --------------------------- Render UI ----------------------------- */
   return (
-    <section className="max-full mx-auto ">
+    <section className="max-full mx-auto">
       <div className="flex justify-end gap-3">
         <UserAdditionalDetailsHeader step={step} setStep={setStep} />
       </div>
@@ -469,7 +469,7 @@ const AddUserDetails = ({ step, setStep }) => {
         className="bg-[var(--background)] min-h-screen lg:min-h-[calc(100vh-105px)] shadow-xl 2xl:rounded-b-lg"
       >
         {/* Tabs */}
-        <div className=" border-gray-200 overflow-x-auto">
+        <div className="border-[var(--border)] overflow-x-auto">
           <nav className="flex flex-wrap">
             {tabs.map((tab) => {
               const enabled = isTabEnabled(tab.id);
@@ -499,7 +499,7 @@ const AddUserDetails = ({ step, setStep }) => {
           </nav>
         </div>
 
-        <div className="p-4 sm:p-8">
+        <div className="p-4 sm:p-x-8 sm:py-5">
           {/* BASIC */}
           {activeTab === "basic" && (
             <div className="space-y-6">
@@ -860,7 +860,7 @@ const AddUserDetails = ({ step, setStep }) => {
           {activeTab === "emergency" && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text)]">
                   Emergency Contacts
                 </h2>
                 <button
@@ -959,7 +959,7 @@ const AddUserDetails = ({ step, setStep }) => {
           {activeTab === "education" && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text)]">
                   Education
                 </h2>
                 <button

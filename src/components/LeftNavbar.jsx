@@ -45,7 +45,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
           setIsExpanded(false);
         }
         leaveTimer.current = null;
-      }, 2000);
+      }, 1000);
     }
   };
 

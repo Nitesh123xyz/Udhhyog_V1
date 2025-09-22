@@ -73,9 +73,9 @@ const Users = ({ step, setStep, setEmployeesId }) => {
 
       <section className="max-w-screen">
         <div
-          className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden rounded-b-lg`}
+          className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden  lg:rounded-b-lg`}
         >
-          <div className="overflow-x-auto px-2 max-h-screen h-[calc(100vh-170px)] sm:h-[calc(100vh-176px)]  NavScroll">
+          <div className="overflow-x-auto px-2 max-h-screen h-[calc(100vh-169px)] sm:h-[calc(100vh-176px)]  NavScroll">
             <table className="w-full min-w-max table-auto">
               <thead className="sticky top-[-5px] lg:top-0 z-50">
                 <tr>{SortingFields()}</tr>

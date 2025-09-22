@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const PageNotFound = () => {
   return (
-    <div className="h-[calc(100vh-62px)] rounded-lg bg-[var(--background)] text-yellow-400 flex justify-center items-start">
+    <div className="min-h-screen h-[calc(100vh-62px)] rounded-lg bg-[var(--background)] text-yellow-400 flex justify-center items-start">
       <div className="text-center px-4">
         <img
           src="/404.png"
