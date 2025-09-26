@@ -26,17 +26,15 @@ const Otp = ({ setStep, setSharingOtp }) => {
     mode: "onSubmit",
   });
 
-  // Keep hidden otpString in sync with visible boxes
   const syncOtpString = (arr) => {
     const joined = arr.join("");
     setValue("otp", joined, { shouldValidate: true });
     if (joined.length === 6) clearErrors("otp");
   };
 
-  // Handle normal typing (digits only, auto-advance)
   const handleChange = (index) => (event) => {
     const raw = event.target.value;
-    const value = raw.replace(/\D/g, "").slice(0, 1); // one digit max
+    const value = raw.replace(/\D/g, "").slice(0, 1);
 
     const next = [...otpInput];
     next[index] = value;
@@ -48,7 +46,6 @@ const Otp = ({ setStep, setSharingOtp }) => {
     }
   };
 
-  // Handle backspace (clear current, move focus left)
   const handleKeyDown = (index) => (event) => {
     if (event.key === "Backspace") {
       event.preventDefault();
@@ -67,10 +64,15 @@ const Otp = ({ setStep, setSharingOtp }) => {
         setOtpInput(next);
         syncOtpString(next);
       }
+    } else if (event.key === "ArrowLeft") {
+      if (index > 0) inputRefs.current[index - 1].focus();
+    } else if (event.key === "ArrowRight") {
+      if (index < 5) inputRefs.current[index + 1].focus();
+    } else if (event.key === "Enter") {
+      if (index === 5) handleSubmit(handleOTPVerification)();
     }
   };
 
-  // Handle paste (fill from first box)
   const handlePaste = (event) => {
     event.preventDefault();
     const pasteData = event.clipboardData.getData("text").replace(/\D/g, "");
@@ -83,7 +85,6 @@ const Otp = ({ setStep, setSharingOtp }) => {
     setOtpInput(next);
     syncOtpString(next);
 
-    // Focus last filled input
     const lastIndex = Math.min(pasteData.length, next.length) - 1;
     if (lastIndex >= 0 && inputRefs.current[lastIndex]) {
       inputRefs.current[lastIndex].focus();

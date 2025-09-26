@@ -25,6 +25,19 @@ export const authSlice = createApi({
         body,
       }),
     }),
+
+    TwoFactorAuthentication: builder.mutation({
+      query: (credential) => ({
+        url: "/2FA_Authentication",
+        method: "POST",
+        body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+
     forgotPassword: builder.mutation({
       query: (credential) => ({
         url: "/forget-password",
@@ -66,4 +79,5 @@ export const {
   useForgotPasswordMutation,
   useOTPVerificationMutation,
   useChangePasswordMutation,
+  useTwoFactorAuthenticationMutation,
 } = authSlice;

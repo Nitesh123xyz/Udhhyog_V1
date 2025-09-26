@@ -1,52 +1,50 @@
-import React, { lazy, useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import { useLoginUserMutation } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+import { useTwoFactorAuthenticationMutation } from "../../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../../utils/ApiResponse";
-import { getToken, setToken } from "../../utils/StoreSessionInfo";
+import { setToken } from "../../utils/StoreSessionInfo";
 import { showCustomToast } from "../../components/CustomToast";
 import { QRCodeSVG } from "qrcode.react";
+import Animation from "../../components/Animation";
 
-// -------------------------------------------------------
-
-const Animation = lazy(() => import("../../components/Animation"));
-// -------------------------------------------------------
-
-// Zod Schema
-const loginSchema = z.object({
-  password: z.string().nonempty("Password is required"),
+const VerificationSchema = z.object({
+  authcode: z
+    .string()
+    .min(6, "Please enter the complete code.")
+    .regex(/^\d{6}$/, "Authentication code must be numeric"),
 });
 
 const Two_Factor_Authentication = () => {
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  // ------------------------------------------------------
-
-  // If already logged in, take to dashboard
-  useEffect(() => {
-    if (getToken()) navigate("/dashboard", { replace: true });
-  }, [navigate]);
-
-  // ------------------------------------------------------
-
   const {
-    register: AuthenticateUser,
+    register: TwoFactorAuthentication,
     handleSubmit,
     formState: { errors },
+    setValue,
+    clearErrors,
   } = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(VerificationSchema),
+    defaultValues: { authcode: "" },
+    mode: "onSubmit",
   });
 
-  // ------------------------------------------------------
+  const [loginTwoFactorAuthentication, { isLoading }] =
+    useTwoFactorAuthenticationMutation();
 
-  const [login, { isLoading }] = useLoginUserMutation();
+  const [inputBox, setInputBox] = useState(Array(6).fill(""));
+  const inputsRef = useRef([]);
+  inputsRef.current = Array.from(
+    { length: 6 },
+    (_, i) => inputsRef.current[i] ?? React.createRef()
+  );
+
   const handleUserLogin = async (data) => {
     const { success, status, ApiData } = await fetchWithErrorHandling(() =>
-      login(data).unwrap()
+      loginTwoFactorAuthentication({ authcode: data.authcode }).unwrap()
     );
     if (success && status === 200) {
       const { token } = ApiData || {};
@@ -57,19 +55,94 @@ const Two_Factor_Authentication = () => {
     } else {
       if (status === 401) {
         showCustomToast("Invalid Credentials", "/error.gif", "Error");
+      } else {
+        showCustomToast("Login failed", "/error.gif", "Error");
       }
     }
   };
 
-  // ------------------------------------------------------
+  const syncAuthCode = (arr) => {
+    const joined = Array.isArray(arr) ? arr.join("") : inputBox.join("");
+    setValue("authcode", joined, { shouldValidate: true });
+    if (joined.length === 6) clearErrors("authcode");
+  };
+
+  const updateAt = (idx, value) => {
+    const next = [...inputBox];
+    next[idx] = value.slice(0, 1);
+    setInputBox(next);
+    syncAuthCode(next);
+  };
+
+  const onChangeInput = (e, idx) => {
+    const val = e.target.value.replace(/\D/g, "");
+    if (!val) {
+      const next = [...inputBox];
+      next[idx] = "";
+      setInputBox(next);
+      syncAuthCode(next);
+      return;
+    }
+
+    if (val.length > 1) {
+      handlePasteAt(val.replace(/\D/g, ""), idx);
+      return;
+    }
+
+    updateAt(idx, val);
+    if (idx < 5) {
+      inputsRef.current[idx + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e, idx) => {
+    if (e.key === "Backspace") {
+      if (inputBox[idx] === "") {
+        if (idx > 0) {
+          inputsRef.current[idx - 1]?.focus();
+          updateAt(idx - 1, "");
+        }
+      } else {
+        updateAt(idx, "");
+      }
+    } else if (e.key === "ArrowLeft") {
+      if (idx > 0) inputsRef.current[idx - 1]?.focus();
+    } else if (e.key === "ArrowRight") {
+      if (idx < 5) inputsRef.current[idx + 1]?.focus();
+    } else if (e.key === "Enter") {
+      if (idx === 5) {
+        handleSubmit(handleOTPVerification)();
+      }
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const paste = e.clipboardData.getData("text");
+    handlePasteAt(paste.replace(/\D/g, ""), 0);
+  };
+
+  const handlePasteAt = (text, startIdx) => {
+    const chars = text.split("");
+    const next = [...inputBox];
+    for (let i = startIdx, j = 0; i < 6 && j < chars.length; i++, j++) {
+      next[i] = chars[j];
+    }
+
+    setInputBox(next);
+    const joined = next.join("");
+    syncAuthCode(next);
+
+    const firstEmpty = next.findIndex((c) => c === "");
+    const focusIndex = firstEmpty === -1 ? 5 : firstEmpty;
+    inputsRef.current[Math.min(focusIndex, 5)]?.focus();
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
-      {/* Background Animation */}
       <div className="absolute inset-0 opacity-60">
         <Animation />
       </div>
-
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         <div className="flex justify-center relative z-20">
           <div className="outline-4 outline-gray-200 rounded-full">
@@ -82,8 +155,7 @@ const Two_Factor_Authentication = () => {
         </div>
 
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
-          {/* Header */}
-          <div className="text-center mb-6 sm:mb-6">
+          <div className="text-center mb-5 sm:mb-5">
             <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
@@ -98,73 +170,63 @@ const Two_Factor_Authentication = () => {
                 />
               </div>
             </div>
-            <div>
-              <p className="text-gray-100 text-[0.8rem] sm:text-[0.9rem] my-4">
-                Scan QR Code to Login
-              </p>
-            </div>
+            <p className="text-gray-100 text-[0.8rem] sm:text-[0.9rem] my-3">
+              Scan QR Code to Login
+            </p>
           </div>
 
           <form
             onSubmit={handleSubmit(handleUserLogin)}
             className="space-y-5 sm:space-y-3"
           >
-            <div className="relative mb-3">
-              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
-              </div>
+            <input {...TwoFactorAuthentication("authcode")} type="hidden" />
 
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter 2FA Code"
-                autoComplete="off"
-                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
-                  errors.password ? "border-red-500" : ""
-                }`}
-                {...AuthenticateUser("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                ) : (
-                  <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                )}
-              </button>
-              {errors.password && (
-                <p className="absolute text-red-400 text-xs sm:text-sm mt-1 pl-2 -bottom-6 sm:-bottom-7">
-                  {errors.password.message}
-                </p>
-              )}
+            <div className="flex justify-center gap-2 mb-3">
+              {inputBox.map((value, idx) => (
+                <input
+                  key={idx}
+                  ref={(el) => (inputsRef.current[idx] = el)}
+                  value={value}
+                  onChange={(e) => onChangeInput(e, idx)}
+                  onKeyDown={(e) => handleKeyDown(e, idx)}
+                  onPaste={handlePaste}
+                  inputMode="numeric"
+                  pattern="\d*"
+                  maxLength={1}
+                  autoComplete="one-time-code"
+                  className="w-full h-10 sm:h-12 text-center bg-white/1 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base"
+                />
+              ))}
             </div>
 
+            {errors.authcode && (
+              <p className="text-red-400 text-md text-center">
+                {errors.authcode.message}
+              </p>
+            )}
+
             <button
+              id="submit-2fa"
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
+              className="w-full py-3 sm:py-3 bg-white/1 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Logging in...
+                  Verifying...
                 </div>
               ) : (
-                "Log In"
+                "Verify"
               )}
             </button>
 
             <div className="text-center">
-              <Link
-                to="/"
-                className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
-              >
+              <a className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1">
                 <span className="break-words">
                   Udhhyog - One Stop Shop for All Industrial Needs
                 </span>
-              </Link>
+              </a>
             </div>
           </form>
         </div>

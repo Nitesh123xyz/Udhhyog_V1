@@ -53,7 +53,6 @@ const Login = ({ step, setStep }) => {
       if (token) {
         // setToken(token);
         setStep(2);
-        // navigate("/dashboard", { replace: true });
       }
     } else {
       if (status === 401) {
