@@ -25,10 +25,10 @@ const FontSwitch = () => {
         value={font}
         onChange={(e) => setFont(e.target.value)}
         className="w-full px-3 py-2 pr-10 text-sm 
-               rounded-lg border border-[var(--border)]
-               bg-[var(--background)] text-[var(--text)]
-               shadow-sm outline-none 
-               appearance-none"
+        rounded-lg border border-[var(--border)]
+        bg-[var(--background)] text-[var(--text)]
+        shadow-sm outline-none 
+        appearance-none"
       >
         {Object.keys(FONT_CLASSES).map((font) => (
           <option

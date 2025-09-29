@@ -7,6 +7,7 @@ import { showCustomToast } from "../components/CustomToast";
 import MainLoader from "../components/Loader";
 import { setPermissionList } from "../utils/Utils";
 import { useDispatch } from "react-redux";
+import useAuth from "../hooks/useAuth";
 // -------------------------------------------------------------
 
 function pathToPageName(pathname) {
@@ -20,6 +21,7 @@ function pathToPageName(pathname) {
 // -------------------------------------------------------------
 
 export default function PermissionGate({ children }) {
+  const { token } = useAuth();
   const location = useLocation();
   const dispatch = useDispatch();
   const [rows, setRows] = useState(null);
@@ -35,7 +37,7 @@ export default function PermissionGate({ children }) {
       success,
       status,
       ApiData = {},
-    } = await fetchWithErrorHandling(() => PagePermissionList().unwrap());
+    } = await fetchWithErrorHandling(() => PagePermissionList(token).unwrap());
 
     if (success) {
       const { permission = [] } = ApiData || {};

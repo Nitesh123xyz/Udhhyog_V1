@@ -17,6 +17,7 @@
 body {
   font-family: "Outfit", sans-serif;
   font-weight: var(--app-font-weight);
+  font-size: calc(var(--app-base-font));
 }
 
 :root {
@@ -38,6 +39,8 @@ body {
   --activeBg: #f3f4f6;
   --activeText: #000;
   --logo_circle: #dfd8bb;
+  /*font scaling */
+  --app-base-font: 16;
 }
 .dark {
   --background: #1e2939; /* gray-600 */
@@ -58,4 +61,6 @@ body {
   --activeBg: rgba(255, 255, 255, 0.1);
   --activeText: #ffffff;
   --logo_circle: #4b5563;
+  /*font scaling */
+  --app-base-font: 16;
 }

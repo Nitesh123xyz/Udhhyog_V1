@@ -3,17 +3,17 @@ import {
   LogOut,
   Sun,
   Moon,
-  RefreshCcw,
   Type as TypeIcon,
+  CaseSensitive,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
   clearAllSession,
   getThemeMode,
-  RefreshPage,
   setThemeMode,
 } from "../utils/StoreSessionInfo";
 import FontSwitch from "../components/FontSwitch";
+import TextScaler from "./TextScaler";
 
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
   const boxRef = useRef(null);
@@ -23,13 +23,9 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
 
   const handleClick = (item) => {
     if (!item.clickable) return;
-
     if (item.isLogout) {
       clearAllSession();
       window.location.href = "/";
-    } else if (item.isRefresh) {
-      window.location.reload();
-      RefreshPage();
     } else if (item.path) {
       window.location.href = item.path;
     }
@@ -96,10 +92,10 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
       clickable: false,
     },
     {
-      icon: RefreshCcw,
-      text: "Refresh",
-      isRefresh: true,
-      clickable: true,
+      icon: CaseSensitive,
+      text: "Text",
+      hasTextSelect: true,
+      clickable: false,
     },
     {
       icon: LogOut,
@@ -135,7 +131,6 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       {item.text}
                     </span>
                   </div>
-
                   {/* Theme toggle */}
                   {item.hasToggle && (
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -159,7 +154,6 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       />
                     </label>
                   )}
-
                   {item.hasFontSelect && (
                     <div
                       onClick={(e) => e.stopPropagation()}
@@ -167,6 +161,16 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       className="ml-3"
                     >
                       <FontSwitch />
+                    </div>
+                  )}
+
+                  {item.hasTextSelect && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="ml-3"
+                    >
+                      <TextScaler />
                     </div>
                   )}
                 </button>

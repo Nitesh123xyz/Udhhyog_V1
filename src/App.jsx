@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { useMenu } from "./components/useMenu";
 import SessionExpired from "./components/SessionExpired";
 import { getSessionExpire } from "./utils/StoreSessionInfo";
+import useAuth from "./hooks/useAuth";
 
 // ---------------------------------------------------
 const TopNavbar = lazy(() => import("./components/TopNavbar"));
@@ -23,6 +24,7 @@ const App = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { PinBar, MobileNav } = useSelector((state) => state.ExpendNavbar);
   const [isSessionExpired, setIsSessionExpired] = useState(getSessionExpire());
+  const { hasToken } = useAuth();
   // -------------------------------------------------------------------
 
   useEffect(() => {
@@ -68,7 +70,7 @@ const App = () => {
 
   return (
     <div className="flex min-h-screen">
-      {!HideNavbar && menuList.length > 0 && (
+      {!HideNavbar && menuList.length > 0 && hasToken && (
         <div
           className={`transition-all duration-300 lg:block ${
             PinBar
@@ -93,7 +95,7 @@ const App = () => {
               "conic-gradient(from 180deg at 50% 50%, #4facfe, #00f2fe, #43e97b, #f8ffae, #4facfe)",
           }}
         >
-          {!HideNavbar && (
+          {!HideNavbar && hasToken && (
             <div className="px-0 lg:px-[0.3rem] sticky top-0 z-50">
               <TopNavbar setIsExpanded={setIsExpanded} />
             </div>

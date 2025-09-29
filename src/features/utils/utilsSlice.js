@@ -1,6 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getToken } from "../../utils/StoreSessionInfo";
-
 export const utilsSlice = createApi({
   reducerPath: "utilsApi",
   baseQuery: fetchBaseQuery({
@@ -16,10 +14,10 @@ export const utilsSlice = createApi({
   }),
   endpoints: (builder) => ({
     leftSideNavigationMenu: builder.mutation({
-      query: () => ({
+      query: (Token) => ({
         url: "/main-menu",
         method: "POST",
-        body: { token: getToken() },
+        body: { token: Token },
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,

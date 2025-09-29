@@ -6,29 +6,27 @@ import { Eye, EyeOff, Lock, ArrowRight, CircleUser } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../../utils/ApiResponse";
-import { getToken, setToken } from "../../utils/StoreSessionInfo";
 import { showCustomToast } from "../../components/CustomToast";
+import useAuth from "../../hooks/useAuth";
 
 // -------------------------------------------------------
 
 const Animation = lazy(() => import("../../components/Animation"));
 // -------------------------------------------------------
 
-// Zod Schema
 const loginSchema = z.object({
   email: z.string().nonempty("Email is required"),
   password: z.string().nonempty("Password is required"),
 });
 
-const Login = ({ step, setStep }) => {
+const Login = ({ setStep, setAuthData }) => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-
+  const { hasToken } = useAuth();
   // ------------------------------------------------------
 
-  // If already logged in, take to dashboard
   useEffect(() => {
-    if (getToken()) navigate("/dashboard", { replace: true });
+    if (hasToken) navigate("/dashboard", { replace: true });
   }, [navigate]);
 
   // ------------------------------------------------------
@@ -49,11 +47,19 @@ const Login = ({ step, setStep }) => {
       login(data).unwrap()
     );
     if (success && status === 200) {
-      const { token } = ApiData || {};
-      if (token) {
-        // setToken(token);
+      const { twofa_url, twofa_secret } = ApiData || {};
+      if (twofa_url || twofa_secret) {
+        setAuthData((prev) => ({
+          ...prev,
+          twofa_url,
+          twofa_secret,
+          email: data.email,
+        }));
         setStep(2);
       }
+    } else if (success && status === 202) {
+      setAuthData({ email: data.email });
+      setStep(2);
     } else {
       if (status === 401) {
         showCustomToast("Invalid Credentials", "/error.gif", "Error");

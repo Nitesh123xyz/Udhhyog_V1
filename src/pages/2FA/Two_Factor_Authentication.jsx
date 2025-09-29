@@ -1,14 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { lazy, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { useTwoFactorAuthenticationMutation } from "../../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../../utils/ApiResponse";
-import { setToken } from "../../utils/StoreSessionInfo";
 import { showCustomToast } from "../../components/CustomToast";
 import { QRCodeSVG } from "qrcode.react";
-import Animation from "../../components/Animation";
+import { Check, Copy } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setAccessToken } from "../../utils/Utils";
+
+const Animation = lazy(() => import("../../components/Animation"));
 
 const VerificationSchema = z.object({
   authcode: z
@@ -17,13 +20,13 @@ const VerificationSchema = z.object({
     .regex(/^\d{6}$/, "Authentication code must be numeric"),
 });
 
-const Two_Factor_Authentication = () => {
+const Two_Factor_Authentication = ({ authData }) => {
   const navigate = useNavigate();
-
+  const [copied, setCopied] = useState(false);
+  const dispatch = useDispatch();
   const {
     register: TwoFactorAuthentication,
     handleSubmit,
-    formState: { errors },
     setValue,
     clearErrors,
   } = useForm({
@@ -32,24 +35,28 @@ const Two_Factor_Authentication = () => {
     mode: "onSubmit",
   });
 
-  const [loginTwoFactorAuthentication, { isLoading }] =
-    useTwoFactorAuthenticationMutation();
-
   const [inputBox, setInputBox] = useState(Array(6).fill(""));
   const inputsRef = useRef([]);
   inputsRef.current = Array.from(
     { length: 6 },
     (_, i) => inputsRef.current[i] ?? React.createRef()
   );
+  const allFilled = inputBox.every(Boolean);
+
+  const [loginTwoFactorAuthentication, { isLoading }] =
+    useTwoFactorAuthenticationMutation();
 
   const handleUserLogin = async (data) => {
     const { success, status, ApiData } = await fetchWithErrorHandling(() =>
-      loginTwoFactorAuthentication({ authcode: data.authcode }).unwrap()
+      loginTwoFactorAuthentication({
+        totp: data.authcode,
+        email: authData.email,
+      }).unwrap()
     );
     if (success && status === 200) {
       const { token } = ApiData || {};
       if (token) {
-        setToken(token);
+        dispatch(setAccessToken(token));
         navigate("/dashboard", { replace: true });
       }
     } else {
@@ -111,7 +118,7 @@ const Two_Factor_Authentication = () => {
       if (idx < 5) inputsRef.current[idx + 1]?.focus();
     } else if (e.key === "Enter") {
       if (idx === 5) {
-        handleSubmit(handleOTPVerification)();
+        handleSubmit(handleUserLogin)();
       }
     }
   };
@@ -138,6 +145,16 @@ const Two_Factor_Authentication = () => {
     inputsRef.current[Math.min(focusIndex, 5)]?.focus();
   };
 
+  const handleCopy = () => {
+    const joined = authData?.twofa_secret;
+    console.log(joined);
+    navigator.clipboard.writeText(joined);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 600);
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       <div className="absolute inset-0 opacity-60">
@@ -159,20 +176,52 @@ const Two_Factor_Authentication = () => {
             <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
-            <div className="flex justify-center mt-2">
-              <div className="bg-white p-2 rounded-lg shadow-lg hover:scale-110 transition-scale duration-300 cursor-pointer">
-                <QRCodeSVG
-                  value={"https://udhhyog.com/"}
-                  size={150}
-                  bgColor="#fff"
-                  fgColor="#000"
-                  level="H"
-                />
-              </div>
-            </div>
-            <p className="text-gray-100 text-[0.8rem] sm:text-[0.9rem] my-3">
-              Scan QR Code to Login
-            </p>
+            {!authData?.twofa_url && (
+              <p className="text-gray-100 text-[1rem] my-3">
+                ! Enter Code to Authenticate
+              </p>
+            )}
+            {authData?.twofa_url && (
+              <>
+                <div className="flex justify-center mt-2">
+                  <div className="bg-white p-2 rounded-lg shadow-lg hover:scale-110 transition-scale duration-300 cursor-pointer">
+                    <QRCodeSVG
+                      value={authData?.twofa_url}
+                      size={150}
+                      bgColor="#fff"
+                      fgColor="#000"
+                      level="H"
+                    />
+                  </div>
+                </div>
+                <p className="text-gray-100 text-[0.8rem] sm:text-[0.9rem] my-3">
+                  Scan QR Code to Authenticate
+                </p>
+
+                <div className="text-gray-100 text-[0.7rem] my-3 flex justify-center items-center gap-2">
+                  <div>
+                    <span className="font-medium text-[0.8rem] mr-0.5">
+                      Secret Key :{" "}
+                    </span>
+
+                    <span className="relative inline-block">
+                      {authData?.twofa_secret
+                        ?.replace(/(.{5})/g, "$1    ")
+                        .trim()}
+                      <span className="w-full h-[1px] bottom-[-3px] block absolute bg-[var(--border)]" />
+                    </span>
+                  </div>
+                  {copied ? (
+                    <Check className="animate__animated animate__bounceOut text-white" />
+                  ) : (
+                    <Copy
+                      className="cursor-pointer text-white"
+                      onClick={handleCopy}
+                    />
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <form
@@ -199,25 +248,24 @@ const Two_Factor_Authentication = () => {
               ))}
             </div>
 
-            {errors.authcode && (
-              <p className="text-red-400 text-md text-center">
-                {errors.authcode.message}
-              </p>
-            )}
-
             <button
               id="submit-2fa"
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3 sm:py-3 bg-white/1 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
+              disabled={isLoading || !allFilled}
+              className={`w-full py-3 sm:py-3 border rounded-lg text-sm sm:text-base font-medium transition-all
+          ${
+            isLoading || !allFilled
+              ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
+              : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40"
+          }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                  Verifying...
+                  Submitting...
                 </div>
               ) : (
-                "Verify"
+                "Submit"
               )}
             </button>
 

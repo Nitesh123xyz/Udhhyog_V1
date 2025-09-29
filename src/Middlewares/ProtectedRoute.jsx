@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
-
-const hasToken = () => sessionStorage.getItem("token");
+import useAuth from "../hooks/useAuth";
 
 export default function ProtectedRoute({ children }) {
-  return hasToken() ? <>{children}</> : <Navigate to="/" replace={true} />;
+  const { hasToken } = useAuth();
+  return hasToken ? <>{children}</> : <Navigate to="/" replace={true} />;
 }

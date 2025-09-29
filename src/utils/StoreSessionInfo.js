@@ -1,9 +1,3 @@
-const KEY = "token";
-export const setToken = (Token) =>
-  Token ? sessionStorage.setItem(KEY, Token) : sessionStorage.removeItem(KEY);
-
-export const getToken = () => sessionStorage.getItem(KEY) || null;
-
 // ------------------------------------------------------
 const MenuKey = "leftSideNavigationMenu";
 export const setLeftSideNavigationMenu = (Menu) =>
@@ -24,6 +18,26 @@ export const setAppFontWeight = (FontWeight) => {
 };
 export const getAppFontWeight = () =>
   localStorage.getItem(FontWeightKey) || "font-default";
+
+// ------------------------------------------------------
+
+export const SCALE_KEY = "app_scale";
+
+/** returns a number (scale), falls back to 1 */
+export function getAppScale() {
+  try {
+    const v = localStorage.getItem(SCALE_KEY);
+    return v ? parseFloat(v) : 1;
+  } catch (e) {
+    return 1;
+  }
+}
+
+export function setAppScale(scale) {
+  try {
+    localStorage.setItem(SCALE_KEY, String(scale));
+  } catch (e) {}
+}
 
 // ------------------------------------------------------
 

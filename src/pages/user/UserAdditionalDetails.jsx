@@ -60,35 +60,35 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               </h3>
               <div className="text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2  2xl:grid-cols-3 space-y-2">
                 <div>
-                  <span className="font-bold text-[var(--text)]">Name :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Name :</span>
                   <span className="text-gray-400">{name}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Job :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Job :</span>
                   <span className="text-gray-400">{jobTitle}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Department :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{department}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Status :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Status :</span>
                   <span className="text-gray-400">{status}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Start Date :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{startDate}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Salary :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Salary :</span>
                   <span className="text-gray-400">{salary}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Email :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Email :</span>
                   {contact?.email && (
                     <a
                       href={`mailto:${contact.email}`}
@@ -99,7 +99,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   )}
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Phone :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Phone :</span>
                   {contact?.phone && (
                     <a
                       href={`tel:${contact.phone}`}
@@ -112,7 +112,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Whatsapp :
-                  </span>{" "}
+                  </span>
                   {contact?.whatsapp && (
                     <a
                       href={`https://wa.me/${contact.whatsapp}`}
@@ -125,13 +125,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   )}
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">DOB :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">DOB :</span>
                   <span className="text-gray-400">{contact?.dob}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Marital Status :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">
                     {contact?.maritalStatus}
                   </span>
@@ -139,13 +139,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Blood Group :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{contact?.bloodGroup}</span>
                 </div>
                 <div>
                   <span className="font-bold  text-[var(--text)]">
                     Address :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{contact?.address}</span>
                 </div>
               </div>
@@ -223,7 +223,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         DOB
-                      </th>{" "}
+                      </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Occupation
                       </th>
@@ -321,7 +321,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Role
-                      </th>{" "}
+                      </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Years
                       </th>
@@ -420,19 +420,19 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Holder :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{bank?.accountHolder}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Bank Name :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{bank?.bankName}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Number :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">
                     {bank?.accountHolder?.replace(/.(?=.{4})/g, "X")}
                   </span>
@@ -440,15 +440,15 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     IFSC Code :
-                  </span>{" "}
+                  </span>
                   <span className="text-gray-400">{bank?.ifsc}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Branch :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">Branch :</span>
                   <span className="text-gray-400">{bank?.branch}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">UPI ID :</span>{" "}
+                  <span className="font-bold text-[var(--text)]">UPI ID :</span>
                   <span className="text-gray-400">{bank?.upi}</span>
                 </div>
               </div>
@@ -464,11 +464,11 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               title="Delete User"
               message={
                 <p className="text-[var(--text)]">
-                  Are you sure you want to delete{" "}
+                  Are you sure you want to delete
                   <div className="font-semibold text-red-600 relative inline-block">
                     {name}
                     <span className="w-full h-[1.5px] bottom-0 block absolute bg-red-600" />
-                  </div>{" "}
+                  </div>
                   profile? All of your data will be permanently removed. This
                   action cannot be undone
                 </p>

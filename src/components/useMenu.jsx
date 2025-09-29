@@ -4,19 +4,20 @@ import { fetchWithErrorHandling } from "../utils/ApiResponse";
 import transformMenu from "../utils/ReuseData";
 import {
   getLeftSideNavigationMenu,
-  getToken,
   setLeftSideNavigationMenu,
   setUserInfo,
 } from "../utils/StoreSessionInfo";
+import useAuth from "../hooks/useAuth";
 
 export const useMenu = () => {
   const [menuList, setMenuList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [LeftSideNavigationMenu] = useLeftSideNavigationMenuMutation();
+  const { token, hasToken } = useAuth();
 
   const fetchMenu = async () => {
     const { success, ApiData } = await fetchWithErrorHandling(() =>
-      LeftSideNavigationMenu().unwrap()
+      LeftSideNavigationMenu(token).unwrap()
     );
 
     if (success) {
@@ -37,11 +38,11 @@ export const useMenu = () => {
       setMenuList(transformMenu(storedMenu));
       setLoading(false);
     } else {
-      if (getToken()) {
+      if (hasToken) {
         fetchMenu();
       }
     }
-  }, [getToken()]);
+  }, [hasToken]);
 
   return { menuList, loading, setMenuList };
 };

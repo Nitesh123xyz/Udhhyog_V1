@@ -1,6 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getToken } from "../../utils/StoreSessionInfo";
-
 export const pagePermissionSlice = createApi({
   reducerPath: "PagePermissionApi",
   baseQuery: fetchBaseQuery({
@@ -16,10 +14,10 @@ export const pagePermissionSlice = createApi({
   }),
   endpoints: (builder) => ({
     pagePermissionList: builder.mutation({
-      query: () => ({
+      query: (Token) => ({
         url: "/page-permission",
         method: "POST",
-        body: { token: getToken(), from_page: "dashboard" },
+        body: { token: Token, from_page: "dashboard" },
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,

@@ -28,7 +28,7 @@ export const authSlice = createApi({
 
     TwoFactorAuthentication: builder.mutation({
       query: (credential) => ({
-        url: "/2FA_Authentication",
+        url: "/2fa",
         method: "POST",
         body: { ...credential, api_key: import.meta.env.VITE_API_KEY },
       }),

@@ -9,6 +9,8 @@ export const fetchWithErrorHandling = async (fetchFunction = () => {}) => {
 
     if (status === 200) {
       return { success: true, status, ApiData: body };
+    } else if (status === 202) {
+      return { success: true, status };
     } else {
       showCustomToast(
         `Something went wrong! Please try again. status: ${status}`,
