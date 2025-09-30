@@ -24,7 +24,20 @@ export const utilsSlice = createApi({
         body,
       }),
     }),
+
+    allProfileMenu: builder.mutation({
+      query: (Token) => ({
+        url: "/employee-menu",
+        method: "POST",
+        body: { token: Token },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLeftSideNavigationMenuMutation } = utilsSlice;
+export const { useLeftSideNavigationMenuMutation, useAllProfileMenuMutation } =
+  utilsSlice;

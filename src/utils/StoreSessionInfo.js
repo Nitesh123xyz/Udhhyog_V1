@@ -64,11 +64,11 @@ export const getUserInfo = () =>
 
 // ------------------------------------------------------
 
-const SessionExpire = "SessionExpire";
+const SessionExpireKey = "SessionExpire";
 
 export const getSessionExpire = () => {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "false");
+    return JSON.parse(localStorage.getItem(SessionExpireKey) ?? "false");
   } catch {
     return false;
   }
@@ -76,9 +76,9 @@ export const getSessionExpire = () => {
 
 export const setSessionExpire = (value) => {
   if (typeof value === "boolean") {
-    localStorage.setItem(KEY, JSON.stringify(value));
+    localStorage.setItem(SessionExpireKey, JSON.stringify(value));
   } else {
-    localStorage.removeItem(KEY);
+    localStorage.removeItem(SessionExpireKey);
   }
 
   // notify this tab immediately
@@ -90,7 +90,7 @@ export const setSessionExpire = (value) => {
 };
 
 export const clearSessionExpire = () => {
-  sessionStorage.removeItem(SessionExpire);
+  sessionStorage.removeItem(SessionExpireKey);
 };
 
 // ------------------------------------------------------

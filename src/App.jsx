@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useMenu } from "./components/useMenu";
+import { useMenu } from "./hooks/useMenu";
 import SessionExpired from "./components/SessionExpired";
 import { getSessionExpire } from "./utils/StoreSessionInfo";
 import useAuth from "./hooks/useAuth";
@@ -29,11 +29,9 @@ const App = () => {
 
   useEffect(() => {
     const onCustom = (e) => {
-      console.log(e);
       setIsSessionExpired(e.detail?.value ?? getSessionExpire());
     };
     const onStorage = (e) => {
-      console.log(e);
       if (e.key === "SessionExpire") {
         setIsSessionExpired(JSON.parse(e.newValue || "false"));
       }

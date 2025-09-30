@@ -13,12 +13,12 @@ const UtileSlice = createSlice({
     setAccessToken(state, action) {
       state.accessToken = action.payload || "";
     },
-    clearAuth(state) {
-      state.accessToken = "";
+    setProfileMenuList(state, action) {
+      state.profileMenuList = action.payload;
     },
   },
 });
 
-export const { setPermissionList, setAccessToken, clearAuth } =
+export const { setPermissionList, setAccessToken, setProfileMenuList } =
   UtileSlice.actions;
 export default UtileSlice.reducer;

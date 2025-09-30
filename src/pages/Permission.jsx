@@ -8,6 +8,7 @@ import {
 import { fetchWithErrorHandling } from "../utils/ApiResponse";
 import { showCustomToast } from "../components/CustomToast";
 import { useSelector } from "react-redux";
+import AllProfileMenu from "../components/AllProfileMenu";
 
 const clone = (x) => structuredClone(x); // deep clone utility
 
@@ -198,6 +199,8 @@ const Permission = () => {
               >
                 Save All Changes ({totalChanged})
               </button>
+
+              <AllProfileMenu />
             </div>
 
             <div>

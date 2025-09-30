@@ -11,7 +11,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   const [rows, setRows] = useState(() => [...employees]);
   const [order, setOrder] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentEmployees = rows.slice(startIndex, endIndex);

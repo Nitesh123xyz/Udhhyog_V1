@@ -226,7 +226,9 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
             src="/logo.png"
             alt="company_logo"
             className={`rounded-full shadow-md transition-all duration-300 ring-4 ring-[var(--logo_circle)] ease-in ${
-              isExpanded ? "h-[45px] w-[45px]" : `h-[60px] w-[60px]`
+              isExpanded
+                ? "h-[2.813rem] w-[2.813rem]"
+                : `h-[3.75rem] w-[3.75rem]`
             }`}
             style={{
               filter: "drop-shadow(0.35rem 0.35rem 0.2rem rgba(0, 0, 0, 0.2))",
