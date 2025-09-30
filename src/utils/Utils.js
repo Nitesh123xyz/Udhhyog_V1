@@ -1,7 +1,11 @@
 // utileSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { permissionList: [], accessToken: "" };
+const initialState = {
+  permissionList: [],
+  accessToken: "",
+  selectedProfile: {},
+};
 
 const UtileSlice = createSlice({
   name: "UtileSlice",
@@ -14,7 +18,7 @@ const UtileSlice = createSlice({
       state.accessToken = action.payload || "";
     },
     setProfileMenuList(state, action) {
-      state.profileMenuList = action.payload;
+      state.selectedProfile = action.payload;
     },
   },
 });

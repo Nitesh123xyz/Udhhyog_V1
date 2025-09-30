@@ -33,7 +33,7 @@ const AllProfileMenu = () => {
     console.log(item);
     setSelected(item);
     setOpen(false);
-    dispatch(setProfileMenuList(selected));
+    dispatch(setProfileMenuList(item));
   };
 
   //   --------------------------------------------
@@ -57,13 +57,13 @@ const AllProfileMenu = () => {
   //   --------------------------------------------
 
   return (
-    <div ref={DropDownList} className="relative w-72">
+    <div ref={DropDownList} className="relative w-64 sm:w-[20rem]">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center rounded-lg bg-[var(--background)] px-4 py-2 text-sm text-[var(--text)]
+        className="w-full flex justify-between items-center rounded-md bg-[var(--background)] px-1 sm:px-4 py-2 text-sm text-[var(--text)]
         shadow-md transition-all duration-200 border border-[var(--border)]"
       >
-        <span>
+        <span className="text-xs sm:text-sm">
           {selected
             ? `${selected.emp_id} : ${selected.emp_name}, ${selected.emp_profile}`
             : isLoading
@@ -82,7 +82,7 @@ const AllProfileMenu = () => {
             <li
               key={item.emp_id}
               onClick={() => handleSelectMenu(item)}
-              className="cursor-pointer rounded-lg px-4 mx-1 my-1 py-2 text-sm text-[var(--text)] hover:bg-[var(--border)] transition-colors"
+              className="cursor-pointer rounded-lg px-4 mx-1 my-1 py-2 text-xs sm:text-sm text-[var(--text)] hover:bg-[var(--border)] transition-colors"
             >
               {`${item.emp_id} : ${item.emp_name}, ${item.emp_profile}`}
             </li>

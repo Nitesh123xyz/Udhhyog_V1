@@ -26,7 +26,7 @@ export const pagePermissionSlice = createApi({
     }),
     UpdatePagePermission: builder.mutation({
       query: (payload) => ({
-        url: "/page-permission/update",
+        url: "/update-permission",
         method: "POST",
         body: payload,
       }),

@@ -9,6 +9,8 @@ import { fetchWithErrorHandling } from "../utils/ApiResponse";
 import { showCustomToast } from "../components/CustomToast";
 import { useSelector } from "react-redux";
 import AllProfileMenu from "../components/AllProfileMenu";
+import { SaveAll } from "lucide-react";
+import useAuth from "../hooks/useAuth";
 
 const clone = (x) => structuredClone(x); // deep clone utility
 
@@ -64,6 +66,8 @@ const ToggleSwitch = ({ enabled, onChange }) => {
 };
 
 const Permission = () => {
+  const { selectedProfile } = useSelector((state) => state.UtileSlice);
+  const { token } = useAuth();
   // ------------------------------------------
   const [UpdatePagePermission, { isLoading: isUpdateLoading }] =
     useUpdatePagePermissionMutation();
@@ -145,22 +149,29 @@ const Permission = () => {
   // Batch save all changed rows
   const saveAllChanges = async () => {
     const changes = Object.values(changedMap);
-    console.log("Saving all changes:", changes);
+    console.log("Saving all changes:", changes, selectedProfile);
     if (changes.length === 0) {
       toast("No changes to save.");
       return;
     }
 
+    const final = {
+      token: token,
+      emp_id: selectedProfile.emp_id,
+      updates: changes,
+    };
+
+    console.log(final);
+
     try {
       // You can call a bulk API if you have one; otherwise loop:
       // await UpdatePagePermissionBulk({ changes }).unwrap();
-      for (const payload of changes) {
-        // eslint-disable-next-line no-await-in-loop
-        await UpdatePagePermission(payload).unwrap();
-        originalRef.current = originalRef.current.map((r) =>
-          r.page_id === payload.page_id ? { ...r, ...payload } : r
-        );
-      }
+      // for (const payload of changes) {
+      //   await UpdatePagePermission(payload).unwrap();
+      //   originalRef.current = originalRef.current.map((r) =>
+      //     r.page_id === payload.page_id ? { ...r, ...payload } : r
+      //   );
+      // }
 
       setChangedMap({});
       toast.success("All changes saved.");
@@ -177,29 +188,33 @@ const Permission = () => {
       </div>
 
       <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 lg:gap-1">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[0_0.2rem]">
+          <div className="col-span-1 lg:col-span-2 flex justify-end mr-1.5 sm:justify-center sticky top-[calc(28%-4.8rem)] sm:top-[50%] z-[999] -mt-36">
+            <button
+              disabled={isUpdateLoading || totalChanged === 0}
+              onClick={saveAllChanges}
+              className={`w-[2.4rem] h-[2.4rem] sm:w-[3.3rem] sm:h-[3.3rem] p-1 rounded-full text-xs sm:text-sm border whitespace-nowrap bg-red-400 border-none text-[var(--text)] ${
+                totalChanged === 0
+                  ? "opacity-60 cursor-not-allowed"
+                  : "hover:opacity-90 cursor-pointer"
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <SaveAll className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+            </button>
+          </div>
           {/* Left Column */}
           <div className="rounded-lg shadow-md p-1.5 md:p-2 mb-1  border-[var(--border)] border-1">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm sm:text-base text-[var(--text)]">
-                <span className="relative">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <h2 className="text-sm sm:text-base text-[var(--text)] ml-1">
+                <span className="relative text-xs sm:text-[1rem]">
                   PERMISSION CONTROL
                   <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
                 </span>
               </h2>
 
-              <button
-                disabled={isUpdateLoading || totalChanged === 0}
-                onClick={saveAllChanges}
-                className={`px-3 py-1.5 rounded-md text-xs sm:text-sm border whitespace-nowrap ${
-                  totalChanged === 0
-                    ? "opacity-60 cursor-not-allowed"
-                    : "hover:opacity-90"
-                } border-gray-400 text-[var(--text)]`}
-              >
-                Save All Changes ({totalChanged})
-              </button>
-
+              {/* {employee list} */}
               <AllProfileMenu />
             </div>
 
@@ -239,7 +254,6 @@ const Permission = () => {
                           </span>
                         </td>
 
-                        {/* All (computed) */}
                         <td className="px-1 md:px-2 text-center">
                           <div className="flex justify-center">
                             <ToggleSwitch
