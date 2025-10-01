@@ -4,7 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   permissionList: [],
   accessToken: "",
-  selectedProfile: {},
+  selectedProfile: null,
 };
 
 const UtileSlice = createSlice({

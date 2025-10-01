@@ -33,7 +33,7 @@ const AllProfileMenu = () => {
     console.log(item);
     setSelected(item);
     setOpen(false);
-    dispatch(setProfileMenuList(item));
+    dispatch(setProfileMenuList(item?.emp_id));
   };
 
   //   --------------------------------------------

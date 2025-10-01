@@ -1,10 +1,9 @@
+//
+
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../components/Header";
 import toast from "react-hot-toast";
-import {
-  usePagePermissionListMutation,
-  useUpdatePagePermissionMutation,
-} from "../features/permission_page/page_permission";
+import { useUpdatePagePermissionMutation } from "../features/permission_page/page_permission";
 import { fetchWithErrorHandling } from "../utils/ApiResponse";
 import { showCustomToast } from "../components/CustomToast";
 import { useSelector } from "react-redux";
@@ -12,34 +11,47 @@ import AllProfileMenu from "../components/AllProfileMenu";
 import { SaveAll } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 
-const clone = (x) => structuredClone(x); // deep clone utility
+const clone = (x) =>
+  typeof structuredClone === "function"
+    ? structuredClone(x)
+    : JSON.parse(JSON.stringify(x));
 
-/**
- * Compute if all permissions are ON for a row
- */
-const isAllOn = (row) => !!row.view && !!row.edit && !!row.add && !!row.delete;
-
-/**
- * Create a minimal diff between original row and updated row.
- * Only include changed flags. Always include page_id.
- */
-const diffRow = (original, updated) => {
-  const changed = { page_id: updated.page_id };
-  let hasChange = false;
-
-  ["view", "edit", "add", "delete"].forEach((k) => {
-    if (original[k] !== updated[k]) {
-      changed[k] = updated[k];
-      hasChange = true;
-    }
-  });
-
-  return hasChange ? changed : null;
+// ---------- Helpers ----------
+const toBool = (v) => {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "number") return v !== 0;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    if (s === "0" || s === "false" || s === "") return false;
+    return true;
+  }
+  return Boolean(v);
 };
+
+const normalizePermissions = (arr) =>
+  (arr || []).map((r) => ({
+    ...r,
+    view: toBool(r.view),
+    edit: toBool(r.edit),
+    add: toBool(r.add),
+    delete: toBool(r.delete),
+  }));
+
+const isAllOn = (row) =>
+  !!row && !!row.view && !!row.edit && !!row.add && !!row.delete;
 
 const ToggleSwitch = ({ enabled, onChange }) => {
   return (
     <label
+      role="switch"
+      aria-checked={!!enabled}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onChange();
+        }
+      }}
       className={`inline-flex items-center cursor-pointer ${
         enabled ? "outline-1" : "outline-0"
       } outline-0 outline-[var(--border)] px-1 py-2 rounded-lg`}
@@ -47,7 +59,7 @@ const ToggleSwitch = ({ enabled, onChange }) => {
       <input
         type="checkbox"
         className="sr-only"
-        checked={enabled}
+        checked={!!enabled}
         onChange={onChange}
       />
       <div
@@ -65,47 +77,64 @@ const ToggleSwitch = ({ enabled, onChange }) => {
   );
 };
 
+// ---------------- Component ----------------
 const Permission = () => {
-  const { selectedProfile } = useSelector((state) => state.UtileSlice);
-  const { token } = useAuth();
-  // ------------------------------------------
+  const [rows, setRows] = useState([]);
+  const originalRef = useRef([]);
+  const [changedMap, setChangedMap] = useState({});
+
+  // --------------------------------------------------------
+
   const [UpdatePagePermission, { isLoading: isUpdateLoading }] =
     useUpdatePagePermissionMutation();
+
+  const { selectedProfile } = useSelector((state) => state.UtileSlice);
+  const { token } = useAuth();
+
   const permissionList = useSelector(
     (state) => state.UtileSlice.permissionList
   );
 
-  // ----------------------------------------
-  const [rows, setRows] = useState(permissionList);
-  const originalRef = useRef([]);
-  const [changedMap, setChangedMap] = useState({});
-  originalRef.current = clone(rows);
-  // -----------------------------------------
+  // --------------------------------------------------------
+
+  useEffect(() => {
+    const normalized = normalizePermissions(permissionList);
+    setRows(normalized);
+    originalRef.current = clone(normalized);
+    setChangedMap({});
+  }, [permissionList]);
 
   const totalChanged = useMemo(
     () => Object.keys(changedMap).length,
     [changedMap]
   );
 
-  // --------------------- Toggling ----------------------
   const applyRowChange = (rowIndex, nextRow) => {
     setRows((prev) => {
       const copy = clone(prev);
       copy[rowIndex] = nextRow;
 
-      // Build diff against original snapshot
+      // Build minimal diff against original snapshot
       const originalRow =
-        originalRef.current.find((r) => r.page_id === nextRow.page_id) ||
-        nextRow;
+        (originalRef.current || []).find(
+          (r) => r.page_id === nextRow.page_id
+        ) || nextRow;
 
-      const delta = diffRow(originalRow, nextRow);
+      const changed = { page_id: nextRow.page_id };
+      let hasChange = false;
+      ["view", "edit", "add", "delete"].forEach((k) => {
+        if (originalRow[k] !== nextRow[k]) {
+          changed[k] = nextRow[k];
+          hasChange = true;
+        }
+      });
 
       setChangedMap((prevChanged) => {
         const newMap = { ...prevChanged };
-        if (delta) {
-          newMap[nextRow.page_id] = delta; // keep only changed fields + page_id
+        if (hasChange) {
+          newMap[nextRow.page_id] = changed;
         } else {
-          delete newMap[nextRow.page_id]; // no changes left for this row
+          delete newMap[nextRow.page_id];
         }
         return newMap;
       });
@@ -115,69 +144,83 @@ const Permission = () => {
   };
 
   const toggleOne = (rowIndex, key) => {
-    setRows((prev) => {
-      const current = prev[rowIndex];
-      const next = { ...current };
+    if (!selectedProfile) {
+      showCustomToast("Please Select a Profile", "/error.gif", "Error");
+      return;
+    }
+    const current = rows[rowIndex];
+    if (!current) return;
 
-      if (key === "all") {
-        const turnOn = !isAllOn(current);
-        next.view = turnOn;
-        next.edit = turnOn;
-        next.add = turnOn;
-        next.delete = turnOn;
-        applyRowChange(rowIndex, next);
-        toast.success(
-          `${current.page_name}: ${
-            turnOn ? "Full access enabled" : "Full access removed"
-          }`
-        );
-        return prev; // applyRowChange already updated state
-      }
-
-      // Flip just the selected flag
-      next[key] = !current[key];
+    if (key === "all") {
+      const turnOn = !isAllOn(current);
+      const next = {
+        ...current,
+        view: turnOn,
+        edit: turnOn,
+        add: turnOn,
+        delete: turnOn,
+      };
       applyRowChange(rowIndex, next);
       toast.success(
-        `${current.page_name}: "${key}" ${next[key] ? "enabled" : "disabled"}`
+        `${current.page_name}: ${
+          turnOn ? "Full access enabled" : "Full access removed"
+        }`
       );
-      return prev; // applyRowChange already updated state
-    });
-  };
-
-  // --------------------- Save handlers -----------------
-
-  // Batch save all changed rows
-  const saveAllChanges = async () => {
-    const changes = Object.values(changedMap);
-    console.log("Saving all changes:", changes, selectedProfile);
-    if (changes.length === 0) {
-      toast("No changes to save.");
       return;
     }
 
-    const final = {
+    const next = { ...current, [key]: !current[key] };
+    applyRowChange(rowIndex, next);
+    // toast.success(
+    //   `${current.page_name}: "${key}" ${next[key] ? "enabled" : "disabled"}`
+    // );
+  };
+
+  const saveAllChanges = async () => {
+    if (!selectedProfile) {
+      showCustomToast("Please Select a Profile", "/error.gif", "Error");
+      return;
+    }
+
+    console.log(changedMap);
+
+    const diffs = Object.values(changedMap);
+    if (diffs.length === 0) {
+      toast.success("No changes to save.");
+      return;
+    }
+
+    const update_list = [];
+    diffs.forEach((d) => {
+      const pid = d.page_id;
+      ["view", "edit", "add", "delete"].forEach((k) => {
+        if (k in d) {
+          update_list.push({
+            page_id: pid,
+            perm_type: k,
+            perm_bool: !!d[k],
+          });
+        }
+      });
+    });
+
+    const payload = {
       token: token,
-      emp_id: selectedProfile.emp_id,
-      updates: changes,
+      emp_id: selectedProfile ? selectedProfile.emp_id : null,
+      update_list,
     };
 
-    console.log(final);
-
-    try {
-      // You can call a bulk API if you have one; otherwise loop:
-      // await UpdatePagePermissionBulk({ changes }).unwrap();
-      // for (const payload of changes) {
-      //   await UpdatePagePermission(payload).unwrap();
-      //   originalRef.current = originalRef.current.map((r) =>
-      //     r.page_id === payload.page_id ? { ...r, ...payload } : r
-      //   );
-      // }
-
+    const { success, status } = await fetchWithErrorHandling(() =>
+      UpdatePagePermission(payload).unwrap()
+    );
+    if (success && status === 200) {
+      originalRef.current = clone(rows);
       setChangedMap({});
-      toast.success("All changes saved.");
-    } catch (err) {
-      console.error(err);
-      toast.error("Saving changes failed.");
+      showCustomToast("Permission Updated", "/success.gif", "Success");
+    } else {
+      if (status === 401) {
+        showCustomToast("Permission Updated Failed", "/error.gif", "Error");
+      }
     }
   };
 
@@ -188,22 +231,23 @@ const Permission = () => {
       </div>
 
       <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[0_0.2rem]">
-          <div className="col-span-1 lg:col-span-2 flex justify-end mr-1.5 sm:justify-center sticky top-[calc(28%-4.8rem)] sm:top-[50%] z-[999] -mt-36">
-            <button
-              disabled={isUpdateLoading || totalChanged === 0}
-              onClick={saveAllChanges}
-              className={`w-[2.4rem] h-[2.4rem] sm:w-[3.3rem] sm:h-[3.3rem] p-1 rounded-full text-xs sm:text-sm border whitespace-nowrap bg-red-400 border-none text-[var(--text)] ${
-                totalChanged === 0
-                  ? "opacity-60 cursor-not-allowed"
-                  : "hover:opacity-90 cursor-pointer"
-              }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <SaveAll className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
-            </button>
-          </div>
+        <div className="fixed top-2 right-3 w-fit z-[999] sm:sticky sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2">
+          <button
+            disabled={isUpdateLoading || totalChanged === 0}
+            onClick={saveAllChanges}
+            aria-label="Save all changes"
+            className={`w-[2.4rem] h-[2.4rem] sm:w-[3.3rem] sm:h-[3.3rem] p-1 rounded-full text-xs sm:text-sm border whitespace-nowrap bg-red-400 border-none text-[var(--text)] ${
+              totalChanged === 0
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:opacity-90 cursor-pointer"
+            }`}
+          >
+            <div className="flex items-center justify-center gap-2">
+              <SaveAll className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+          </button>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[0_0.2rem] sm:-mt-[3.2rem]">
           {/* Left Column */}
           <div className="rounded-lg shadow-md p-1.5 md:p-2 mb-1  border-[var(--border)] border-1">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
@@ -236,68 +280,69 @@ const Permission = () => {
                 </thead>
 
                 <tbody>
-                  {rows?.map((row, idx) => {
-                    const allOn = isAllOn(row);
+                  {rows
+                    ?.sort((a, b) => a.page_id - b.page_id)
+                    ?.map((row, idx) => {
+                      const allOn = isAllOn(row);
+                      return (
+                        <tr
+                          key={row.page_id}
+                          className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
+                        >
+                          <td className="py-4 px-1 md:px-2 text-xs xl:text-sm  rounded-l-lg text-[var(--text)] truncate">
+                            <span
+                              title={row.page_name}
+                              className="text-wrap relative"
+                            >
+                              {row.page_name}
+                              <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                            </span>
+                          </td>
 
-                    return (
-                      <tr
-                        key={row.page_id}
-                        className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
-                      >
-                        <td className="py-4 px-1 md:px-2 text-xs xl:text-sm  rounded-l-lg text-[var(--text)] truncate">
-                          <span
-                            title={row.page_name}
-                            className="text-wrap relative"
-                          >
-                            {row.page_name}
-                            <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                          </span>
-                        </td>
+                          <td className="px-1 md:px-2 text-center">
+                            <div className="flex justify-center">
+                              <ToggleSwitch
+                                enabled={allOn}
+                                onChange={() => toggleOne(idx, "all")}
+                              />
+                            </div>
+                          </td>
 
-                        <td className="px-1 md:px-2 text-center">
-                          <div className="flex justify-center">
-                            <ToggleSwitch
-                              enabled={allOn}
-                              onChange={() => toggleOne(idx, "all")}
-                            />
-                          </div>
-                        </td>
-
-                        <td className="px-1 md:px-2 text-center">
-                          <div className="flex justify-center">
-                            <ToggleSwitch
-                              enabled={!!row.view}
-                              onChange={() => toggleOne(idx, "view")}
-                            />
-                          </div>
-                        </td>
-                        <td className="px-1 md:px-2 text-center">
-                          <div className="flex justify-center">
-                            <ToggleSwitch
-                              enabled={!!row.edit}
-                              onChange={() => toggleOne(idx, "edit")}
-                            />
-                          </div>
-                        </td>
-                        <td className="px-1 md:px-2 text-center">
-                          <div className="flex justify-center">
-                            <ToggleSwitch
-                              enabled={!!row.add}
-                              onChange={() => toggleOne(idx, "add")}
-                            />
-                          </div>
-                        </td>
-                        <td className="px-1 md:px-2 text-center rounded-r-lg">
-                          <div className="flex justify-center">
-                            <ToggleSwitch
-                              enabled={!!row.delete}
-                              onChange={() => toggleOne(idx, "delete")}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          <td className="px-1 md:px-2 text-center">
+                            <div className="flex justify-center">
+                              <ToggleSwitch
+                                enabled={!!row.view}
+                                onChange={() => toggleOne(idx, "view")}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-1 md:px-2 text-center">
+                            <div className="flex justify-center">
+                              <ToggleSwitch
+                                enabled={!!row.edit}
+                                onChange={() => toggleOne(idx, "edit")}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-1 md:px-2 text-center">
+                            <div className="flex justify-center">
+                              <ToggleSwitch
+                                enabled={!!row.add}
+                                onChange={() => toggleOne(idx, "add")}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-1 md:px-2 text-center rounded-r-lg">
+                            <div className="flex justify-center">
+                              <ToggleSwitch
+                                enabled={!!row.delete}
+                                onChange={() => toggleOne(idx, "delete")}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
