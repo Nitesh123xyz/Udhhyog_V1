@@ -29,6 +29,7 @@ const Two_Factor_Authentication = ({ authData }) => {
     handleSubmit,
     setValue,
     clearErrors,
+    formState: { isValid },
   } = useForm({
     resolver: zodResolver(VerificationSchema),
     defaultValues: { authcode: "" },
@@ -41,11 +42,10 @@ const Two_Factor_Authentication = ({ authData }) => {
     { length: 6 },
     (_, i) => inputsRef.current[i] ?? React.createRef()
   );
-  const allFilled = inputBox.every(Boolean);
 
   const [loginTwoFactorAuthentication, { isLoading }] =
     useTwoFactorAuthenticationMutation();
-
+  const btnDisabled = isLoading || !isValid;
   const handleUserLogin = async (data) => {
     const { success, status, ApiData } = await fetchWithErrorHandling(() =>
       loginTwoFactorAuthentication({
@@ -125,19 +125,17 @@ const Two_Factor_Authentication = ({ authData }) => {
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const paste = e.clipboardData.getData("text");
-    handlePasteAt(paste.replace(/\D/g, ""), 0);
+    const paste = e.clipboardData.getData("text").slice(0, 6);
+    handlePasteAt(paste.replace(/\D/g, ""));
   };
 
-  const handlePasteAt = (text, startIdx) => {
+  const handlePasteAt = (text) => {
     const chars = text.split("");
     const next = [...inputBox];
-    for (let i = startIdx, j = 0; i < 6 && j < chars.length; i++, j++) {
+    for (let i = 0, j = 0; i < 6 && j < chars.length; i++, j++) {
       next[i] = chars[j];
     }
-
     setInputBox(next);
-    const joined = next.join("");
     syncAuthCode(next);
 
     const firstEmpty = next.findIndex((c) => c === "");
@@ -145,9 +143,9 @@ const Two_Factor_Authentication = ({ authData }) => {
     inputsRef.current[Math.min(focusIndex, 5)]?.focus();
   };
 
+  // --------------------------------------------------
   const handleCopy = () => {
     const joined = authData?.twofa_secret;
-    console.log(joined);
     navigator.clipboard.writeText(joined);
     setCopied(true);
     setTimeout(() => {
@@ -240,8 +238,6 @@ const Two_Factor_Authentication = ({ authData }) => {
                   onKeyDown={(e) => handleKeyDown(e, idx)}
                   onPaste={handlePaste}
                   inputMode="numeric"
-                  pattern="\d*"
-                  maxLength={1}
                   autoComplete="one-time-code"
                   className="w-full h-10 sm:h-12 text-center bg-white/1 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base"
                 />
@@ -251,10 +247,10 @@ const Two_Factor_Authentication = ({ authData }) => {
             <button
               id="submit-2fa"
               type="submit"
-              disabled={isLoading || !allFilled}
+              disabled={btnDisabled}
               className={`w-full py-3 sm:py-3 border rounded-lg text-sm sm:text-base font-medium transition-all
           ${
-            isLoading || !allFilled
+            btnDisabled
               ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
               : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40"
           }`}

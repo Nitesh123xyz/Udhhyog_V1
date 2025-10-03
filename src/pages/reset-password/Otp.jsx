@@ -1,7 +1,10 @@
 import { lazy, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useOTPVerificationMutation } from "../../features/auth/authSlice";
+import {
+  useForgotPasswordMutation,
+  useOTPVerificationMutation,
+} from "../../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../../utils/ApiResponse";
 import { showCustomToast } from "../../components/CustomToast";
 
@@ -17,7 +20,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
     register: OtpVerify,
     setValue,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
     clearErrors,
   } = useForm({
     defaultValues: {
@@ -75,12 +78,15 @@ const Otp = ({ setStep, setSharingOtp }) => {
 
   const handlePaste = (event) => {
     event.preventDefault();
-    const pasteData = event.clipboardData.getData("text").replace(/\D/g, "");
+    const pasteData = event.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (!pasteData) return;
 
     const next = [...otpInput];
-    for (let i = 0; i < next.length; i++) {
-      next[i] = pasteData[i] || "";
+    for (let i = 0, j = 0; i < 6 && j < pasteData.length; i++, j++) {
+      next[i] = pasteData[j];
     }
     setOtpInput(next);
     syncOtpString(next);
@@ -91,8 +97,8 @@ const Otp = ({ setStep, setSharingOtp }) => {
     }
   };
 
-  const [OTPVerification, { isLoading, isError, error }] =
-    useOTPVerificationMutation();
+  const [OTPVerification, { isLoading }] = useOTPVerificationMutation();
+  const btnDisabled = isLoading || !isValid;
   const handleOTPVerification = async (data) => {
     if (!data.otp || data.otp.length !== 6) return;
 
@@ -104,6 +110,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
       showCustomToast("OTP Verified Successfully", "/success.gif", "Success");
       setSharingOtp(data.otp);
       setStep(3);
+      sessionStorage.removeItem("temEmail");
     } else {
       if (status === 401) {
         showCustomToast("Invalid OTP Try Again", "/error.gif", "Error");
@@ -113,24 +120,52 @@ const Otp = ({ setStep, setSharingOtp }) => {
 
   // --------------------------------------------------------
 
-  useEffect(() => {
-    if (time <= 0) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+  const [ResendOtpRequest, { isLoading: ResendOtpLoading }] =
+    useForgotPasswordMutation();
+  const handleResendOtp = async () => {
+    const TempEmail = sessionStorage.getItem("tempEmail");
+    const { success, status } = await fetchWithErrorHandling(() =>
+      ResendOtpRequest({ email: TempEmail }).unwrap()
+    );
+    if (success) {
+      showCustomToast(
+        "OTP Sent Successfully, Please check your email",
+        "/success.gif",
+        "Success"
+      );
+      setTime(60);
+      startTimer();
+    } else {
+      if (status === 401) {
+        showCustomToast("Invalid Email Address", "/error.gif", "Error");
       }
     }
+  };
 
+  // --------------------------------------------------------
+
+  const startTimer = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setTime((prev) => {
         if (prev <= 1) {
           clearInterval(intervalRef.current);
+          intervalRef.current = null;
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+  };
 
-    return () => clearInterval(intervalRef.current);
+  useEffect(() => {
+    if (time > 0 && !intervalRef.current) startTimer();
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, []);
 
   // ------------------------------------------------------
@@ -190,41 +225,56 @@ const Otp = ({ setStep, setSharingOtp }) => {
                 {otpInput?.map((val, index) => (
                   <input
                     key={index}
-                    type="text"
+                    ref={(el) => (inputRefs.current[index] = el)}
                     value={val}
-                    maxLength={1}
-                    autoComplete="one-time-code"
-                    inputMode="numeric"
-                    pattern="\d*"
                     onChange={handleChange(index)}
                     onKeyDown={handleKeyDown(index)}
-                    onPaste={index === 0 ? handlePaste : undefined}
-                    ref={(el) => (inputRefs.current[index] = el)}
-                    autoFocus={index === 0}
+                    onPaste={handlePaste}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
                     className="w-[2rem] flex-1 sm:w-[3rem] px-0.5 py-2 sm:px-3 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white text-center text-base focus:outline-none backdrop-blur-sm focus:border-white/40"
-                    aria-label={`OTP Digit ${index + 1}`}
                   />
                 ))}
               </div>
 
-              <div className="text-red-400 flex  my-5">
-                {errors.otp && <span>{errors.otp.message}</span>}
-                {time > 0 ? (
-                  <span className="ml-auto">{formattedTime}</span>
+              <div className="text-red-400 flex my-5">
+                {ResendOtpLoading ? (
+                  <div className="ml-auto">
+                    <div className="flex gap-1.5">
+                      <span className="inline-block w-8 h-6 rounded bg-gray-700 relative overflow-hidden  animate-pulse">
+                        <span className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-500 to-transparent"></span>
+                      </span>{" "}
+                      <span className="inline-block w-8 h-6 rounded bg-gray-700 relative overflow-hidden  animate-pulse">
+                        <span className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-gray-500 to-transparent"></span>
+                      </span>
+                    </div>
+                  </div>
                 ) : (
-                  <span
-                    onClick={() => setTime(60)}
-                    className="ml-auto cursor-pointer"
-                  >
-                    Send OTP
-                  </span>
+                  <>
+                    {time > 0 ? (
+                      <span className="ml-auto">{formattedTime}</span>
+                    ) : (
+                      <span
+                        onClick={handleResendOtp}
+                        className="ml-auto cursor-pointer"
+                      >
+                        Send OTP
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full py-3 bg-white/10 border border-white/20 rounded-lg text-white backdrop-blur-sm hover:bg-white/20 hover:border-white/30 transition-all font-medium"
+                disabled={btnDisabled}
+                className={`w-full py-3 sm:py-4 border rounded-lg sm:rounded-xl transition-all text-sm sm:text-base 
+              ${
+                btnDisabled
+                  ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
+                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40 cursor-pointer"
+              }
+             `}
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">

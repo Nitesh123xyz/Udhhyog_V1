@@ -23,7 +23,7 @@ const ForgotPassword = ({ setStep }) => {
   const {
     register: ForgotUserPassword,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
   } = useForm({
     resolver: zodResolver(ForgotSchema),
   });
@@ -31,7 +31,9 @@ const ForgotPassword = ({ setStep }) => {
   // ------------------------------------------------------
 
   const [ForgotPasswordRequest, { isLoading }] = useForgotPasswordMutation();
+  const btnDisabled = isLoading || !isValid;
   const handlePasswordReset = async (data) => {
+    sessionStorage.setItem("tempEmail", data.email);
     const { success, status } = await fetchWithErrorHandling(() =>
       ForgotPasswordRequest(data).unwrap()
     );
@@ -94,17 +96,18 @@ const ForgotPassword = ({ setStep }) => {
                 className="w-full pl-10 sm:pl-12 py-3 sm:py-4  bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 placeholder:text-[11px] md:placeholder:text-[16px] focus:outline-none backdrop-blur-sm text-xs md:text-md sm:text-base focus:border-white/40 transition-colors"
                 {...ForgotUserPassword("email")}
               />
-              {errors.email && (
-                <p className="text-red-400 text-[10px] sm:text-sm mt-1 pl-2 absolute -bottom-6 sm:-bottom-7">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm hover:bg-white/10 hover:border-white/30 transition-all text-sm sm:text-base font-medium"
+              disabled={btnDisabled}
+              className={`w-full py-3 sm:py-4 border rounded-lg sm:rounded-xl transition-all text-sm sm:text-base 
+              ${
+                btnDisabled
+                  ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
+                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40 cursor-pointer"
+              }
+             `}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
