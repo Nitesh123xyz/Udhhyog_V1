@@ -43,7 +43,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
 
   return (
     <>
-      <section className="bg-[var(--background)] backdrop-blur-md rounded-t-lg  lg:rounded-lg px-2 py-2">
+      <section className="bg-[var(--background)] backdrop-blur-md rounded-t-lg  lg:rounded-lg px-2 py-1">
         <div className="flex justify-end gap-3 mb-2">
           <UserAdditionalDetailsHeader
             step={step}
@@ -51,44 +51,44 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
             setOpenDialog={setOpenDialog}
           />
         </div>
-        <div className="mx-auto space-y-2 min-h-screen lg:min-h-[calc(100vh-138px)]">
+        <div className="mx-auto space-y-2 min-h-screen">
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-3">
-            <div className="p-4 rounded-lg border border-[var(--border)]">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
               <h3 className="font-semibold mb-2 text-[var(--text)] relative">
                 Contact & Identity
                 <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
               </h3>
               <div className="text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2  2xl:grid-cols-3 space-y-2">
                 <div>
-                  <span className="font-bold text-[var(--text)]">Name :</span>
+                  <span className="font-bold text-[var(--text)]">Name :</span>{" "}
                   <span className="text-gray-400">{name}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Job :</span>
+                  <span className="font-bold text-[var(--text)]">Job :</span>{" "}
                   <span className="text-gray-400">{jobTitle}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Department :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{department}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Status :</span>
+                  <span className="font-bold text-[var(--text)]">Status :</span>{" "}
                   <span className="text-gray-400">{status}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Start Date :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{startDate}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Salary :</span>
+                  <span className="font-bold text-[var(--text)]">Salary :</span>{" "}
                   <span className="text-gray-400">{salary}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Email :</span>
+                  <span className="font-bold text-[var(--text)]">Email :</span>{" "}
                   {contact?.email && (
                     <a
                       href={`mailto:${contact.email}`}
@@ -99,7 +99,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   )}
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Phone :</span>
+                  <span className="font-bold text-[var(--text)]">Phone :</span>{" "}
                   {contact?.phone && (
                     <a
                       href={`tel:${contact.phone}`}
@@ -112,7 +112,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Whatsapp :
-                  </span>
+                  </span>{" "}
                   {contact?.whatsapp && (
                     <a
                       href={`https://wa.me/${contact.whatsapp}`}
@@ -125,13 +125,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   )}
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">DOB :</span>
+                  <span className="font-bold text-[var(--text)]">DOB :</span>{" "}
                   <span className="text-gray-400">{contact?.dob}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Marital Status :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">
                     {contact?.maritalStatus}
                   </span>
@@ -139,20 +139,20 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Blood Group :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{contact?.bloodGroup}</span>
                 </div>
                 <div>
                   <span className="font-bold  text-[var(--text)]">
                     Address :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{contact?.address}</span>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <div className="flex items-center justify-between mb-1">
                 <h3 className="font-semibold text-[var(--text)] relative">
                   Emergency Contacts
                   <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
@@ -200,8 +200,8 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <div className="flex items-center justify-between mb-1">
                 <h3 className="font-semibold text-[var(--text)] relative">
                   Family Details
                   <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
@@ -261,8 +261,8 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <h3 className=" inline-block font-semibold mb-3 relative text-[var(--text)]">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <h3 className=" inline-block font-semibold mb-1 relative text-[var(--text)]">
                 Documents Preview
                 <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
               </h3>
@@ -304,8 +304,8 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
           {/* ------------------------------------------------------------------------ */}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <div className="flex items-center justify-between mb-1">
                 <h3 className="font-semibold text-[var(--text)] relative">
                   Experience
                   <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
@@ -358,8 +358,8 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <div className="flex items-center justify-between mb-4">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <div className="flex items-center justify-between mb-1">
                 <h3 className="font-semibold text-[var(--text)] relative">
                   Education Details
                   <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
@@ -410,29 +410,29 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
           {/* ------------------------------------------------------------------------ */}
 
           <div className="grid grid-cols-1 lg:grid-cols-1 gap-3">
-            <div className="p-4 rounded-lg border border-[var(--border)]">
-              <h3 className="font-semibold mb-2 text-[var(--text)] relative">
+            <div className="p-2 rounded-lg border border-[var(--border)]">
+              <h3 className="font-semibold mb-1 text-[var(--text)] relative">
                 Bank Details
                 <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
               </h3>
 
-              <div className="text-sm grid grid-cols-1 sm:grid-cols-3 space-y-2">
+              <div className="text-sm grid grid-cols-1 sm:grid-cols-3 space-y-2.5 pt-1">
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Holder :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{bank?.accountHolder}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Bank Name :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{bank?.bankName}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Number :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">
                     {bank?.accountHolder?.replace(/.(?=.{4})/g, "X")}
                   </span>
@@ -440,15 +440,15 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     IFSC Code :
-                  </span>
+                  </span>{" "}
                   <span className="text-gray-400">{bank?.ifsc}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Branch :</span>
+                  <span className="font-bold text-[var(--text)]">Branch :</span>{" "}
                   <span className="text-gray-400">{bank?.branch}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">UPI ID :</span>
+                  <span className="font-bold text-[var(--text)]">UPI ID :</span>{" "}
                   <span className="text-gray-400">{bank?.upi}</span>
                 </div>
               </div>

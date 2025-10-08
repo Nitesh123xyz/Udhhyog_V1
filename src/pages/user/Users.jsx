@@ -45,13 +45,15 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                 item.status === true ? "cursor-pointer" : "cursor-default"
               }`}
             >
-              {item?.status && (
-                <ArrowDownUp
-                  size={16}
-                  className={`inline-block ml-1  text-[var(--icon)]`}
-                />
-              )}
-              <span className="ml-2">{item?.name}</span>
+              <div className="flex items-center gap-1">
+                {item?.status && (
+                  <ArrowDownUp
+                    size={16}
+                    className={`inline-block text-[var(--icon)]`}
+                  />
+                )}
+                <span>{item?.name}</span>
+              </div>
             </th>
           );
         })}
@@ -104,36 +106,36 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                     </td>
 
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                     >
                       {employee.jobTitle}
                     </td>
 
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      className={`px-4 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                     >
                       {employee.department}
                     </td>
 
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
+                      className={`px-9 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
                     >
                       {employee.salary}
                     </td>
 
                     <td
-                      className={`px-6 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                     >
                       {employee.startDate}
                     </td>
 
                     <td
-                      className={`px-7 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      className={`px-5 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                     >
                       {employee.lifecycle}
                     </td>
 
-                    <td className="px-3 py-4 whitespace-nowrap rounded-r-2xl">
+                    <td className="px-0 py-4 whitespace-nowrap rounded-r-2xl">
                       <StatusBtn Status={employee.status} />
                     </td>
                   </tr>

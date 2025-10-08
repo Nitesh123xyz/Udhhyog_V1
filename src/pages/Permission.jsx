@@ -231,7 +231,13 @@ const Permission = () => {
       </div>
 
       <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
-        <div className="fixed top-2 right-3 w-fit z-[999] sm:sticky sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2">
+        <div
+          className={`${
+            totalChanged === 0
+              ? "opacity-0 cursor-not-allowed"
+              : "opacity-90 cursor-pointer"
+          } fixed top-2 right-3 w-fit z-[999] sm:sticky sm:top-2/3 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2`}
+        >
           <button
             disabled={isUpdateLoading || totalChanged === 0}
             onClick={saveAllChanges}
@@ -239,7 +245,7 @@ const Permission = () => {
             className={`w-[2.4rem] h-[2.4rem] sm:w-[3.3rem] sm:h-[3.3rem] p-1 rounded-full text-xs sm:text-sm border whitespace-nowrap bg-red-400 border-none text-[var(--text)] ${
               totalChanged === 0
                 ? "opacity-60 cursor-not-allowed"
-                : "hover:opacity-90 cursor-pointer"
+                : "opacity-90 cursor-pointer"
             }`}
           >
             <div className="flex items-center justify-center gap-2">
