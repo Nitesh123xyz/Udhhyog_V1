@@ -4,10 +4,10 @@ export const StatusBtn = ({ Status }) => {
   };
 
   const getStatusBg = (status) => {
-    return status === "Inactive" ? "bg-orange-100" : "bg-gray-200";
+    return status === 1 ? "bg-gray-200" : "bg-orange-100";
   };
   const getPointerColor = (status) => {
-    return status === "Inactive" ? "bg-red-400" : "bg-green-400";
+    return status === 1 ? "bg-green-400" : "bg-red-400";
   };
 
   return (
@@ -21,7 +21,7 @@ export const StatusBtn = ({ Status }) => {
           <span
             className={`w-2 h-2 mr-2 ${getPointerColor(Status)} rounded-full`}
           ></span>
-          {Status}
+          {Status === 1 ? "Active" : "Inactive"}
         </span>
       </div>
     </>

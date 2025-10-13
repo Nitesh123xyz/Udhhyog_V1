@@ -1,46 +1,52 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Search, Download, Plus } from "lucide-react";
+import { Search, Download, Plus, RefreshCw } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import useAuth from "../hooks/useAuth";
+import { useSearchUsersMutation } from "../features/users/usersSlice";
 
-const normalize = (s) =>
-  String(s || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " ");
-
-const Header = ({ rows, setRows, step, setStep }) => {
+const Header = ({
+  setRows,
+  step,
+  setStep,
+  currentPage,
+  itemsPerPage,
+  handleUserInfo = () => {},
+}) => {
   const [isFocused, setIsFocused] = useState(false);
   const [query, setQuery] = useState("");
   const [openSearch, setOpenSearch] = useState(false);
-
-  const masterRef = useRef([]);
-
-  useEffect(() => {
-    if (!query) masterRef.current = Array.isArray(rows) ? [...rows] : [];
-  }, [rows, query]);
+  const StoreInterval = useRef(null);
+  const [rotated, setRotated] = useState(0);
 
   const location = useLocation();
   const hideHeaderOptions = ["/permission"];
   const HideHeader = hideHeaderOptions.includes(location.pathname);
-
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
 
+  const [searchUser, { isLoading }] = useSearchUsersMutation();
+  const { token } = useAuth();
+
+  useEffect(() => {
+    const Search_query = {
+      per_page: Number(itemsPerPage),
+      page_no: currentPage,
+      search: query,
+      token: token,
+    };
+
+    const delayDebounce = setTimeout(async () => {
+      clearTimeout(StoreInterval.current);
+      const { body: data } = await searchUser(Search_query).unwrap();
+      setRows(data?.emp_data || []);
+      StoreInterval.current = null;
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [query, itemsPerPage]);
+
   const handleSearch = (e) => {
-    const raw = e.target.value;
-    const q = normalize(raw);
-    setQuery(raw);
-
-    if (!q) {
-      setRows([...masterRef.current]);
-      return;
-    }
-
-    const filtered = masterRef.current.filter((row) =>
-      normalize(row?.name).includes(q)
-    );
-
-    setRows(filtered);
+    setQuery(e.target.value);
   };
 
   return (
@@ -91,6 +97,24 @@ const Header = ({ rows, setRows, step, setStep }) => {
                 onClick={() => setStep(4)}
                 size={15}
                 className="text-gray-800"
+              />
+            </div>
+            <div
+              role="button"
+              aria-pressed={rotated}
+              onClick={() => {
+                setRotated((r) => r + 260);
+                handleUserInfo();
+              }}
+              className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm transition-all duration-300"
+            >
+              <RefreshCw
+                size={15}
+                className={`transform transition-transform duration-500 text-gray-800`}
+                style={{
+                  transform: `rotate(${rotated}deg)`,
+                  transition: "transform 600ms",
+                }}
               />
             </div>
             {step !== 1 && (

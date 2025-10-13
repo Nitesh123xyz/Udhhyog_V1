@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-export const employeeSlice = createApi({
-  reducerPath: "employeeApi",
+export const UsersSlice = createApi({
+  reducerPath: "usersApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
     responseHandler: async (response) => {
@@ -13,11 +13,33 @@ export const employeeSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
-    GetEmployees: builder.mutation({
+    GetUsers: builder.mutation({
       query: (Token) => ({
-        url: "/employees",
+        url: "/users",
         method: "POST",
-        body: { token: Token, from_page: "dashboard" },
+        body: { token: Token, from_page: "users" },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    SearchUsers: builder.mutation({
+      query: (searchData) => ({
+        url: "/search-user",
+        method: "POST",
+        body: searchData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    QueryUsers: builder.mutation({
+      query: (searchData) => ({
+        url: "/query-user",
+        method: "POST",
+        body: searchData,
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,
@@ -61,8 +83,10 @@ export const employeeSlice = createApi({
 });
 
 export const {
-  useGetEmployeesMutation,
+  useGetUsersMutation,
+  useSearchUsersMutation,
+  useQueryUsersMutation,
   useAddEmployeeMutation,
   useUpdateEmployeeMutation,
   useDeleteEmployeeMutation,
-} = employeeSlice;
+} = UsersSlice;

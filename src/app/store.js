@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { authSlice } from "../features/auth/authSlice";
 import { utilsSlice } from "../features/utils/utilsSlice";
 import { pagePermissionSlice } from "../features/permission_page/page_permission";
-import { employeeSlice } from "../features/employee/employeeSlice";
+import { UsersSlice } from "../features/users/usersSlice";
 import expendNavbarReducer from "../utils/ExpendNavbar";
 import UtileSliceReducer from "../utils/Utils";
 export const store = configureStore({
@@ -11,14 +11,14 @@ export const store = configureStore({
     UtileSlice: UtileSliceReducer,
     [authSlice.reducerPath]: authSlice.reducer,
     [utilsSlice.reducerPath]: utilsSlice.reducer,
-    [employeeSlice.reducerPath]: employeeSlice.reducer,
+    [UsersSlice.reducerPath]: UsersSlice.reducer,
     [pagePermissionSlice.reducerPath]: pagePermissionSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authSlice.middleware,
       utilsSlice.middleware,
-      employeeSlice.middleware,
+      UsersSlice.middleware,
       pagePermissionSlice.middleware
     ),
 });

@@ -1,14 +1,13 @@
 const Pagination = ({
-  MainData = [],
   currentPage = 10,
+  setItemsPerPage = () => {},
   setCurrentPage = () => {},
   itemsPerPage,
   startIndex = 0,
   endIndex = 0,
+  TotalPages,
 }) => {
-  const totalPages = Math.ceil(MainData.length / itemsPerPage);
-
-  if (totalPages <= 1) return null;
+  const totalPages = Math.ceil(TotalPages / itemsPerPage);
 
   const handleClick = (page) => {
     if (page === "..." || page === currentPage) return;
@@ -38,9 +37,19 @@ const Pagination = ({
   return (
     <div className="px-6 py-4 border-t border-[var(--border)]">
       <div className="flex items-center justify-between">
-        <div className="text-[0.7rem] md:text-sm text-[var(--text)]">
-          {MainData.length === 0 ? 0 : startIndex + 1} to{" "}
-          {Math.min(endIndex, MainData.length)} of {MainData.length} results
+        <div className="flex gap-2.5 items-center">
+          <div className="text-[0.7rem] md:text-sm text-[var(--text)]">
+            {TotalPages === 0 ? 0 : startIndex + 1} to{" "}
+            {Math.min(endIndex, TotalPages)} of {TotalPages} results
+          </div>
+          <select
+            onChange={(e) => setItemsPerPage(e.target.value)}
+            className="px-3 py-1 border border-[var(--border)] rounded-md text-[0.7rem] md:text-sm text-[var(--text)] bg-[var(--background)]"
+          >
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
         </div>
 
         {/* Pagination Buttons */}
