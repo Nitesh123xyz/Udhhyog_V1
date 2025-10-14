@@ -44,11 +44,11 @@ const Pagination = ({
           </div>
           <select
             onChange={(e) => setItemsPerPage(e.target.value)}
-            className="px-3 py-1 border border-[var(--border)] rounded-md text-[0.7rem] md:text-sm text-[var(--text)] bg-[var(--background)]"
+            className="px-3 py-1 border border-[var(--border)] outline-none rounded-md text-[0.7rem] md:text-sm text-[var(--text)] bg-[var(--background)]"
           >
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
           </select>
         </div>
 
@@ -66,7 +66,7 @@ const Pagination = ({
               <button
                 key={`page-${page}`}
                 onClick={() => handleClick(page)}
-                className={`w-7 h-7 flex items-center cursor-pointer justify-center text-xs md:text-sm rounded-full transition-all duration-200 focus:outline-none ${
+                className={`w-6 h-6 sm:w-7 sm:h-7 flex items-center cursor-pointer justify-center text-xs md:text-sm rounded-full transition-all duration-200 sm:outline-none ${
                   currentPage === page
                     ? "bg-[var(--icon_bg)] text-[var(--icon_text)] shadow-md"
                     : "text-[var(--text)] hover:bg-[var(--permissionTable)] hover:text-[var(--text)]"

@@ -79,7 +79,8 @@ const ToggleSwitch = ({ enabled, onChange }) => {
 
 // ---------------- Component ----------------
 const Permission = () => {
-  const [rows, setRows] = useState([]);
+  // const [rows, setRows] = useState([]);
+  const [permissionDataList, setPermissionDataList] = useState([]);
   const originalRef = useRef([]);
   const [changedMap, setChangedMap] = useState({});
 
@@ -99,7 +100,7 @@ const Permission = () => {
 
   useEffect(() => {
     const normalized = normalizePermissions(permissionList);
-    setRows(normalized);
+    setPermissionDataList(normalized);
     originalRef.current = clone(normalized);
     setChangedMap({});
   }, [permissionList]);
@@ -110,7 +111,7 @@ const Permission = () => {
   );
 
   const applyRowChange = (rowIndex, nextRow) => {
-    setRows((prev) => {
+    setPermissionDataList((prev) => {
       const copy = clone(prev);
       copy[rowIndex] = nextRow;
 
@@ -148,7 +149,7 @@ const Permission = () => {
       showCustomToast("Please Select a Profile", "/error.gif", "Error");
       return;
     }
-    const current = rows[rowIndex];
+    const current = permissionDataList[rowIndex];
     if (!current) return;
 
     if (key === "all") {
@@ -214,7 +215,7 @@ const Permission = () => {
       UpdatePagePermission(payload).unwrap()
     );
     if (success && status === 200) {
-      originalRef.current = clone(rows);
+      originalRef.current = clone(permissionDataList);
       setChangedMap({});
       showCustomToast("Permission Updated", "/success.gif", "Success");
     } else {
@@ -224,10 +225,18 @@ const Permission = () => {
     }
   };
 
+  const sortedRows = permissionDataList
+    ? permissionDataList?.sort((a, b) => a.page_id - b.page_id)
+    : [];
+
   return (
     <section className="bg-[var(--background)] backdrop-blur-md rounded-lg h-[calc(100vh-62px)]">
       <div className="px-1 pt-1">
-        <Header rows={rows} setRows={setRows} title="PAGE PERMISSIONS" />
+        <Header
+          permissionDataList={permissionDataList}
+          setPermissionDataList={setPermissionDataList}
+          title="PAGE PERMISSIONS"
+        />
       </div>
 
       <div className="bg-[var(--background)] backdrop-blur-md rounded-t-lg px-1 mt-1">
@@ -286,69 +295,67 @@ const Permission = () => {
                 </thead>
 
                 <tbody>
-                  {rows
-                    ?.sort((a, b) => a.page_id - b.page_id)
-                    ?.map((row, idx) => {
-                      const allOn = isAllOn(row);
-                      return (
-                        <tr
-                          key={row.page_id}
-                          className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
-                        >
-                          <td className="py-4 px-1 md:px-2 text-xs xl:text-sm  rounded-l-lg text-[var(--text)] truncate">
-                            <span
-                              title={row.page_name}
-                              className="text-wrap relative"
-                            >
-                              {row.page_name}
-                              <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
-                            </span>
-                          </td>
+                  {sortedRows?.map((row, idx) => {
+                    const allOn = isAllOn(row);
+                    return (
+                      <tr
+                        key={row.page_id}
+                        className={`bg-[var(--background)] shadow-sm rounded-lg hover:bg-[var(--permissionTable)] transition duration-200 ease-in-out`}
+                      >
+                        <td className="py-4 px-1 md:px-2 text-xs xl:text-sm  rounded-l-lg text-[var(--text)] truncate">
+                          <span
+                            title={row.page_name}
+                            className="text-wrap relative"
+                          >
+                            {row.page_name}
+                            <span className="w-full h-[1px] bottom-[-1.5] block absolute bg-[var(--border)]" />
+                          </span>
+                        </td>
 
-                          <td className="px-1 md:px-2 text-center">
-                            <div className="flex justify-center">
-                              <ToggleSwitch
-                                enabled={allOn}
-                                onChange={() => toggleOne(idx, "all")}
-                              />
-                            </div>
-                          </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={allOn}
+                              onChange={() => toggleOne(idx, "all")}
+                            />
+                          </div>
+                        </td>
 
-                          <td className="px-1 md:px-2 text-center">
-                            <div className="flex justify-center">
-                              <ToggleSwitch
-                                enabled={!!row.view}
-                                onChange={() => toggleOne(idx, "view")}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-1 md:px-2 text-center">
-                            <div className="flex justify-center">
-                              <ToggleSwitch
-                                enabled={!!row.edit}
-                                onChange={() => toggleOne(idx, "edit")}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-1 md:px-2 text-center">
-                            <div className="flex justify-center">
-                              <ToggleSwitch
-                                enabled={!!row.add}
-                                onChange={() => toggleOne(idx, "add")}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-1 md:px-2 text-center rounded-r-lg">
-                            <div className="flex justify-center">
-                              <ToggleSwitch
-                                enabled={!!row.delete}
-                                onChange={() => toggleOne(idx, "delete")}
-                              />
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.view}
+                              onChange={() => toggleOne(idx, "view")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.edit}
+                              onChange={() => toggleOne(idx, "edit")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.add}
+                              onChange={() => toggleOne(idx, "add")}
+                            />
+                          </div>
+                        </td>
+                        <td className="px-1 md:px-2 text-center rounded-r-lg">
+                          <div className="flex justify-center">
+                            <ToggleSwitch
+                              enabled={!!row.delete}
+                              onChange={() => toggleOne(idx, "delete")}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -364,7 +371,7 @@ const Permission = () => {
 
             <div className="p-2 lg:p-3 text-sm text-[var(--text)] leading-relaxed space-y-2">
               <p>
-                ✔️ Total Pages: <strong>{rows.length}</strong>
+                ✔️ Total Pages: <strong>{permissionDataList?.length}</strong>
               </p>
               <p>
                 ✔️ Changes pending: <strong>{totalChanged}</strong>

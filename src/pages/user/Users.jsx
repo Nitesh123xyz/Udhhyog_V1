@@ -12,19 +12,21 @@ import {
 
 import useAuth from "../../hooks/useAuth";
 import { formatDateToIndian, formatRupees } from "../../utils/formatter";
-import UserlistLoader from "../../components/Loaders/UserlistLoader";
+import Loader from "../../components/Loader";
+import "../../css/commonLayout.css";
 
 const Users = ({ step, setStep, setEmployeesId }) => {
   const [rows, setRows] = useState([]);
   const [order, setOrder] = useState("_a");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   // server-side pagination: rows contains only current page items
   const [TotalPages, setTotalPages] = useState(0);
   const [currentSort, setCurrentSort] = useState(null);
   const [currentActive, setCurrentActive] = useState(null);
+  const [playShow, setPlayShow] = useState(false);
   const [employeesHeaderData, setEmployeesHeaderData] =
     useState(employeesHeading);
 
@@ -32,6 +34,20 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   const [getUserInfo, { isLoading }] = useGetUsersMutation();
   const [getQueryInfo, { isLoading: queryLoading }] = useQueryUsersMutation();
   const { token } = useAuth();
+
+  const loading = Boolean(isLoading || queryLoading);
+
+  useEffect(() => {
+    if (!loading) {
+      setPlayShow(true);
+      const t = setTimeout(() => setPlayShow(false), 900);
+      return () => clearTimeout(t);
+    } else {
+      setPlayShow(false);
+    }
+  }, [loading]);
+
+  // ------------------------------------------------------------------
 
   const handleUserInfo = async () => {
     // 10 Default Api Data
@@ -43,6 +59,8 @@ const Users = ({ step, setStep, setEmployeesId }) => {
       console.log(error);
     }
   };
+
+  // ------------------------------------------------------------------
 
   const handleQueryUser = async (sortingValue = null, pageOverride = null) => {
     try {
@@ -58,7 +76,6 @@ const Users = ({ step, setStep, setEmployeesId }) => {
 
       const { body } = await getQueryInfo(queryUser).unwrap();
 
-      // set rows & total rows
       setRows(body?.emp_data || []);
       setTotalPages(body?.t_rows || 0);
 
@@ -69,8 +86,8 @@ const Users = ({ step, setStep, setEmployeesId }) => {
         setRows(retryBody?.emp_data || []);
         setTotalPages(retryBody?.t_rows || 0);
       }
-    } catch (err) {
-      console.error("handleQueryUser error:", err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -138,8 +155,6 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   };
 
   // ------------------------------------------------------
-
-  // ------------------------------------------------------
   return (
     <>
       <Header
@@ -147,6 +162,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
         step={step}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
+        currentActive={currentActive}
         handleUserInfo={handleUserInfo}
         setRows={setRows}
         setStep={setStep}
@@ -155,17 +171,22 @@ const Users = ({ step, setStep, setEmployeesId }) => {
 
       <section className="max-w-screen">
         <div
-          className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden  lg:rounded-b-lg`}
+          className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden lg:rounded-b-lg`}
         >
           <div className="overflow-x-auto px-2 max-h-screen h-[calc(100vh-169px)] sm:h-[calc(100vh-176px)]  NavScroll">
-            <table className="w-full min-w-max table-auto">
+            <table className="w-full min-w-max table-auto" aria-busy={loading}>
               <thead className="sticky top-[-5px] lg:top-0 z-50">
                 <tr>{SortingFields()}</tr>
               </thead>
-              {isLoading || queryLoading ? (
-                <UserlistLoader rows={Math.max(1, Number(itemsPerPage))} />
+
+              {loading ? (
+                <Loader />
               ) : (
-                <tbody className="divide-y  divide-[var(--border)]">
+                <tbody
+                  className={`divide-y  divide-[var(--border)] ${
+                    playShow ? "animate-showDataSmooth" : ""
+                  }`}
+                >
                   {rows && rows.length > 0 ? (
                     rows?.map((employee) => (
                       <tr
@@ -177,7 +198,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                         className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
                       >
                         <td
-                          className={`px-3 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
+                          className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
                         >
                           {employee?.emp_id}
                         </td>
@@ -203,7 +224,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                           {employee?.job_title}
                         </td>
                         <td
-                          className={`px-4 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                         >
                           {employee?.department}
                         </td>
@@ -218,11 +239,11 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                           {formatDateToIndian(employee?.joining_date)}
                         </td>
                         <td
-                          className={`px-5 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
                         >
                           {employee?.employement_type}
                         </td>
-                        <td className="px-0 py-4 whitespace-nowrap rounded-r-2xl">
+                        <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
                           <StatusBtn Status={employee?.active} />
                         </td>
                       </tr>
@@ -251,9 +272,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             setItemsPerPage={(val) => {
-              // ensure number
               setItemsPerPage(Number(val));
-              // when changing items per page, keep sorting and reset page to 1
               setCurrentPage(1);
             }}
             TotalPages={TotalPages}

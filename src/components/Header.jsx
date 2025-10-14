@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Search, Download, Plus, RefreshCw } from "lucide-react";
+import { Search, Download, Plus, RefreshCw, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
@@ -11,6 +11,7 @@ const Header = ({
   setStep,
   currentPage,
   itemsPerPage,
+  currentActive,
   handleUserInfo = () => {},
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -50,7 +51,7 @@ const Header = ({
   };
 
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 transition-all duration-300">
+    <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between p-1.5 transition-all duration-300">
       <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg ml-1">
         {CurrentLabel?.ChildTabLabel !== ""
           ? CurrentLabel?.ChildTabLabel
@@ -59,10 +60,8 @@ const Header = ({
 
       <div className="flex">
         <div
-          className={`flex items-center gap-2 ${
-            HideHeader ? "mr-0" : "mr-2"
-          } relative p-1 md:border-1 md:border-[var(--border)] bg-[var(--background)] rounded-full ${
-            openSearch ? "border-1 border-[var(--border)]" : "border-0"
+          className={`flex items-center mr-0.5 relative border-[var(--border)] bg-[var(--background)]  transition-all duration-200 ${
+            openSearch ? "border-b border-[var(--border)]" : "border-0"
           }`}
         >
           <input
@@ -72,21 +71,23 @@ const Header = ({
             onChange={handleSearch}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className={`bg-transparent text-sm text-[var(--text)] outline-0 placeholder:text-gray-400 px-1 transition-all duration-300
-              ${
-                isFocused
-                  ? "w-[8rem] md:w-[20rem] lg:w-[35rem]"
-                  : `${
-                      openSearch ? "w-[8rem]" : "w-0 md:block"
-                    } md:w-[12rem] lg:w-[20rem]`
-              }`}
+            className={`bg-transparent text-sm text-[var(--text)] outline-0 placeholder:text-gray-400 px-2 transition-all duration-400 ${
+              openSearch || isFocused ? "w-[6rem] md:w-[20rem]" : "w-0"
+            } overflow-hidden`}
           />
-          <div className="w-8 h-8 bg-yellow-400 text-black rounded-full flex items-center justify-center shadow-md">
-            <Search
-              onClick={() => setOpenSearch(!openSearch)}
-              size={15}
-              className="text-black"
-            />
+          <div
+            onClick={() => setOpenSearch(!openSearch)}
+            className="w-8 h-8 m-1 bg-yellow-400 text-black cursor-pointer rounded-full flex items-center justify-center shadow-md"
+          >
+            {openSearch ? (
+              <X
+                onClick={() => setQuery("")}
+                size={15}
+                className="text-black"
+              />
+            ) : (
+              <Search size={15} className="text-black" />
+            )}
           </div>
         </div>
 
@@ -99,24 +100,26 @@ const Header = ({
                 className="text-gray-800"
               />
             </div>
-            <div
-              role="button"
-              aria-pressed={rotated}
-              onClick={() => {
-                setRotated((r) => r + 260);
-                handleUserInfo();
-              }}
-              className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm transition-all duration-300"
-            >
-              <RefreshCw
-                size={15}
-                className={`transform transition-transform duration-500 text-gray-800`}
-                style={{
-                  transform: `rotate(${rotated}deg)`,
-                  transition: "transform 600ms",
+            {currentActive && (
+              <div
+                role="button"
+                aria-pressed={rotated}
+                onClick={() => {
+                  setRotated((r) => r + 260);
+                  handleUserInfo();
                 }}
-              />
-            </div>
+                className="cursor-pointer w-8 h-8 flex items-center justify-center bg-red-500 backdrop-blur-sm rounded-full shadow-sm transition-all duration-300"
+              >
+                <RefreshCw
+                  size={15}
+                  className={`transform transition-transform duration-500 text-white`}
+                  style={{
+                    transform: `rotate(${rotated}deg)`,
+                    transition: "transform 600ms",
+                  }}
+                />
+              </div>
+            )}
             {step !== 1 && (
               <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
                 <Download size={15} className="text-gray-800" />

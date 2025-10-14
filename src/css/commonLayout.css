@@ -31,3 +31,16 @@
 .animate-custom-leave {
   animation: custom-leave 0.2s ease-in forwards;
 }
+
+.animate-showDataSmooth {
+  animation: showDataSmooth 0.8s ease-in forwards;
+}
+
+@keyframes showDataSmooth {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

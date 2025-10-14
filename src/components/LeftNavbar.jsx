@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronRight, ChevronDown, PinOff, Pin, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import {
   NavarMobileOpenClose,
@@ -19,10 +19,9 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
     {}
   );
 
-  // ------------------------------------------------------------------
-
   const width = window.innerWidth;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // ------------------------------------------------------------------
 
@@ -66,10 +65,14 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
   }, [isExpanded]);
 
   const toggleSection = (index) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+    setExpandedSections((prev) => {
+      const isOpen = !!prev[index];
+      if (isOpen) return {};
+      return { [index]: true };
+    });
+    setExpandedSubSections({});
+    setExpandedSubSubSections({});
+    setExpandedSubSubSubSections({});
   };
 
   const toggleSubSection = (sectionIndex, subIndex) => {
@@ -115,30 +118,48 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
             `${parentIndices[0]}-${parentIndices[1]}-${parentIndices[2]}-${index}`
           ];
 
+    // ---------------------------------------------------------------
+
+    const handleRowClick = (e) => {
+      if (e.target.closest("[data-no-nav]")) return;
+      if (item.clickable && item.path) {
+        navigate(item.path);
+        dispatch(trackCurrentTabAndLink({ ChildTabLabel: item.label }));
+        if (MobileNav) handleToggle();
+      }
+    };
+
+    // ---------------------------------------------------------------
+
+    const handleChevronClick = (e, item) => {
+      e.stopPropagation();
+      dispatch(trackCurrentTabAndLink({ ParentTabLabel: item.label }));
+      if (level === 0) toggleSection(index);
+      else if (level === 1) toggleSubSection(parentIndices[0], index);
+      else if (level === 2)
+        toggleSubSubSection(parentIndices[0], parentIndices[1], index);
+      else if (level === 3)
+        toggleSubSubSubSection(
+          parentIndices[0],
+          parentIndices[1],
+          parentIndices[2],
+          index
+        );
+    };
+
+    const indent = { marginLeft: `${level * 16}px` };
+
     return (
-      <div
-        key={`${parentIndices.join("-")}-${index}`}
-        className={`ml-${level * 2}`}
-      >
+      <div key={`${parentIndices.join("-")}-${index}`} style={indent}>
         <div
-          className={`flex items-center py-4 rounded-xl hover:bg-white/10 cursor-pointer transition-all duration-200 ${
+          className={`flex items-center py-4 rounded-xl hover:bg-[var(--permissionTable)] cursor-pointer transition-all duration-200 ${
             item.active ? "bg-white/20 text-white" : "text-gray-800"
-          }
-          ${isExpanded ? "px-2 mt-0" : "px-4"}
-          `}
-          onClick={() => {
+          } ${isExpanded ? "px-2 mt-0" : "px-4"}`}
+          onClick={(e) => {
             if (item.hasSubmenu) {
-              if (level === 0 && isExpanded) toggleSection(index);
-              else if (level === 1) toggleSubSection(parentIndices[0], index);
-              else if (level === 2)
-                toggleSubSubSection(parentIndices[0], parentIndices[1], index);
-              else if (level === 3)
-                toggleSubSubSubSection(
-                  parentIndices[0],
-                  parentIndices[1],
-                  parentIndices[2],
-                  index
-                );
+              handleChevronClick(e, item);
+            } else {
+              handleRowClick(e);
             }
           }}
         >
@@ -150,52 +171,45 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
             />
 
             <span
-              onClick={
-                expandedSections && MobileNav && item.clickable
-                  ? handleToggle
-                  : undefined
-              }
               className={`${isExpanded ? "" : "hidden"} text-[var(--text)]`}
             >
               {item.clickable ? (
-                <Link to={item.path}>
-                  <span
-                    onClick={() =>
-                      dispatch(
-                        trackCurrentTabAndLink({ ChildTabLabel: item.label })
-                      )
-                    }
-                  >
-                    {item.label}
-                  </span>
+                <Link
+                  to={item.path}
+                  // onClick={(e) => {
+                  //   e.stopPropagation();
+
+                  //   if (MobileNav) handleToggle();
+                  // }}
+                >
+                  <span>{item.label}</span>
                 </Link>
               ) : (
-                <span
-                  className="cursor-default"
-                  onClick={(e) => {
-                    dispatch(
-                      trackCurrentTabAndLink({ ParentTabLabel: item.label })
-                    );
-                  }}
-                >
-                  {item.label}
-                </span>
+                <span className="cursor-default">{item.label}</span>
               )}
             </span>
           </div>
 
           {item.hasSubmenu && (
             <div className={`ml-auto ${isExpanded ? "block" : "hidden"}`}>
-              {isSectionExpanded ? (
-                <ChevronDown className={`w-4 h-4 text-[var(--text)]`} />
-              ) : (
-                <ChevronRight className={`w-4 h-4 text-[var(--text)]`} />
-              )}
+              <button
+                type="button"
+                data-no-nav="true"
+                className="p-1"
+                aria-expanded={isSectionExpanded ? "true" : "false"}
+              >
+                {isSectionExpanded ? (
+                  <ChevronDown className={`w-4 h-4 text-[var(--text)]`} />
+                ) : (
+                  <ChevronRight className={`w-4 h-4 text-[var(--text)]`} />
+                )}
+              </button>
             </div>
           )}
         </div>
+
         {item.hasSubmenu && isSectionExpanded && (
-          <div className="ml-4">
+          <div style={{ marginLeft: 16 }}>
             {item.submenu.map((subItem, subIndex) =>
               renderMenuItem(subItem, subIndex, level + 1, [
                 ...parentIndices,
