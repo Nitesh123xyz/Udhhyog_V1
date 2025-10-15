@@ -5,6 +5,7 @@ const initialState = {
   permissionList: [],
   accessToken: "",
   selectedProfile: null,
+  searchLoading: false,
 };
 
 const UtileSlice = createSlice({
@@ -20,9 +21,16 @@ const UtileSlice = createSlice({
     setProfileMenuList(state, action) {
       state.selectedProfile = action.payload;
     },
+    setSearchLoading(state, action) {
+      state.searchLoading = action.payload;
+    },
   },
 });
 
-export const { setPermissionList, setAccessToken, setProfileMenuList } =
-  UtileSlice.actions;
+export const {
+  setPermissionList,
+  setAccessToken,
+  setProfileMenuList,
+  setSearchLoading,
+} = UtileSlice.actions;
 export default UtileSlice.reducer;

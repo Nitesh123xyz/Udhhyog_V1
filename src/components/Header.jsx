@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Search, Download, Plus, RefreshCw, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
 import { useSearchUsersMutation } from "../features/users/usersSlice";
+import { setSearchLoading } from "../utils/Utils";
 
 const Header = ({
   setRows,
@@ -24,11 +25,18 @@ const Header = ({
   const hideHeaderOptions = ["/permission"];
   const HideHeader = hideHeaderOptions.includes(location.pathname);
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
-
+  const isFirstRender = useRef(true);
   const [searchUser, { isLoading }] = useSearchUsersMutation();
   const { token } = useAuth();
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    // Skip first render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const Search_query = {
       per_page: Number(itemsPerPage),
       page_no: currentPage,
@@ -37,10 +45,19 @@ const Header = ({
     };
 
     const delayDebounce = setTimeout(async () => {
-      clearTimeout(StoreInterval.current);
-      const { body: data } = await searchUser(Search_query).unwrap();
-      setRows(data?.emp_data || []);
-      StoreInterval.current = null;
+      dispatch(setSearchLoading(true));
+      try {
+        clearTimeout(StoreInterval.current);
+        const { body: data } = await searchUser(Search_query).unwrap();
+        dispatch(setSearchLoading(isLoading));
+        setRows(data?.emp_data || []);
+        StoreInterval.current = null;
+      } catch (error) {
+        console.error("search error:", err);
+        setRows([]);
+      } finally {
+        dispatch(setSearchLoading(false));
+      }
     }, 500);
 
     return () => clearTimeout(delayDebounce);

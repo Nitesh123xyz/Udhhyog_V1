@@ -4,7 +4,6 @@ import { employeesHeading } from "../../utils/DummyData";
 import { StatusBtn } from "../../components/StatusBtn";
 import Pagination from "../../components/Pagination";
 import Header from "../../components/Header";
-import "../../css/commonLayout.css";
 import {
   useGetUsersMutation,
   useQueryUsersMutation,
@@ -13,7 +12,7 @@ import {
 import useAuth from "../../hooks/useAuth";
 import { formatDateToIndian, formatRupees } from "../../utils/formatter";
 import Loader from "../../components/Loader";
-import "../../css/commonLayout.css";
+import { useSelector } from "react-redux";
 
 const Users = ({ step, setStep, setEmployeesId }) => {
   const [rows, setRows] = useState([]);
@@ -26,26 +25,16 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   const [TotalPages, setTotalPages] = useState(0);
   const [currentSort, setCurrentSort] = useState(null);
   const [currentActive, setCurrentActive] = useState(null);
-  const [playShow, setPlayShow] = useState(false);
   const [employeesHeaderData, setEmployeesHeaderData] =
     useState(employeesHeading);
 
   // ------------------------------------------------------
   const [getUserInfo, { isLoading }] = useGetUsersMutation();
   const [getQueryInfo, { isLoading: queryLoading }] = useQueryUsersMutation();
+  const { searchLoading } = useSelector((state) => state.UtileSlice);
+  console.log(searchLoading)
   const { token } = useAuth();
-
-  const loading = Boolean(isLoading || queryLoading);
-
-  useEffect(() => {
-    if (!loading) {
-      setPlayShow(true);
-      const t = setTimeout(() => setPlayShow(false), 900);
-      return () => clearTimeout(t);
-    } else {
-      setPlayShow(false);
-    }
-  }, [loading]);
+  const loading = Boolean(isLoading || queryLoading || searchLoading);
 
   // ------------------------------------------------------------------
 
@@ -174,92 +163,84 @@ const Users = ({ step, setStep, setEmployeesId }) => {
           className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden lg:rounded-b-lg`}
         >
           <div className="overflow-x-auto px-2 max-h-screen h-[calc(100vh-169px)] sm:h-[calc(100vh-176px)]  NavScroll">
-            <table className="w-full min-w-max table-auto" aria-busy={loading}>
+            {loading && <Loader />}
+            <table className="w-full min-w-max table-auto">
               <thead className="sticky top-[-5px] lg:top-0 z-50">
                 <tr>{SortingFields()}</tr>
               </thead>
-
-              {loading ? (
-                <Loader />
-              ) : (
-                <tbody
-                  className={`divide-y  divide-[var(--border)] ${
-                    playShow ? "animate-showDataSmooth" : ""
-                  }`}
-                >
-                  {rows && rows.length > 0 ? (
-                    rows?.map((employee) => (
-                      <tr
-                        onClick={() => {
-                          setStep(2);
-                          setEmployeesId(employee?.emp_id);
-                        }}
-                        key={employee?.emp_id}
-                        className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
-                      >
-                        <td
-                          className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
-                        >
-                          {employee?.emp_id}
-                        </td>
-                        <td className="px-0 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-3">
-                            <img
-                              src={
-                                employee.avatar ||
-                                "https://cdn-icons-png.freepik.com/512/16524/16524724.png?uid=R213905709&ga=GA1.1.928608604.1757403767"
-                              }
-                              alt={employee.name}
-                              className="w-8 h-8 rounded-full object-cover"
-                            />
-                            <span className={`text-xs text-[var(--text)]`}>
-                              {employee.name}
-                            </span>
-                          </div>
-                        </td>
-
-                        <td
-                          className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                        >
-                          {employee?.job_title}
-                        </td>
-                        <td
-                          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                        >
-                          {employee?.department}
-                        </td>
-                        <td
-                          className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
-                        >
-                          {formatRupees(employee.salary)}
-                        </td>
-                        <td
-                          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                        >
-                          {formatDateToIndian(employee?.joining_date)}
-                        </td>
-                        <td
-                          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                        >
-                          {employee?.employement_type}
-                        </td>
-                        <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
-                          <StatusBtn Status={employee?.active} />
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
+              <tbody className={`divide-y  divide-[var(--border)]`}>
+                {rows && rows.length > 0 ? (
+                  rows?.map((employee) => (
+                    <tr
+                      onClick={() => {
+                        setStep(2);
+                        setEmployeesId(employee?.emp_id);
+                      }}
+                      key={employee?.emp_id}
+                      className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
+                    >
                       <td
-                        colSpan={8}
-                        className="py-[15%] text-[3rem] text-[var(--text)] text-center"
+                        className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
                       >
-                        No Data Found
+                        {employee?.emp_id}
+                      </td>
+                      <td className="px-0 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-3">
+                          <img
+                            src={
+                              employee.avatar ||
+                              "https://cdn-icons-png.freepik.com/512/16524/16524724.png?uid=R213905709&ga=GA1.1.928608604.1757403767"
+                            }
+                            alt={employee.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                          <span className={`text-xs text-[var(--text)]`}>
+                            {employee.name}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td
+                        className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      >
+                        {employee?.job_title}
+                      </td>
+                      <td
+                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      >
+                        {employee?.department}
+                      </td>
+                      <td
+                        className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
+                      >
+                        {formatRupees(employee.salary)}
+                      </td>
+                      <td
+                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      >
+                        {formatDateToIndian(employee?.joining_date)}
+                      </td>
+                      <td
+                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                      >
+                        {employee?.employement_type}
+                      </td>
+                      <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
+                        <StatusBtn Status={employee?.active} />
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              )}
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={8}
+                      className="py-[15%] text-[3rem] text-[var(--text)] text-center"
+                    >
+                      No Data Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
             </table>
           </div>
 

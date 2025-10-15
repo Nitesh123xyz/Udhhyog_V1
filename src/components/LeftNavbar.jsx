@@ -132,7 +132,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
     // ---------------------------------------------------------------
 
     const handleChevronClick = (e, item) => {
-      e.stopPropagation();
+      // e.stopPropagation();
       dispatch(trackCurrentTabAndLink({ ParentTabLabel: item.label }));
       if (level === 0) toggleSection(index);
       else if (level === 1) toggleSubSection(parentIndices[0], index);

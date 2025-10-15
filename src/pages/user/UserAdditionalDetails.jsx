@@ -58,36 +58,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 Contact & Identity
                 <span className="w-full h-[1.4px] bottom-[-3px] block absolute bg-[var(--border)]" />
               </h3>
-              <div className="text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2  2xl:grid-cols-3 space-y-2">
-                <div>
+              <div className="text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 divide-x divide-y divide-[var(--border)]">
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Name :</span>{" "}
                   <span className="text-gray-400">{name}</span>
                 </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">Job :</span>{" "}
-                  <span className="text-gray-400">{jobTitle}</span>
-                </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">
-                    Department :
-                  </span>{" "}
-                  <span className="text-gray-400">{department}</span>
-                </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">Status :</span>{" "}
-                  <span className="text-gray-400">{status}</span>
-                </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">
-                    Start Date :
-                  </span>{" "}
-                  <span className="text-gray-400">{startDate}</span>
-                </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">Salary :</span>{" "}
-                  <span className="text-gray-400">{salary}</span>
-                </div>
-                <div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Email :</span>{" "}
                   {contact?.email && (
                     <a
@@ -98,18 +75,20 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                     </a>
                   )}
                 </div>
-                <div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Phone :</span>{" "}
                   {contact?.phone && (
                     <a
                       href={`tel:${contact.phone}`}
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
-                      {contact?.phone}
+                      {contact.phone}
                     </a>
                   )}
                 </div>
-                <div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Whatsapp :
                   </span>{" "}
@@ -120,15 +99,41 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
-                      {contact?.whatsapp}
+                      {contact.whatsapp}
                     </a>
                   )}
                 </div>
-                <div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">DOB :</span>{" "}
                   <span className="text-gray-400">{contact?.dob}</span>
                 </div>
-                <div>
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">Job :</span>{" "}
+                  <span className="text-gray-400">{jobTitle}</span>
+                </div>
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">
+                    Department :
+                  </span>{" "}
+                  <span className="text-gray-400">{department}</span>
+                </div>
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">
+                    Joining Date :
+                  </span>{" "}
+                  <span className="text-gray-400">{startDate}</span>
+                </div>
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">Salary :</span>{" "}
+                  <span className="text-gray-400">{salary}</span>
+                </div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Marital Status :
                   </span>{" "}
@@ -136,14 +141,21 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                     {contact?.maritalStatus}
                   </span>
                 </div>
-                <div>
+
+                <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Blood Group :
                   </span>{" "}
                   <span className="text-gray-400">{contact?.bloodGroup}</span>
                 </div>
-                <div>
-                  <span className="font-bold  text-[var(--text)]">
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">Status :</span>{" "}
+                  <span className="text-gray-400">{status}</span>
+                </div>
+
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">
                     Address :
                   </span>{" "}
                   <span className="text-gray-400">{contact?.address}</span>
@@ -343,13 +355,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                           {exp?.role}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {exp?.year}
-                        </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {exp?.startDate}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {exp?.endDate}
+                        </td>
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                          {exp?.year}
                         </td>
                       </tr>
                     ))}

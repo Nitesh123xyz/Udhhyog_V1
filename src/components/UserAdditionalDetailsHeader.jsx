@@ -23,7 +23,7 @@ const UserAdditionalDetailsHeader = ({ step, setStep, setOpenDialog }) => {
       </div>
       <div className="flex">
         <div className="flex space-x-2 py-1 px-0">
-          {step !== 4 && step !== 3 && (
+          {step !== 4 && step !== 3 && step !== 2 && (
             <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
               <Plus
                 onClick={() => setStep(4)}
