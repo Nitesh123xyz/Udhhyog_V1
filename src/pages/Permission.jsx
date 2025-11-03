@@ -224,6 +224,7 @@ const Permission = () => {
       }
     }
   };
+  console.log(permissionDataList);
 
   const sortedRows = permissionDataList
     ? permissionDataList?.sort((a, b) => a.page_id - b.page_id)
@@ -235,7 +236,8 @@ const Permission = () => {
         <Header
           permissionDataList={permissionDataList}
           setPermissionDataList={setPermissionDataList}
-          title="PAGE PERMISSIONS"
+          title="permission"
+          originalRef={originalRef}
         />
       </div>
 

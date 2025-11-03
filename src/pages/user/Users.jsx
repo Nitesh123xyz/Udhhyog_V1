@@ -155,7 +155,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
         handleUserInfo={handleUserInfo}
         setRows={setRows}
         setStep={setStep}
-        title="EMPLOYEES"
+        title="users"
       />
 
       <section className="max-w-screen">

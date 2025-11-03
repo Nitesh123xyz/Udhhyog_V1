@@ -17,6 +17,7 @@
     "@tsparticles/slim": "^3.8.1",
     "animate.css": "^4.1.1",
     "lucide-react": "^0.527.0",
+    "primereact": "^10.9.7",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

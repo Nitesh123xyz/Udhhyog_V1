@@ -7,12 +7,16 @@ import { useSearchUsersMutation } from "../features/users/usersSlice";
 import { setSearchLoading } from "../utils/Utils";
 
 const Header = ({
+  title,
   setRows,
   step,
   setStep,
   currentPage,
   itemsPerPage,
   currentActive,
+  permissionDataList,
+  originalRef = [],
+  setPermissionDataList = () => {},
   handleUserInfo = () => {},
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -20,7 +24,6 @@ const Header = ({
   const [openSearch, setOpenSearch] = useState(false);
   const StoreInterval = useRef(null);
   const [rotated, setRotated] = useState(0);
-
   const location = useLocation();
   const hideHeaderOptions = ["/permission"];
   const HideHeader = hideHeaderOptions.includes(location.pathname);
@@ -29,6 +32,8 @@ const Header = ({
   const [searchUser, { isLoading }] = useSearchUsersMutation();
   const { token } = useAuth();
   const dispatch = useDispatch();
+
+  console.log(title);
 
   useEffect(() => {
     // Skip first render
@@ -64,8 +69,27 @@ const Header = ({
   }, [query, itemsPerPage]);
 
   const handleSearch = (e) => {
-    setQuery(e.target.value);
+    const value = e.target.value.toLowerCase();
+    setQuery(value);
+
+    if (title === "permission") {
+      if (value === "" || query === "") {
+        // reset to full data
+        setPermissionDataList([...originalRef.current]);
+      } else {
+        const filtered = originalRef.current.filter((item) =>
+          item?.page_name?.toLowerCase().includes(value)
+        );
+        setPermissionDataList(filtered);
+      }
+    }
   };
+
+  useEffect(() => {
+    if (title === "permission" && query === "") {
+      setPermissionDataList([...originalRef.current]);
+    }
+  }, [query]);
 
   return (
     <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between p-1.5 transition-all duration-300">
@@ -107,7 +131,6 @@ const Header = ({
             )}
           </div>
         </div>
-
         {!HideHeader && (
           <div className="flex space-x-2 py-1 px-0">
             <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">

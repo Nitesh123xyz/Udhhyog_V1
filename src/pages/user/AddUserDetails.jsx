@@ -91,10 +91,11 @@ const contactSchema = z.object({
 });
 
 const schema = z.object({
-  name: z.string().min(1, "Full name is required"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().optional(),
   jobTitle: z.string().min(1, "Job title required"),
   department: z.string().min(1, "Department required"),
-  site: z.string().optional(),
+  team: z.string().optional(),
   salary: z.string().optional(),
   startDate: z.string().optional(),
   lifecycle: z.string().optional(),
@@ -110,10 +111,11 @@ const schema = z.object({
 
 /* -------------------------- Default form values ------------------------- */
 const defaultValues = {
-  name: "",
+  first_name: "",
+  last_name: "",
   jobTitle: "",
-  department: "",
-  site: "",
+  department: "Sales Department",
+  team: "",
   salary: "",
   startDate: "",
   lifecycle: "Hired",
@@ -127,7 +129,12 @@ const defaultValues = {
     bloodGroup: "",
     address: "",
   },
-  documents: [{ type: "PAN", doc: "", url: "" }],
+  // documents: [
+  //   { type: "PAN", doc: "", url: "" },
+  //   { type: "Aadhaar", doc: "", url: "" },
+  //   { type: "Passport", doc: "", url: "" },
+  //   { type: "Bank Account", doc: "", url: "" },
+  // ],
   emergencyContacts: [{ name: "", relation: "", phone: "" }],
   education: [{ degree: "", institute: "", result: "", year: "" }],
   family: [{ name: "", relation: "", dob: "", phone: "", occupation: "" }],
@@ -141,6 +148,15 @@ const defaultValues = {
   },
   experience: [{ company: "", role: "", startDate: "", endDate: "", year: "" }],
 };
+
+/* ---------------------------- dummy data --------------------------- */
+
+const Documents = [
+  { type: "PAN", doc: "", url: "", require: true },
+  { type: "Aadhaar", doc: "", url: "", require: true },
+  { type: "Passport", doc: "", url: "", require: false },
+  { type: "Bank Account", doc: "", url: "", require: false },
+];
 
 /* ---------------------------- Re-usable Field --------------------------- */
 const InputField = ({
@@ -260,7 +276,7 @@ const AddUserDetails = ({ step, setStep }) => {
     switch (tabId) {
       case "basic":
         return (
-          !!String(vals.name ?? "").trim() &&
+          !!String(vals.first_name ?? "").trim() &&
           !!String(vals.jobTitle ?? "").trim() &&
           !!String(vals.department ?? "").trim() &&
           !!vals.startDate
@@ -315,7 +331,7 @@ const AddUserDetails = ({ step, setStep }) => {
   };
 
   const fieldsToValidateForTab = {
-    basic: ["name", "jobTitle", "department", "startDate"],
+    basic: ["first_name", "jobTitle", "department", "startDate"],
     contact: [
       "contact.email",
       "contact.phone",
@@ -375,38 +391,38 @@ const AddUserDetails = ({ step, setStep }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reset, tabs]);
 
-  const saveDraft = () => {
-    try {
-      const payload = {
-        values: getValues(),
-        meta: {
-          activeTab,
-          enabledTabs,
-          __savedAt: new Date().toISOString(),
-        },
-      };
-      localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
-      alert("Draft saved locally.");
-    } catch (e) {
-      console.error("Error saving draft:", e);
-      alert("Failed to save draft.");
-    }
-  };
+  // const saveDraft = () => {
+  //   try {
+  //     const payload = {
+  //       values: getValues(),
+  //       meta: {
+  //         activeTab,
+  //         enabledTabs,
+  //         __savedAt: new Date().toISOString(),
+  //       },
+  //     };
+  //     localStorage.setItem(DRAFT_KEY, JSON.stringify(payload));
+  //     alert("Draft saved locally.");
+  //   } catch (e) {
+  //     console.error("Error saving draft:", e);
+  //     alert("Failed to save draft.");
+  //   }
+  // };
 
-  const clearDraft = () => {
-    try {
-      localStorage.removeItem(DRAFT_KEY);
-    } catch (e) {
-      console.warn("Failed to clear draft", e);
-    }
-  };
+  // const clearDraft = () => {
+  //   try {
+  //     localStorage.removeItem(DRAFT_KEY);
+  //   } catch (e) {
+  //     console.warn("Failed to clear draft", e);
+  //   }
+  // };
 
   /* ----------------------- submit and navigation ---------------------- */
   const onSubmit = (data) => {
     // Your API call would go here
     console.log("Validated form data:", data);
     alert("Employee data saved successfully!");
-    clearDraft();
+    // clearDraft();
     // reset(defaultValues); // optional
   };
 
@@ -510,16 +526,31 @@ const AddUserDetails = ({ step, setStep }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 text-[var(--text)]">
                 <Controller
                   control={control}
-                  name="name"
+                  name="first_name"
                   render={({ field }) => (
                     <InputField
-                      label="Full Name"
+                      label="First Name"
                       value={field.value}
                       onChange={field.onChange}
                       required
                       Icon={User}
-                      placeholder="Enter full name"
-                      error={errors?.name?.message}
+                      placeholder="Enter First name"
+                      error={errors?.first_name?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name="last_name"
+                  render={({ field }) => (
+                    <InputField
+                      label="Last Name"
+                      value={field.value}
+                      onChange={field.onChange}
+                      // required
+                      Icon={User}
+                      placeholder="Enter Last name"
+                      // error={errors?.name?.message}
                     />
                   )}
                 />
@@ -548,20 +579,31 @@ const AddUserDetails = ({ step, setStep }) => {
                       label="Department"
                       value={field.value}
                       onChange={field.onChange}
-                      required
-                      Icon={Building2}
-                      placeholder="e.g., Product"
-                      error={errors?.department?.message}
+                      options={[
+                        "Sales Department",
+                        "IT Department",
+                        "HR Department",
+                        "Marketing Department",
+                        "SEO Department",
+                      ]}
+                      // option={[
+                      //   "Sales",
+                      //   "IT Department",
+                      // ]}
+                      // required
+                      // Icon={Building2}
+                      // placeholder="e.g., Product"
+                      // error={errors?.department?.message}
                     />
                   )}
                 />
 
                 <Controller
                   control={control}
-                  name="site"
+                  name="team"
                   render={({ field }) => (
                     <InputField
-                      label="Site/Location"
+                      label="List team"
                       value={field.value}
                       onChange={field.onChange}
                       Icon={MapPin}
@@ -748,7 +790,16 @@ const AddUserDetails = ({ step, setStep }) => {
                       value={field.value}
                       onChange={field.onChange}
                       Icon={Droplets}
-                      placeholder="e.g., B+"
+                      options={[
+                        "A +",
+                        "A -",
+                        "B +",
+                        "B -",
+                        "AB +",
+                        "AB -",
+                        "O +",
+                        "O -",
+                      ]}
                     />
                   )}
                 />
@@ -781,26 +832,26 @@ const AddUserDetails = ({ step, setStep }) => {
                 <h2 className="text-xl sm:text-2xl font-semibold text-[var(--text)]">
                   Documents
                 </h2>
-                <button
+                {/* <button
                   type="button"
                   onClick={() => docsFA.append({ type: "", doc: "", url: "" })}
                   className="cursor-pointer w-10 h-10 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
                 >
                   <Plus size={16} />
-                </button>
+                </button> */}
               </div>
 
               <div className="space-y-4">
-                {docsFA.fields.map((item, index) => (
+                {Documents?.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={index}
                     className="border border-[var(--border)] rounded-lg p-4 sm:p-6"
                   >
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="font-medium text-[var(--text)]">
                         Document {index + 1}
                       </h3>
-                      {docsFA.fields.length > 1 && (
+                      {/* {docsFA.fields.length > 1 && (
                         <button
                           type="button"
                           onClick={() => docsFA.remove(index)}
@@ -808,7 +859,7 @@ const AddUserDetails = ({ step, setStep }) => {
                         >
                           <X size={14} className="text-[var(--text)]" />
                         </button>
-                      )}
+                      )} */}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-[var(--text)]">
@@ -818,8 +869,9 @@ const AddUserDetails = ({ step, setStep }) => {
                         render={({ field }) => (
                           <InputField
                             label="Document Type"
-                            value={field.value}
+                            value={item.type}
                             onChange={field.onChange}
+                            required={item.require}
                             placeholder="e.g., PAN, Aadhar, Bank"
                           />
                         )}
@@ -1394,7 +1446,7 @@ const AddUserDetails = ({ step, setStep }) => {
 
           {/* submit + nav */}
           <div className="mt-8 pt-4 border-t border-[var(--border)]">
-            <div className="grid grid-cols-3 md:grid-cols-3 md:justify-self-end gap-2">
+            <div className="flex justify-end gap-2">
               {prevTabId && (
                 <button
                   type="button"
@@ -1421,13 +1473,13 @@ const AddUserDetails = ({ step, setStep }) => {
               )}
 
               {/* Save Draft - visible on every tab (manual save) */}
-              <button
+              {/* <button
                 type="button"
                 onClick={saveDraft}
                 className="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2 px-2 py-3 sm:px-8 rounded-lg border border-[var(--border)] text-[var(--text)]"
               >
                 <Save size={20} /> Draft
-              </button>
+              </button> */}
 
               {/* Send (final submit) - enabled only when form is complete */}
               <button
