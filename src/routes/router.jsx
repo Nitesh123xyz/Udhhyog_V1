@@ -5,7 +5,7 @@ import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
 import MultilayerAuth from "../pages/2FA/MultilayerAuth";
-import TeamTable from "../pages/teams/teamTable";
+import TeamTable from "../pages/teams/TeamTable";
 // ---------------------------------------------------
 
 const UserTableInfo = lazy(() => import("../pages/user/User"));
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             {/* <PermissionGate>
             </PermissionGate> */}
-              <TeamTable />
+            <TeamTable />
           </ProtectedRoute>
         ),
         caseSensitive: true,

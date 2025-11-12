@@ -2,6 +2,22 @@
   display: none;
 }
 
+
+
+.CustomVerticalBar::-webkit-scrollbar {
+  width: 4px; /* Width of the scrollbar */
+}
+
+.CustomVerticalBar::-webkit-scrollbar-track {
+  background: rgb(194, 188, 188); /* Track color */
+  border-radius: 10px;
+}
+
+.CustomVerticalBar::-webkit-scrollbar-thumb {
+  background: transparent; /* Thumb color */
+  border-radius: 10px;
+}
+
 @keyframes custom-enter {
   from {
     opacity: 0;

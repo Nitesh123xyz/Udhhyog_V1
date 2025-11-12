@@ -6,6 +6,9 @@ import DialogBox from "../../components/DialogBox";
 import ScrollTop from "../../utils/ScrollTop";
 import Header from "../../components/Header";
 import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
+import { useUsersAdditionalDetailsQuery } from "../../features/users/usersSlice";
+import useAuth from "../../hooks/useAuth";
+import { formatDateToIndian } from "../../utils/formatter";
 const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [preview, setPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -13,20 +16,16 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const rows = [...employees.filter((e) => e.id === employeesId)];
   const {
-    name,
-    jobTitle,
     contact,
-    department,
-    salary,
-    startDate,
     status,
     emergencyContacts,
-    education,
-    family,
+    // education,
+    // family,
     documents,
     bank,
-    experience,
   } = rows[0] || [];
+
+  // console.log(rows);
 
   const imagesFromDocs = (documents || []).map((d) => ({
     src: d.url,
@@ -40,6 +39,38 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
     }
     // setStep(1);
   };
+  const { token } = useAuth();
+
+  const { data } = useUsersAdditionalDetailsQuery({
+    emp_id: employeesId,
+    token: token,
+  });
+
+  const {
+    name,
+    email,
+    salary,
+    job_title,
+    job_status,
+    joining_date,
+    marital_status,
+    phone_no,
+    whatsapp_no,
+    address,
+    bank_name,
+    acc_no,
+    blood_group,
+    department,
+    dob,
+    ifsc_no,
+
+    emergency,
+    experience,
+    family,
+    education,
+  } = data?.body || {};
+
+  console.log(data?.body);
 
   return (
     <>
@@ -66,24 +97,24 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
 
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Email :</span>{" "}
-                  {contact?.email && (
+                  {email && (
                     <a
-                      href={`mailto:${contact.email}`}
+                      href={`mailto:${email}`}
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
-                      {contact.email}
+                      {email}
                     </a>
                   )}
                 </div>
 
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Phone :</span>{" "}
-                  {contact?.phone && (
+                  {phone_no && (
                     <a
-                      href={`tel:${contact.phone}`}
+                      href={`tel:${phone_no}`}
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
-                      {contact.phone}
+                      {phone_no}
                     </a>
                   )}
                 </div>
@@ -92,26 +123,32 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Whatsapp :
                   </span>{" "}
-                  {contact?.whatsapp && (
+                  {whatsapp_no && (
                     <a
-                      href={`https://wa.me/${contact.whatsapp}`}
+                      href={`https://wa.me/${whatsapp_no}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
-                      {contact.whatsapp}
+                      {whatsapp_no}
                     </a>
                   )}
                 </div>
 
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">DOB :</span>{" "}
-                  <span className="text-gray-400">{contact?.dob}</span>
+                  <span className="text-gray-400">{dob}</span>
                 </div>
 
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Job :</span>{" "}
-                  <span className="text-gray-400">{jobTitle}</span>
+                  <span className="text-gray-400">{job_title}</span>
+                </div>
+                <div className="p-2">
+                  <span className="font-bold text-[var(--text)]">
+                    Job Status :
+                  </span>{" "}
+                  <span className="text-gray-400">{job_status}</span>
                 </div>
 
                 <div className="p-2">
@@ -125,7 +162,9 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Joining Date :
                   </span>{" "}
-                  <span className="text-gray-400">{startDate}</span>
+                  <span className="text-gray-400">
+                    {formatDateToIndian(joining_date)}
+                  </span>
                 </div>
 
                 <div className="p-2">
@@ -137,16 +176,14 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Marital Status :
                   </span>{" "}
-                  <span className="text-gray-400">
-                    {contact?.maritalStatus}
-                  </span>
+                  <span className="text-gray-400">{marital_status}</span>
                 </div>
 
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Blood Group :
                   </span>{" "}
-                  <span className="text-gray-400">{contact?.bloodGroup}</span>
+                  <span className="text-gray-400">{blood_group}</span>
                 </div>
 
                 <div className="p-2">
@@ -158,7 +195,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Address :
                   </span>{" "}
-                  <span className="text-gray-400">{contact?.address}</span>
+                  <span className="text-gray-400">{address}</span>
                 </div>
               </div>
             </div>
@@ -171,7 +208,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="rounded-lg">
+              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -187,7 +224,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {emergencyContacts?.map((ec, i) => (
+                    {emergency?.map((ec, i) => (
                       <tr key={i} className="hover:bg-[var(--permissionTable)]">
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {ec?.name}
@@ -196,12 +233,12 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                           {ec?.relation}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {ec?.phone && (
+                          {ec?.phone_no && (
                             <a
-                              href={`tel:${ec?.phone}`}
+                              href={`tel:${ec?.phone_no}`}
                               className="text-gray-400 hover:underline hover:decoration-yellow-400"
                             >
-                              {ec?.phone}
+                              {ec?.phone_no}
                             </a>
                           )}
                         </td>
@@ -220,7 +257,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="overflow-x-auto rounded-sm">
+              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -232,9 +269,6 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Phone
-                      </th>
-                      <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
-                        DOB
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Occupation
@@ -251,17 +285,14 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                           {f?.relation}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {f?.phone && (
+                          {f?.phone_no && (
                             <a
-                              href={`tel:${f?.phone}`}
+                              href={`tel:${f?.phone_no}`}
                               className="text-gray-400 hover:underline hover:decoration-yellow-400"
                             >
-                              {f?.phone}
+                              {f?.phone_no}
                             </a>
                           )}
-                        </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {f?.dob}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {f?.occupation}
@@ -324,7 +355,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="overflow-x-auto rounded-lg">
+              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem]  text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -335,13 +366,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                         Role
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
-                        Years
-                      </th>
-                      <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         Start Date
                       </th>
                       <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
                         End Date
+                      </th>
+                      <th className="text-left text-[var(--text)] p-2 border-b border-[var(--border)]">
+                        Years
                       </th>
                     </tr>
                   </thead>
@@ -355,13 +386,14 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                           {exp?.role}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {exp?.startDate}
+                          {formatDateToIndian(exp?.start_date)}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {exp?.endDate}
+                          {formatDateToIndian(exp?.end_date)}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
-                          {exp?.year}
+                          {exp?.end_date.slice(0, 4) -
+                            exp?.start_date.slice(0, 4)}
                         </td>
                       </tr>
                     ))}
@@ -378,7 +410,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="overflow-x-auto rounded-lg">
+              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -403,7 +435,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                           {ed?.degree}
                         </td>
                         <td className="p-2 border-t border-[var(--border)] text-gray-400">
-                          {ed?.institute}
+                          {ed?.university}
                         </td>
                         <td className="p-2 border-t border-[var(--border)] text-gray-400">
                           {ed?.result}
@@ -433,35 +465,31 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Account Holder :
                   </span>{" "}
-                  <span className="text-gray-400">{bank?.accountHolder}</span>
+                  <span className="text-gray-400">{name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Bank Name :
                   </span>{" "}
-                  <span className="text-gray-400">{bank?.bankName}</span>
+                  <span className="text-gray-400">{bank_name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Number :
                   </span>{" "}
                   <span className="text-gray-400">
-                    {bank?.accountHolder?.replace(/.(?=.{4})/g, "X")}
+                    {acc_no?.replace(/.(?=.{4})/g, "X")}
                   </span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     IFSC Code :
                   </span>{" "}
-                  <span className="text-gray-400">{bank?.ifsc}</span>
+                  <span className="text-gray-400">{ifsc_no}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">Branch :</span>{" "}
                   <span className="text-gray-400">{bank?.branch}</span>
-                </div>
-                <div>
-                  <span className="font-bold text-[var(--text)]">UPI ID :</span>{" "}
-                  <span className="text-gray-400">{bank?.upi}</span>
                 </div>
               </div>
             </div>

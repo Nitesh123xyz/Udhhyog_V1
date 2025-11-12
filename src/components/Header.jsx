@@ -133,12 +133,11 @@ const Header = ({
         </div>
         {!HideHeader && (
           <div className="flex space-x-2 py-1 px-0">
-            <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
-              <Plus
-                onClick={() => setStep(4)}
-                size={15}
-                className="text-gray-800"
-              />
+            <div
+              onClick={() => setStep(4)}
+              className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
+            >
+              <Plus size={15} className="text-gray-800" />
             </div>
             {currentActive && (
               <div

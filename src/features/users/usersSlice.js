@@ -46,6 +46,17 @@ export const UsersSlice = createApi({
         body,
       }),
     }),
+    UsersAdditionalDetails: builder.query({
+      query: (payload) => ({
+        url: "/user-details",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
     AddEmployee: builder.mutation({
       query: (payload) => ({
         url: "/add-employee",
@@ -57,6 +68,7 @@ export const UsersSlice = createApi({
         body,
       }),
     }),
+
     UpdateEmployee: builder.mutation({
       query: (payload) => ({
         url: "/update-employee",
@@ -86,6 +98,7 @@ export const {
   useGetUsersMutation,
   useSearchUsersMutation,
   useQueryUsersMutation,
+  useUsersAdditionalDetailsQuery,
   useAddEmployeeMutation,
   useUpdateEmployeeMutation,
   useDeleteEmployeeMutation,
