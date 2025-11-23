@@ -36,8 +36,23 @@ export const utilsSlice = createApi({
         body,
       }),
     }),
+
+    listDepartMent: builder.query({
+      query: (Token) => ({
+        url: "/list-department",
+        method: "POST",
+        body: { token: Token },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLeftSideNavigationMenuMutation, useAllProfileMenuMutation } =
-  utilsSlice;
+export const {
+  useLeftSideNavigationMenuMutation,
+  useAllProfileMenuMutation,
+  useListDepartMentQuery,
+} = utilsSlice;

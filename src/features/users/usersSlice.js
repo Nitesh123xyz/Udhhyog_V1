@@ -57,9 +57,9 @@ export const UsersSlice = createApi({
         body,
       }),
     }),
-    AddEmployee: builder.mutation({
+    AddUser: builder.mutation({
       query: (payload) => ({
-        url: "/add-employee",
+        url: "/add-user",
         method: "POST",
         body: payload,
       }),
@@ -69,9 +69,9 @@ export const UsersSlice = createApi({
       }),
     }),
 
-    UpdateEmployee: builder.mutation({
+    UpdateUserBasic: builder.mutation({
       query: (payload) => ({
-        url: "/update-employee",
+        url: "/upd-user-basic",
         method: "POST",
         body: payload,
       }),
@@ -80,9 +80,20 @@ export const UsersSlice = createApi({
         body,
       }),
     }),
-    DeleteEmployee: builder.mutation({
+    UpdateUserExperience: builder.mutation({
       query: (payload) => ({
-        url: "/delete-employee",
+        url: "/upd-user-exp",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    DeleteUser: builder.mutation({
+      query: (payload) => ({
+        url: "/del-user-data",
         method: "POST",
         body: payload,
       }),
@@ -99,7 +110,8 @@ export const {
   useSearchUsersMutation,
   useQueryUsersMutation,
   useUsersAdditionalDetailsQuery,
-  useAddEmployeeMutation,
-  useUpdateEmployeeMutation,
-  useDeleteEmployeeMutation,
+  useAddUserMutation,
+  useUpdateUserBasicMutation,
+  useUpdateUserExperienceMutation,
+  useDeleteUserMutation,
 } = UsersSlice;

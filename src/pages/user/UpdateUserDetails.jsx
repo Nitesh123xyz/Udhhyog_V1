@@ -1,26 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { employees } from "../../utils/DummyData";
 import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
-import { Pencil, Plus, Save, X } from "lucide-react";
+import { ArrowDown, Pencil, Plus, X } from "lucide-react";
+import useAuth from "../../hooks/useAuth";
+import {
+  useUpdateUserBasicMutation,
+  useUpdateUserExperienceMutation,
+  useUsersAdditionalDetailsQuery,
+} from "../../features/users/usersSlice";
+import { useListDepartMentQuery } from "../../features/utils/utilsSlice";
+import toast from "react-hot-toast";
 
-/* ---------------- ZOD SCHEMAS ---------------- */
-const contactSchema = z.object({
-  email: z
-    .string()
-    .email("Invalid email")
-    .optional()
-    .or(z.literal(""))
-    .nullable(),
-  phone: z.string().optional().or(z.literal("")).nullable(),
-  whatsapp: z.string().optional().or(z.literal("")).nullable(),
-  dob: z.string().optional().nullable(),
-  maritalStatus: z.string().optional().nullable(),
-  bloodGroup: z.string().optional().nullable(),
-  address: z.string().optional().nullable(),
-});
+/* ---------------- ZOD SCHEMAS (form shape) ---------------- */
 
 const documentSchema = z.object({
   type: z.string().min(1, "Type required"),
@@ -46,108 +39,301 @@ const familySchema = z.object({
 const experienceSchema = z.object({
   company: z.string().min(1, "Company required"),
   role: z.string().min(1, "Role required"),
-  startDate: z.string().optional().nullable(),
-  endDate: z.string().optional().nullable(),
+  start_date: z.string().optional().nullable(),
+  end_date: z.string().optional().nullable(),
   year: z.string().optional().nullable(),
 });
 
-const bankSchema = z.object({
-  accountHolder: z.string().optional().nullable(),
-  bankName: z.string().optional().nullable(),
-  accountNumber: z.string().optional().nullable(),
-  ifsc: z.string().optional().nullable(),
-  branch: z.string().optional().nullable(),
-  upi: z.string().optional().nullable(),
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  job_title: z.string().optional().nullable(),
+  job_status: z.string().optional().nullable(),
+  id_department: z.string().optional().nullable(),
+  department_label: z.string().optional().nullable(),
+  site: z.string().optional().nullable(),
+  salary: z.union([z.string(), z.number()]).optional().nullable(),
+  joining_date: z.string().optional().nullable(),
+  marital_status: z.string().optional().nullable(),
+  incentive: z.string().optional().nullable(),
+  email: z.string().email("Invalid email address"),
+  phone_no: z.string().optional().or(z.literal("")).nullable(),
+  whatsapp_no: z.string().optional().or(z.literal("")).nullable(),
+  dob: z.string().optional().nullable(),
+  blood_group: z.string().optional().nullable(),
+  address: z.string().optional().nullable(),
+  accholder: z.string().optional().nullable(),
+  bank_name: z.string().optional().nullable(),
+  acc_no: z.string().optional().nullable(),
+  ifsc_no: z.string().optional().nullable(),
+  branchname: z.string().optional().nullable(),
+  documents: z.array(documentSchema).optional().nullable(),
+  emergencyContacts: z
+    .array(
+      z.object({
+        name: z.string().optional().nullable(),
+        relation: z.string().optional().nullable(),
+        phone: z.string().optional().nullable(),
+      })
+    )
+    .optional()
+    .nullable(),
+  education: z.array(educationSchema).optional().nullable(),
+  family: z.array(familySchema).optional().nullable(),
+  experience: z.array(experienceSchema).optional().nullable(),
 });
 
-const formSchema = z
-  .object({
-    id: z.any().optional().nullable(),
-    name: z.string().min(1, "Name is required"),
-    jobTitle: z.string().optional().nullable(),
-    department: z.string().optional().nullable(),
-    site: z.string().optional().nullable(),
-    salary: z.string().optional().nullable(),
-    startDate: z.string().optional().nullable(),
-    lifecycle: z.string().optional().nullable(),
-    status: z.string().optional().nullable(),
-    avatar: z.string().optional().nullable(),
-    contact: contactSchema,
-    documents: z.array(documentSchema).optional().nullable(),
-    emergencyContacts: z
-      .array(
-        z.object({
-          name: z.string().optional().nullable(),
-          relation: z.string().optional().nullable(),
-          phone: z.string().optional().nullable(),
-        })
-      )
-      .optional()
-      .nullable(),
-    education: z.array(educationSchema).optional().nullable(),
-    family: z.array(familySchema).optional().nullable(),
-    bank: bankSchema.optional().nullable(),
-    experience: z.array(experienceSchema).optional().nullable(),
-  })
-  // ensure at least one contact (email / phone / whatsapp)
-  .refine(
-    (data) =>
-      !!(
-        data.contact &&
-        (data.contact.email?.toString().trim() ||
-          data.contact.phone?.toString().trim() ||
-          data.contact.whatsapp?.toString().trim())
-      ),
-    {
-      message: "Please provide at least one contact: email, phone or whatsapp",
-      path: ["contact"],
+/* ---------------- Helpers & mapping ---------------- */
+const LABEL_SENTINEL = "label::";
+
+const isLabelSentinel = (val) =>
+  typeof val === "string" && val.startsWith(LABEL_SENTINEL);
+
+const labelFromSentinel = (val) =>
+  typeof val === "string" && val.startsWith(LABEL_SENTINEL)
+    ? val.slice(LABEL_SENTINEL.length)
+    : "";
+
+const makeSentinel = (label) => `${LABEL_SENTINEL}${label}`;
+
+const JOB_TITLES = [
+  "Backend Developer",
+  "Frontend Developer",
+  "Fullstack Developer",
+  "Devloper",
+  "Sales",
+  "SEO",
+  "HR",
+];
+const JOB_STATUSES = ["Permanent", "Intern", "Contract", "Trainee"];
+const MARITAL_STATUSES = [
+  "Single",
+  "Married",
+  "Divorced",
+  "Widowed",
+  "Widower",
+];
+
+/* ---------------- Mapping helpers ---------------- */
+
+/**
+ * Normalizes server payload to the flat form shape expected by the form.
+ * Accepts server forms where `department` might be a label string or object or id.
+ */
+const mapServerToForm = (server = {}) => {
+  if (!server) return null;
+
+  const rawDepartment = server.department;
+  let derivedLabel = "";
+  let derivedId = null;
+
+  if (rawDepartment && typeof rawDepartment === "object") {
+    derivedId =
+      rawDepartment.dep_id ??
+      rawDepartment.id ??
+      rawDepartment.department_id ??
+      null;
+    derivedLabel = rawDepartment.department ?? rawDepartment.name ?? "";
+  } else if (rawDepartment !== undefined && rawDepartment !== null) {
+    if (!isNaN(Number(rawDepartment))) {
+      derivedId = Number(rawDepartment);
+    } else {
+      derivedLabel = String(rawDepartment);
     }
-  );
+  }
+
+  return {
+    id: server.id ?? null,
+    name: server.name ?? "",
+    job_title: server.job_title ?? "",
+    job_status: server.job_status ?? "",
+    id_department:
+      derivedId !== null && derivedId !== undefined && derivedId !== ""
+        ? String(derivedId)
+        : "",
+    department_label: derivedLabel ?? "",
+    site: server.site ?? "",
+    salary: server.salary ?? "",
+    joining_date: server.joining_date ?? server.start_date ?? "",
+    marital_status: server.marital_status ?? "",
+    incentive: server.incentive ?? "",
+
+    email: server.email ?? "",
+    phone_no: server.phone_no ?? server.phone ?? "",
+    whatsapp_no: server.whatsapp_no ?? server.whatsapp ?? "",
+    dob: server.dob ?? "",
+    blood_group: server.blood_group ?? server.bloodGroup ?? "",
+    address: server.address ?? "",
+
+    accholder: server.accholder ?? server.account_holder ?? "",
+    bank_name: server.bank_name ?? "",
+    acc_no: server.acc_no ?? server.accountNumber ?? "",
+    ifsc_no: server.ifsc_no ?? server.ifsc ?? "",
+    branchname: server.branchname ?? server.branch ?? "",
+
+    documents:
+      (server.documents &&
+        Array.isArray(server.documents) &&
+        server.documents.map((d) => ({
+          id: d.id ?? null,
+          type: d.doc_type ?? d.type ?? "",
+          doc: d.number ?? d.doc ?? "",
+          url: d.url ?? "",
+        }))) ||
+      [],
+    emergencyContacts:
+      (server.emergency &&
+        Array.isArray(server.emergency) &&
+        server.emergency.map((e) => ({
+          id: e.id ?? null,
+          name: e.name ?? "",
+          relation: e.relation ?? "",
+          phone: e.phone_no ?? e.phone ?? "",
+        }))) ||
+      [],
+    education:
+      (server.education &&
+        Array.isArray(server.education) &&
+        server.education.map((ed) => ({
+          id: ed.id ?? null,
+          degree: ed.degree ?? "",
+          institute: ed.university ?? ed.institute ?? "",
+          result: ed.result ?? "",
+          year: ed.year ?? ed.year_of_passing ?? "",
+        }))) ||
+      [],
+    family:
+      (server.family &&
+        Array.isArray(server.family) &&
+        server.family.map((f) => ({
+          id: f.id ?? null,
+          name: f.name ?? "",
+          relation: f.relation ?? "",
+          dob: f.dob ?? "",
+          phone: f.phone_no ?? f.phone ?? "",
+          occupation: f.occupation ?? "",
+        }))) ||
+      [],
+    experience:
+      (server.experience &&
+        Array.isArray(server.experience) &&
+        server.experience.map((ex) => ({
+          id: ex?.id ?? null,
+          company: ex.company ?? "",
+          role: ex.role ?? ex.role_name ?? "",
+          start_date: ex.start_date ?? "",
+          end_date: ex.end_date ?? "",
+          year: ex.year ?? "",
+        }))) ||
+      [],
+  };
+};
+
+/**
+ * mapBasicFormToPayload: returns ONLY the basic information payload you requested.
+ * It applies sentinel logic: if id_department is a sentinel it sends department text,
+ * otherwise it sends numeric id_department. Also converts sentinel job/title/status/marital to labels.
+ */
+const mapBasicFormToPayload = (form) => {
+  if (!form) return {};
+
+  const payload = {
+    name: form.name ?? "",
+    job_title: form.job_title ?? "",
+    job_status: form.job_status ?? "",
+    site: form.site ?? "",
+    salary:
+      typeof form.salary === "string" ? Number(form.salary) || 0 : form.salary,
+    joining_date: form.joining_date ?? "",
+    marital_status: form.marital_status ?? "",
+    incentive: form.incentive ?? "",
+    email: form.email ?? "",
+    phone_no: form.phone_no ?? "",
+    whatsapp_no: form.whatsapp_no ?? "",
+    dob: form.dob ?? "",
+    blood_group: form.blood_group ?? "",
+    address: form.address ?? "",
+    accholder: form.accholder ?? "",
+    bank_name: form.bank_name ?? "",
+    acc_no: form.acc_no ?? "",
+    ifsc_no: form.ifsc_no ?? "",
+    branchname: form.branchname ?? "",
+  };
+
+  const idDepRaw = form.id_department;
+  if (isLabelSentinel(idDepRaw)) {
+    payload.department = labelFromSentinel(idDepRaw);
+  } else if (idDepRaw !== undefined && idDepRaw !== null && idDepRaw !== "") {
+    // backend key name: change to `department_id` or `department` if required by your API
+    payload.id_department = Number(idDepRaw);
+  } else if (form.department_label) {
+    payload.department = form.department_label;
+  }
+
+  if (isLabelSentinel(form.job_title))
+    payload.job_title = labelFromSentinel(form.job_title);
+  if (isLabelSentinel(form.job_status))
+    payload.job_status = labelFromSentinel(form.job_status);
+  if (isLabelSentinel(form.marital_status))
+    payload.marital_status = labelFromSentinel(form.marital_status);
+
+  return payload;
+};
 
 /* ---------------- COMPONENT ---------------- */
 const UpdateUserDetails = ({ step, setStep, employeesId }) => {
-  const employee = employees.find((e) => e.id === employeesId);
+  const { token } = useAuth();
+  const { data: departMent } = useListDepartMentQuery(token);
+  const { dep_data = [] } = departMent?.body || {};
 
-  const defaultValues = employee || {
-    id: null,
-    name: "",
-    jobTitle: "",
-    department: "",
-    site: "",
-    salary: "",
-    startDate: "",
-    lifecycle: "",
-    status: "",
-    avatar: "",
-    contact: {
-      email: "",
-      phone: "",
-      whatsapp: "",
-      dob: "",
-      maritalStatus: "",
-      bloodGroup: "",
-      address: "",
-    },
-    documents: [],
-    emergencyContacts: [],
-    education: [],
-    family: [],
-    bank: {
-      accountHolder: "",
-      bankName: "",
-      accountNumber: "",
-      ifsc: "",
-      branch: "",
-      upi: "",
-    },
-    experience: [],
-  };
+  const { data, refetch } = useUsersAdditionalDetailsQuery({
+    emp_id: employeesId,
+    token: token,
+  });
+
+  const serverBody = data?.body ?? null;
+
+  const defaultValues = useMemo(() => {
+    if (!serverBody) {
+      return {
+        id: null,
+        name: "",
+        job_title: "",
+        job_status: "",
+        id_department: "",
+        department_label: "",
+        site: "",
+        salary: "",
+        joining_date: "",
+        marital_status: "",
+        incentive: "",
+        email: "",
+        phone_no: "",
+        whatsapp_no: "",
+        dob: "",
+        blood_group: "",
+        address: "",
+        accholder: "",
+        bank_name: "",
+        acc_no: "",
+        ifsc_no: "",
+        branchname: "",
+        documents: [],
+        emergencyContacts: [],
+        education: [],
+        family: [],
+        experience: [],
+      };
+    }
+    return mapServerToForm(serverBody);
+  }, [serverBody]);
 
   const {
     register: updateUserForm,
     handleSubmit,
     control,
     reset,
+    getValues,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
@@ -161,23 +347,143 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
   const famField = useFieldArray({ control, name: "family" });
   const expField = useFieldArray({ control, name: "experience" });
 
+  // reset + matching logic
   useEffect(() => {
-    // reset whenever employee changes (load)
-    reset(defaultValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [employee]);
+    if (!serverBody) return;
 
-  const onSubmit = (data) => {
-    // Mock update in imported array (same as your original behaviour)
-    const idx = employees.findIndex((e) => e.id === employeesId);
-    if (idx === -1) {
-      alert("Employee not found.");
+    const mapped = mapServerToForm(serverBody);
+
+    // try to match server department label with dep_data; otherwise keep sentinel label
+    const serverDeptRaw =
+      serverBody.department ??
+      serverBody.department_name ??
+      mapped.department_label ??
+      "";
+
+    if (serverDeptRaw && Array.isArray(dep_data) && dep_data.length > 0) {
+      const normalizedServerDept = String(serverDeptRaw).trim().toLowerCase();
+      const matched = dep_data.find((d) => {
+        const name = String(d?.department ?? d?.name ?? "")
+          .trim()
+          .toLowerCase();
+        return name === normalizedServerDept;
+      });
+
+      if (matched) {
+        mapped.id_department = String(matched?.dep_id ?? matched?.id ?? "");
+        mapped.department_label = matched?.department ?? matched?.name ?? "";
+      } else {
+        if (String(serverDeptRaw).trim() !== "") {
+          mapped.id_department = makeSentinel(String(serverDeptRaw).trim());
+          mapped.department_label = String(serverDeptRaw).trim();
+        }
+      }
+    } else {
+      if (mapped.department_label && !mapped.id_department) {
+        mapped.id_department = makeSentinel(mapped.department_label);
+      }
+    }
+
+    // job title/status/marital: if not in local lists, show sentinel so user sees exact server label
+    if (mapped.job_title) {
+      const normalized = String(mapped.job_title).trim().toLowerCase();
+      const matched = JOB_TITLES.find(
+        (t) => t.trim().toLowerCase() === normalized
+      );
+      if (!matched && String(mapped.job_title).trim() !== "") {
+        mapped.job_title = makeSentinel(String(mapped.job_title).trim());
+      }
+    }
+
+    if (mapped.job_status) {
+      const normalized = String(mapped.job_status).trim().toLowerCase();
+      const matched = JOB_STATUSES.find(
+        (s) => s.trim().toLowerCase() === normalized
+      );
+      if (!matched && String(mapped.job_status).trim() !== "") {
+        mapped.job_status = makeSentinel(String(mapped.job_status).trim());
+      }
+    }
+
+    if (mapped.marital_status) {
+      const normalized = String(mapped.marital_status).trim().toLowerCase();
+      const matched = MARITAL_STATUSES.find(
+        (s) => s.trim().toLowerCase() === normalized
+      );
+      if (!matched && String(mapped.marital_status).trim() !== "") {
+        mapped.marital_status = makeSentinel(
+          String(mapped.marital_status).trim()
+        );
+      }
+    }
+
+    reset(mapped);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverBody, dep_data]);
+
+  const [updateExperience] = useUpdateUserExperienceMutation();
+  const [updateBasic] = useUpdateUserBasicMutation();
+
+  const UpdateUserExperienceInformation = async (e, i) => {
+    const updatedData = { emp_id: employeesId, token };
+    const currentExp = getValues(`experience.${i}`);
+    if (!currentExp) {
+      console.warn("No experience row found for index", i);
       return;
     }
-    employees[idx] = { ...employees[idx], ...data };
-    alert("Employee updated (mock).");
-    setStep(1);
+    const { id, ...payloadWithoutId } = currentExp;
+    const payload = { ...updatedData, ...payloadWithoutId, row_id: id };
+    try {
+      const res = await updateExperience(payload).unwrap();
+      console.log("Update response:", res);
+      if (res?.status === 200) {
+        toast.success("Experience Updated");
+        setStep(1);
+      }
+    } catch (err) {
+      toast.error(err);
+      console.error("Update failed:", err);
+    }
   };
+
+  // IMPORTANT: This function sends ONLY the basic fields you requested.
+  const UpdateUserBasicInformation = async (formData) => {
+    // formData comes from react-hook-form via handleSubmit
+    const basicPayload = mapBasicFormToPayload(formData);
+
+    const body = {
+      emp_id: employeesId,
+      token,
+      ...basicPayload,
+    };
+    console.log(body);
+
+    try {
+      // call your RTK Query mutation; adjust if your hook expects a different shape
+      const res = await updateBasic(body).unwrap();
+      console.log("Basic update success:", res);
+      if (res?.status === 200) {
+        toast.success("Basic Info Updated");
+        setStep(1);
+      }
+    } catch (err) {
+      toast.error(err);
+      console.error("Basic update failed:", err);
+    }
+  };
+
+  const currentIdDepartment = watch("id_department");
+  const currentDepartmentLabel = watch("department_label");
+  const currentJobTitle = watch("job_title");
+  const currentJobStatus = watch("job_status");
+  const currentMarital = watch("marital_status");
+
+  const renderSentinelOption = (value) =>
+    isLabelSentinel(value) ? (
+      <option value={String(value)} key="server-label">
+        {labelFromSentinel(value)}
+      </option>
+    ) : null;
 
   return (
     <section className="bg-[var(--background)] rounded-t-lg border border-[var(--border)]">
@@ -185,184 +491,286 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         <UserAdditionalDetailsHeader step={step} setStep={setStep} />
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3 px-4 py-2">
-        {/* Core profile */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Name *
-            </label>
-            <input
-              {...updateUserForm("name")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
-            )}
-          </div>
+      <form
+        onSubmit={handleSubmit(UpdateUserBasicInformation)}
+        className="space-y-3 px-4 py-2"
+      >
+        <div className="p-2 rounded-lg border border-[var(--border)]">
+          <h4 className="text-xl sm:text-2xl font-semibold text-[var(--text)]">
+            Basic Information
+          </h4>
 
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Job Title
-            </label>
-            <input
-              {...updateUserForm("jobTitle")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Department
-            </label>
-            <input
-              {...updateUserForm("department")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Site
-            </label>
-            <input
-              {...updateUserForm("site")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Salary
-            </label>
-            <input
-              {...updateUserForm("salary")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Start Date
-            </label>
-            <input
-              {...updateUserForm("startDate")}
-              placeholder="e.g. Mar 13, 2023"
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Lifecycle
-            </label>
-            <input
-              {...updateUserForm("lifecycle")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Status
-            </label>
-            <input
-              {...updateUserForm("status")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[var(--text)]">
-              Avatar URL
-            </label>
-            <input
-              {...updateUserForm("avatar")}
-              className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Contact */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
-          <h4 className="font-semibold mb-3 text-[var(--text)]">Contact</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[var(--text)]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm">Email</label>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Name
+              </label>
               <input
-                {...updateUserForm("contact.email")}
+                {...updateUserForm("name")}
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
-              {errors.contact?.email && (
+              {errors.name && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.contact.email.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm">Phone</label>
-              <input
-                {...updateUserForm("contact.phone")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-              {errors.contact?.phone && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.contact.phone.message}
+                  {errors.name.message}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm">WhatsApp</label>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Job Title
+              </label>
+              <div className="relative">
+                <select
+                  {...updateUserForm("job_title")}
+                  className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] text-[var(--text)] outline-none appearance-none"
+                >
+                  <option value="">Select job title</option>
+                  {renderSentinelOption(currentJobTitle)}
+                  {JOB_TITLES.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text)]">
+                  <ArrowDown size={16} />
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Job Status
+              </label>
+              <div className="relative">
+                <select
+                  {...updateUserForm("job_status")}
+                  className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] text-[var(--text)] outline-none appearance-none"
+                >
+                  <option value="">Select job status</option>
+                  {renderSentinelOption(currentJobStatus)}
+                  {JOB_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text)]">
+                  <ArrowDown size={16} />
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Joining Date
+              </label>
               <input
-                {...updateUserForm("contact.whatsapp")}
+                {...updateUserForm("joining_date")}
+                type="date"
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm">DOB</label>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Department
+              </label>
+              <div className="relative">
+                <select
+                  {...updateUserForm("id_department")}
+                  className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] text-[var(--text)] outline-none appearance-none"
+                >
+                  <option value="">Select department</option>
+                  {renderSentinelOption(currentIdDepartment)}
+                  {dep_data.map((dep) => (
+                    <option
+                      key={dep?.dep_id ?? dep?.id}
+                      value={String(dep?.dep_id ?? dep?.id)}
+                    >
+                      {dep?.department ?? dep?.name}
+                    </option>
+                  ))}
+                </select>
+
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text)]">
+                  <ArrowDown size={16} />
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Salary
+              </label>
               <input
-                {...updateUserForm("contact.dob")}
-                placeholder="YYYY-MM-DD"
+                {...updateUserForm("salary")}
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm">Marital Status</label>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Incentive
+              </label>
               <input
-                {...updateUserForm("contact.maritalStatus")}
+                {...updateUserForm("incentive")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            {/* flat contact and other basic fields */}
+            <div>
+              <label className="block text-sm text-[var(--text)]">Email</label>
+              <input
+                {...updateUserForm("email")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">Phone</label>
+              <input
+                {...updateUserForm("phone_no")}
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm">Blood Group</label>
+              <label className="block text-sm text-[var(--text)]">
+                WhatsApp Number
+              </label>
               <input
-                {...updateUserForm("contact.bloodGroup")}
+                {...updateUserForm("whatsapp_no")}
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm">Address</label>
+            <div>
+              <label className="block text-sm text-[var(--text)]">
+                Date of Birth
+              </label>
+              <input
+                {...updateUserForm("dob")}
+                type="date"
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Marital Status
+              </label>
+              <div className="relative">
+                <select
+                  {...updateUserForm("marital_status")}
+                  className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] text-[var(--text)] outline-none appearance-none"
+                >
+                  <option value="">Select marital status</option>
+                  {renderSentinelOption(currentMarital)}
+                  {MARITAL_STATUSES.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text)]">
+                  <ArrowDown size={16} />
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">
+                Blood Group
+              </label>
+              <input
+                {...updateUserForm("blood_group")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm text-[var(--text)]">
+                Address
+              </label>
               <textarea
-                {...updateUserForm("contact.address")}
-                rows={2}
+                {...updateUserForm("address")}
+                rows={3}
                 className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
               />
             </div>
 
-            {/* show general contact error (refine) */}
-            {errors.contact && typeof errors.contact.message === "string" && (
-              <p className="text-red-500 text-xs mt-1 sm:col-span-2">
-                {errors.contact.message}
-              </p>
-            )}
+            {/* Bank flat fields */}
+            <div>
+              <label className="block text-sm text-[var(--text)]">
+                Account Holder
+              </label>
+              <input
+                {...updateUserForm("accholder")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">
+                Bank Name
+              </label>
+              <input
+                {...updateUserForm("bank_name")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">
+                Account Number
+              </label>
+              <input
+                {...updateUserForm("acc_no")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">IFSC</label>
+              <input
+                {...updateUserForm("ifsc_no")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-[var(--text)]">Branch</label>
+              <input
+                {...updateUserForm("branchname")}
+                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                const values = getValues();
+                UpdateUserBasicInformation(values);
+              }}
+              className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
+            >
+              <Pencil size={14} className="text-[var(--text)]" />
+            </button>
           </div>
         </div>
 
+        {/* Documents, Emergency, Education, Family, Experience sections unchanged (they remain below) */}
         {/* Documents */}
         <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
@@ -589,55 +997,6 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
           </div>
         </div>
 
-        {/* Bank */}
-        <div className="mt-2 p-4 rounded-lg border border-[var(--border)]">
-          <h4 className="font-semibold mb-3 text-[var(--text)]">Bank</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[var(--text)]">
-            <div>
-              <label className="block text-sm">Account Holder</label>
-              <input
-                {...updateUserForm("bank.accountHolder")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm">Bank Name</label>
-              <input
-                {...updateUserForm("bank.bankName")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm">Account Number</label>
-              <input
-                {...updateUserForm("bank.accountNumber")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm">IFSC</label>
-              <input
-                {...updateUserForm("bank.ifsc")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm">Branch</label>
-              <input
-                {...updateUserForm("bank.branch")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm">UPI</label>
-              <input
-                {...updateUserForm("bank.upi")}
-                className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
         {/* Experience */}
         <div className="p-2 rounded-lg border border-[var(--border)]">
           <div className="flex items-center justify-between">
@@ -648,8 +1007,8 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                 expField.append({
                   company: "",
                   role: "",
-                  startDate: "",
-                  endDate: "",
+                  start_date: "",
+                  end_date: "",
                   year: "",
                 })
               }
@@ -677,21 +1036,24 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                 />
                 <input
                   placeholder="Start"
-                  {...updateUserForm(`experience.${i}.startDate`)}
+                  type="date"
+                  {...updateUserForm(`experience.${i}.start_date`)}
                   className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <input
                   placeholder="End"
-                  {...updateUserForm(`experience.${i}.endDate`)}
+                  type="date"
+                  {...updateUserForm(`experience.${i}.end_date`)}
                   className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none"
                 />
                 <div className="flex gap-2 sm:gap-3 items-center">
-                  <input
-                    placeholder="Years"
-                    {...updateUserForm(`experience.${i}.year`)}
-                    className="px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none w-25"
-                  />
-
+                  <button
+                    type="button"
+                    onClick={() => UpdateUserExperienceInformation(e, i)}
+                    className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
+                  >
+                    <Pencil size={14} className="text-[var(--text)]" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => expField.remove(i)}
@@ -703,24 +1065,6 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-2 justify-self-end gap-3">
-          <button
-            type="button"
-            onClick={() => setStep(1)}
-            className="px-4 py-2 rounded-md text-[var(--text)] border border-[var(--border)] bg-white/3 cursor-pointer hover:bg-red-100 transition-colors duration-300"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            // onClick={saveDraft}
-            className="cursor-pointer w-full sm:w-auto flex items-center justify-center gap-2 px-2 py-3 sm:px-8 rounded-lg border border-[var(--border)] text-[var(--text)]"
-          >
-            <Pencil size={20} /> Update
-          </button>
         </div>
       </form>
     </section>

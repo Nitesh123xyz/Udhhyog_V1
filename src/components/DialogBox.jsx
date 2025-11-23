@@ -1,6 +1,7 @@
 const DialogBox = ({
   setOpenDialog,
   setConfirmation,
+  setEnableDeleteBtn,
   message,
   title = "Delete User",
 }) => {
@@ -31,6 +32,15 @@ const DialogBox = ({
             className="cursor-pointer w-full sm:w-auto px-4 py-2 text-sm font-medium text-[var(--text)]  border border-[var(--border)] rounded-md"
           >
             Cancel
+          </button>
+          <button
+            onClick={() => {
+              setEnableDeleteBtn(true);
+              setOpenDialog(false);
+            }}
+            className="cursor-pointer w-full sm:w-auto px-4 py-2 text-sm font-medium text-[var(--text)]  border border-[var(--border)] rounded-md"
+          >
+            Enable Delete
           </button>
           <button
             onClick={() => {

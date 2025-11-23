@@ -21,7 +21,7 @@ export const StatusBtn = ({ Status }) => {
           <span
             className={`w-2 h-2 mr-2 ${getPointerColor(Status)} rounded-full`}
           ></span>
-          {Status === 1 ? "Active" : "Inactive"}
+          {Status === 1 ? "Active" : "InActive"}
         </span>
       </div>
     </>

@@ -1,47 +1,34 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { employees } from "../../utils/DummyData";
 import ImageSlider from "../../components/ImageSlider";
-import { Trash, Undo2, UserPen } from "lucide-react";
+import { Trash } from "lucide-react";
 import DialogBox from "../../components/DialogBox";
 import ScrollTop from "../../utils/ScrollTop";
-import Header from "../../components/Header";
 import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
-import { useUsersAdditionalDetailsQuery } from "../../features/users/usersSlice";
+import {
+  useDeleteUserMutation,
+  useUsersAdditionalDetailsQuery,
+} from "../../features/users/usersSlice";
 import useAuth from "../../hooks/useAuth";
-import { formatDateToIndian } from "../../utils/formatter";
+import { formatDateToIndian, formatRupees } from "../../utils/formatter";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [preview, setPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [confirmation, setConfirmation] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [enableDeleteBtn, setEnableDeleteBtn] = useState(false);
   const rows = [...employees.filter((e) => e.id === employeesId)];
-  const {
-    contact,
-    status,
-    emergencyContacts,
-    // education,
-    // family,
-    documents,
-    bank,
-  } = rows[0] || [];
-
-  // console.log(rows);
-
+  const { documents } = rows[0] || [];
+  const { token } = useAuth();
+  const [DeleteUserInformation] = useDeleteUserMutation();
   const imagesFromDocs = (documents || []).map((d) => ({
     src: d.url,
     alt: d.type,
   }));
 
-  const handleDeleteUser = () => {
-    setOpenDialog(true);
-    if (confirmation) {
-      console.log("user Deleted");
-    }
-    // setStep(1);
-  };
-  const { token } = useAuth();
-
-  const { data } = useUsersAdditionalDetailsQuery({
+  const { data, refetch } = useUsersAdditionalDetailsQuery({
     emp_id: employeesId,
     token: token,
   });
@@ -63,7 +50,10 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
     department,
     dob,
     ifsc_no,
-
+    branchname,
+    status,
+    incentive,
+    // -------
     emergency,
     experience,
     family,
@@ -71,6 +61,39 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   } = data?.body || {};
 
   console.log(data?.body);
+
+  const handleRefetch = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    handleRefetch();
+  }, [handleRefetch]);
+
+  // -------------------------------------------------------
+
+  const handleDeleteUserInfo = async (rowId, blockName) => {
+    try {
+      const delData = {
+        token,
+        emp_id: employeesId,
+        id: rowId,
+        block: blockName,
+      };
+
+      const { status } = await DeleteUserInformation(delData).unwrap();
+
+      if (status) {
+        toast.success(`${blockName} deleted successfully`);
+        refetch();
+      } else {
+        toast.error(`Failed to delete ${blockName}`);
+      }
+    } catch (err) {
+      console.error("delete error", err);
+      toast.error("Something went wrong while deleting");
+    }
+  };
 
   return (
     <>
@@ -92,72 +115,67 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
               <div className="text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 divide-x divide-y divide-[var(--border)]">
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Name :</span>{" "}
-                  <span className="text-gray-400">{name}</span>
+                  <span className="text-gray-400 capitalize">{name}</span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Email :</span>{" "}
                   {email && (
-                    <a
-                      href={`mailto:${email}`}
+                    <Link
+                      to={`mailto:${email}`}
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
                       {email}
-                    </a>
+                    </Link>
                   )}
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Phone :</span>{" "}
                   {phone_no && (
-                    <a
-                      href={`tel:${phone_no}`}
+                    <Link
+                      to={`tel:${phone_no}`}
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
                       {phone_no}
-                    </a>
+                    </Link>
                   )}
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Whatsapp :
                   </span>{" "}
                   {whatsapp_no && (
-                    <a
-                      href={`https://wa.me/${whatsapp_no}`}
+                    <Link
+                      to={`https://wa.me/${whatsapp_no}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-gray-400 hover:underline hover:decoration-yellow-400"
                     >
                       {whatsapp_no}
-                    </a>
+                    </Link>
                   )}
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">DOB :</span>{" "}
-                  <span className="text-gray-400">{dob}</span>
+                  <span className="text-gray-400">
+                    {formatDateToIndian(dob)}
+                  </span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Job :</span>{" "}
-                  <span className="text-gray-400">{job_title}</span>
+                  <span className="text-gray-400 capitalize">{job_title}</span>
                 </div>
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Job Status :
                   </span>{" "}
-                  <span className="text-gray-400">{job_status}</span>
+                  <span className="text-gray-400 capitalize">{job_status}</span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Department :
                   </span>{" "}
-                  <span className="text-gray-400">{department}</span>
+                  <span className="text-gray-400 capitalize">{department}</span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Joining Date :
@@ -166,36 +184,43 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                     {formatDateToIndian(joining_date)}
                   </span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Salary :</span>{" "}
-                  <span className="text-gray-400">{salary}</span>
+                  <span className="text-gray-400">{formatRupees(salary)}</span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Marital Status :
                   </span>{" "}
-                  <span className="text-gray-400">{marital_status}</span>
+                  <span className="text-gray-400 capitalize">
+                    {marital_status}
+                  </span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Blood Group :
                   </span>{" "}
-                  <span className="text-gray-400">{blood_group}</span>
+                  <span className="text-gray-400 uppercase">{blood_group}</span>
                 </div>
-
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">Status :</span>{" "}
-                  <span className="text-gray-400">{status}</span>
-                </div>
-
+                  <span className="text-gray-400">
+                    {status ? "Active" : "InActive"}
+                  </span>
+                </div>{" "}
+                {incentive > 0 && (
+                  <div className="p-2">
+                    <span className="font-bold text-[var(--text)]">
+                      Incentive :
+                    </span>{" "}
+                    <span className="text-gray-400">{incentive}</span>
+                  </div>
+                )}
                 <div className="p-2">
                   <span className="font-bold text-[var(--text)]">
                     Address :
                   </span>{" "}
-                  <span className="text-gray-400">{address}</span>
+                  <span className="text-gray-400 capitalize">{address}</span>
                 </div>
               </div>
             </div>
@@ -226,22 +251,34 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <tbody>
                     {emergency?.map((ec, i) => (
                       <tr key={i} className="hover:bg-[var(--permissionTable)]">
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {ec?.name}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {ec?.relation}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {ec?.phone_no && (
-                            <a
-                              href={`tel:${ec?.phone_no}`}
-                              className="text-gray-400 hover:underline hover:decoration-yellow-400"
+                            <Link
+                              to={`tel:${ec?.phone_no}`}
+                              className="text-gray-400 hover:underline hover:decoration-yellow-400 uppercase"
                             >
                               {ec?.phone_no}
-                            </a>
+                            </Link>
                           )}
                         </td>
+                        {enableDeleteBtn && (
+                          <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                            <div
+                              onClick={() =>
+                                handleDeleteUserInfo(ec?.id, "emergency")
+                              }
+                              className="cursor-pointer w-5 h-5 flex items-center justify-center rounded-full shadow-sm"
+                            >
+                              <Trash size={15} className="text-[var(--text)]" />
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -278,25 +315,37 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <tbody>
                     {family?.map((f, i) => (
                       <tr key={i} className="hover:bg-[var(--permissionTable)]">
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {f?.name}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {f?.relation}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)]">
                           {f?.phone_no && (
-                            <a
-                              href={`tel:${f?.phone_no}`}
-                              className="text-gray-400 hover:underline hover:decoration-yellow-400"
+                            <Link
+                              to={`tel:${f?.phone_no}`}
+                              className="text-gray-400 hover:underline hover:decoration-yellow-400 uppercase"
                             >
                               {f?.phone_no}
-                            </a>
+                            </Link>
                           )}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {f?.occupation}
                         </td>
+                        {enableDeleteBtn && (
+                          <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                            <div
+                              onClick={() =>
+                                handleDeleteUserInfo(f?.id, "family")
+                              }
+                              className="cursor-pointer w-5 h-5 flex items-center justify-center rounded-full shadow-sm"
+                            >
+                              <Trash size={15} className="text-[var(--text)]" />
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -379,22 +428,34 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <tbody>
                     {experience?.map((exp, i) => (
                       <tr key={i} className="hover:bg-[var(--permissionTable)]">
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {exp?.company}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
                           {exp?.role}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {formatDateToIndian(exp?.start_date)}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {formatDateToIndian(exp?.end_date)}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                        <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {exp?.end_date.slice(0, 4) -
                             exp?.start_date.slice(0, 4)}
                         </td>
+                        {enableDeleteBtn && (
+                          <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                            <div
+                              onClick={() =>
+                                handleDeleteUserInfo(exp?.id, "experience")
+                              }
+                              className="cursor-pointer w-5 h-5 flex items-center justify-center rounded-full shadow-sm"
+                            >
+                              <Trash size={15} className="text-[var(--text)]" />
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -431,18 +492,30 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <tbody>
                     {education?.map((ed, i) => (
                       <tr key={i} className="hover:bg-[var(--permissionTable)]">
-                        <td className="p-2 border-t border-[var(--border)] text-gray-400">
+                        <td className="p-2 border-t border-[var(--border)] text-gray-400 uppercase">
                           {ed?.degree}
                         </td>
-                        <td className="p-2 border-t border-[var(--border)] text-gray-400">
+                        <td className="p-2 border-t border-[var(--border)] text-gray-400 uppercase">
                           {ed?.university}
                         </td>
-                        <td className="p-2 border-t border-[var(--border)] text-gray-400">
+                        <td className="p-2 border-t border-[var(--border)] text-gray-400 uppercase">
                           {ed?.result}
                         </td>
-                        <td className="p-2 border-t border-[var(--border)] text-gray-400">
+                        <td className="p-2 border-t border-[var(--border)] text-gray-400 uppercase">
                           {ed?.year}
                         </td>
+                        {enableDeleteBtn && (
+                          <td className="p-2 border-t text-gray-400 border-[var(--border)]">
+                            <div
+                              onClick={() =>
+                                handleDeleteUserInfo(ed?.id, "education")
+                              }
+                              className="cursor-pointer w-5 h-5 flex items-center justify-center rounded-full shadow-sm"
+                            >
+                              <Trash size={15} className="text-[var(--text)]" />
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -465,19 +538,19 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     Account Holder :
                   </span>{" "}
-                  <span className="text-gray-400">{name}</span>
+                  <span className="text-gray-400 capitalize">{name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Bank Name :
                   </span>{" "}
-                  <span className="text-gray-400">{bank_name}</span>
+                  <span className="text-gray-400 uppercase">{bank_name}</span>
                 </div>
                 <div>
                   <span className="font-bold text-[var(--text)]">
                     Account Number :
                   </span>{" "}
-                  <span className="text-gray-400">
+                  <span className="text-gray-400 uppercase">
                     {acc_no?.replace(/.(?=.{4})/g, "X")}
                   </span>
                 </div>
@@ -485,11 +558,13 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                   <span className="font-bold text-[var(--text)]">
                     IFSC Code :
                   </span>{" "}
-                  <span className="text-gray-400">{ifsc_no}</span>
+                  <span className="text-gray-400 uppercase">{ifsc_no}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-[var(--text)]">Branch :</span>{" "}
-                  <span className="text-gray-400">{bank?.branch}</span>
+                  <span className="font-bold text-[var(--text)]">
+                    Branch Address :
+                  </span>{" "}
+                  <span className="text-gray-400 capitalize">{branchname}</span>
                 </div>
               </div>
             </div>
@@ -501,6 +576,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
             <DialogBox
               setOpenDialog={setOpenDialog}
               setConfirmation={setConfirmation}
+              setEnableDeleteBtn={setEnableDeleteBtn}
               title="Delete User"
               message={
                 <p className="text-[var(--text)]">

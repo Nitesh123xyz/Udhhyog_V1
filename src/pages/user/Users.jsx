@@ -32,7 +32,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   const [getUserInfo, { isLoading }] = useGetUsersMutation();
   const [getQueryInfo, { isLoading: queryLoading }] = useQueryUsersMutation();
   const { searchLoading } = useSelector((state) => state.UtileSlice);
-  console.log(searchLoading)
+  console.log(searchLoading);
   const { token } = useAuth();
   const loading = Boolean(isLoading || queryLoading || searchLoading);
 
@@ -143,6 +143,8 @@ const Users = ({ step, setStep, setEmployeesId }) => {
     );
   };
 
+  console.log(rows);
+
   // ------------------------------------------------------
   return (
     <>
@@ -194,19 +196,21 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                             alt={employee.name}
                             className="w-8 h-8 rounded-full object-cover"
                           />
-                          <span className={`text-xs text-[var(--text)]`}>
+                          <span
+                            className={`text-xs text-[var(--text)] capitalize`}
+                          >
                             {employee.name}
                           </span>
                         </div>
                       </td>
 
                       <td
-                        className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                        className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
                       >
                         {employee?.job_title}
                       </td>
                       <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
                       >
                         {employee?.department}
                       </td>
@@ -221,7 +225,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
                         {formatDateToIndian(employee?.joining_date)}
                       </td>
                       <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
                       >
                         {employee?.employement_type}
                       </td>
