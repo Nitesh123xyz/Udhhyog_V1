@@ -32,6 +32,13 @@ import { useAddUserMutation } from "../../features/users/usersSlice";
 import { useListDepartMentQuery } from "../../features/utils/utilsSlice";
 import toast from "react-hot-toast";
 import "../../css/commonLayout.css";
+import {
+  BLOOD_GROUP,
+  JOB_STATUSES,
+  JOB_TITLES,
+  MARITAL_STATUSES,
+} from "../../utils/ReuseData";
+import Loader from "../../components/Loader";
 /* ----------------------------- Zod schemas ----------------------------- */
 
 const documentSchema = z.object({
@@ -41,8 +48,14 @@ const documentSchema = z.object({
 });
 
 const emergencyContactSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  relation: z.string().min(1, "Relation required"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(25, "name must be at most 25 character"),
+  relation: z
+    .string()
+    .min(1, "Relation required")
+    .max(25, "Relation must be at most 25 character"),
   phone_no: z
     .string()
     .min(10, "Phone number must be at least 10 digits")
@@ -50,9 +63,18 @@ const emergencyContactSchema = z.object({
 });
 
 const educationSchema = z.object({
-  degree: z.string().min(1, "Degree is required"),
-  university: z.string().min(1, "University is required"),
-  result: z.string().min(1, "Institute is required"),
+  degree: z
+    .string()
+    .min(1, "Degree is required")
+    .max(50, "Degree must be at most 10 character"),
+  university: z
+    .string()
+    .min(1, "University is required")
+    .max(50, "University must be at most 10 character"),
+  result: z
+    .string()
+    .min(1, "Institute is required")
+    .max(50, "Institute must be at most 10 character"),
   year: z.coerce
     .number()
     .int()
@@ -64,18 +86,33 @@ const educationSchema = z.object({
 });
 
 const familySchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  relation: z.string().min(1, "Relation required"),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(25, "name must be at most 25 characters"),
+  relation: z
+    .string()
+    .min(1, "Relation required")
+    .max(25, "Relation must be at most 25 characters"),
   phone_no: z
     .string()
     .min(10, "Phone number must be at least 10 digits")
     .max(10, "Phone number must be at most 10 digits"),
-  occupation: z.string().min(1, "Occupation is required"),
+  occupation: z
+    .string()
+    .min(1, "Occupation is required")
+    .max(50, "Phone number must be at most 50 characters"),
 });
 
 const experienceSchema = z.object({
-  company: z.string().min(1, "Company is required"),
-  role: z.string().min(1, "role is required"),
+  company: z
+    .string()
+    .min(1, "Company is required")
+    .max(50, "Company must be at most 50 characters"),
+  role: z
+    .string()
+    .min(1, "role is required")
+    .max(50, "Role must be at most 50 characters"),
   start_date: z.string().min(1, "start date is required"),
   end_date: z.string().min(1, "end date is required"),
   year: z.number().default(2001),
@@ -100,7 +137,10 @@ const schema = z.object({
     .min(10, "WhatsApp number must be at least 10 digits")
     .max(10, "Phone number must be at most 10 digits"),
   marital_status: z.string().min(1, "Marital status is required"),
-  address: z.string().min(1, "Address is required"),
+  address: z
+    .string()
+    .min(1, "Address is required")
+    .max(128, "Address must be at most 128 character"),
   job_title: z.string().min(1, "Job title required"),
   job_status: z.string().min(1, "Job status required"),
   phone_no: z
@@ -115,14 +155,23 @@ const schema = z.object({
     .string()
     .min(5, "Account Number must be at least 5 digits")
     .max(25, "Account number must be at most 25 digits"),
-  bank_name: z.string().min(1, "Bank name is required"),
+  bank_name: z
+    .string()
+    .min(1, "Bank name is required")
+    .max(20, "Bank name must be at most 20 character"),
   ifsc_no: z
     .string()
     .min(1, "IFSC number is required")
     .max(11, "IFSC number be at most 11 digits"),
   email: z.string().email("Invalid email address"),
-  accholder: z.string().min(1, "Account holder name is required"),
-  branchname: z.string().min(1, "Branch name is required"),
+  accholder: z
+    .string()
+    .min(1, "Account holder name is required")
+    .max(25, "Account holder name must be at most 25 character"),
+  branchname: z
+    .string()
+    .min(1, "Branch name is required")
+    .max(128, "Branch name must be at most 128 character"),
   document: z.array(documentSchema).optional(),
   ec: z.array(emergencyContactSchema).min(1),
   education: z.array(educationSchema).min(1),
@@ -148,7 +197,7 @@ const defaultValues = {
   id_department: 0,
   joining_date: "",
   whatsapp_no: "",
-  marital_status: "Single",
+  marital_status: "",
   address: "",
   job_title: "",
   job_status: "",
@@ -247,7 +296,7 @@ const InputField = ({
 
 const AddUserDetails = ({ step, setStep }) => {
   const [activeTab, setActiveTab] = useState("basic");
-  const [addUserDetailsInformation] = useAddUserMutation();
+  const [addUserDetailsInformation, { isLoading }] = useAddUserMutation();
   const { token } = useAuth();
   const { data } = useListDepartMentQuery(token);
   const { dep_data = [] } = data?.body || {};
@@ -458,6 +507,11 @@ const AddUserDetails = ({ step, setStep }) => {
 
   /* --------------------------- Render UI ----------------------------- */
 
+  if (isLoading) {
+    return <Loader />;
+  }
+  /* --------------------------- Render UI ----------------------------- */
+
   return (
     <section className="max-full mx-auto">
       <div className="flex justify-end gap-3">
@@ -549,28 +603,13 @@ const AddUserDetails = ({ step, setStep }) => {
 
                   <Controller
                     control={control}
-                    name="password"
-                    render={({ field }) => (
-                      <InputField
-                        label="Password"
-                        value={field.value}
-                        onChange={field.onChange}
-                        required
-                        Icon={KeyRound}
-                        error={errors?.password?.message}
-                      />
-                    )}
-                  />
-
-                  <Controller
-                    control={control}
                     name="job_title"
                     render={({ field }) => (
                       <InputField
                         label="Job Title"
                         value={field.value}
                         onChange={field.onChange}
-                        options={["Backend Developer", "Sales", "SEO", "HR"]}
+                        options={JOB_TITLES}
                         required
                         Icon={Briefcase}
                         error={errors?.job_title?.message}
@@ -585,7 +624,7 @@ const AddUserDetails = ({ step, setStep }) => {
                         label="Job Status"
                         value={field.value}
                         onChange={field.onChange}
-                        options={["Permanent", "Intern", "Contract", "Trainee"]}
+                        options={JOB_STATUSES}
                         required
                         Icon={Briefcase}
                         error={errors?.job_status?.message}
@@ -738,13 +777,7 @@ const AddUserDetails = ({ step, setStep }) => {
                         value={field.value}
                         onChange={field.onChange}
                         required
-                        options={[
-                          "Single",
-                          "Married",
-                          "Divorced",
-                          "Widowed",
-                          "Widower",
-                        ]}
+                        options={MARITAL_STATUSES}
                         Icon={Gem}
                         error={errors?.marital_status?.message}
                       />
@@ -760,16 +793,7 @@ const AddUserDetails = ({ step, setStep }) => {
                         onChange={field.onChange}
                         required
                         Icon={Droplets}
-                        options={[
-                          "A+",
-                          "A-",
-                          "B+",
-                          "B-",
-                          "AB+",
-                          "AB-",
-                          "O+",
-                          "O-",
-                        ]}
+                        options={BLOOD_GROUP}
                         error={errors?.blood_group?.message}
                       />
                     )}

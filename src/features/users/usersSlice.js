@@ -91,6 +91,41 @@ export const UsersSlice = createApi({
         body,
       }),
     }),
+    UpdateUserFamily: builder.mutation({
+      query: (payload) => ({
+        url: "/upd-user-family",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    UpdateUserEducation: builder.mutation({
+      query: (payload) => ({
+        url: "/upd-user-education",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+
+    UpdateUserEmergency: builder.mutation({
+      query: (payload) => ({
+        url: "/upd-user-emergency",
+        method: "POST",
+        body: payload,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+
     DeleteUser: builder.mutation({
       query: (payload) => ({
         url: "/del-user-data",
@@ -112,6 +147,9 @@ export const {
   useUsersAdditionalDetailsQuery,
   useAddUserMutation,
   useUpdateUserBasicMutation,
+  useUpdateUserFamilyMutation,
   useUpdateUserExperienceMutation,
+  useUpdateUserEducationMutation,
+  useUpdateUserEmergencyMutation,
   useDeleteUserMutation,
 } = UsersSlice;

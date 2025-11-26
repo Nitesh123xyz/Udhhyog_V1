@@ -13,6 +13,7 @@ import useAuth from "../../hooks/useAuth";
 import { formatDateToIndian, formatRupees } from "../../utils/formatter";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loader from "../../components/Loader";
 const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [preview, setPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -28,7 +29,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
     alt: d.type,
   }));
 
-  const { data, refetch } = useUsersAdditionalDetailsQuery({
+  const { data, refetch, isLoading } = useUsersAdditionalDetailsQuery({
     emp_id: employeesId,
     token: token,
   });
@@ -105,7 +106,8 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
             setOpenDialog={setOpenDialog}
           />
         </div>
-        <div className="mx-auto space-y-2 min-h-screen">
+        {isLoading && <Loader />}
+        <div className="mx-auto space-y-2 min-h-screen 2xl:min-h-[calc(100vh-130px)]">
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-3">
             <div className="p-2 rounded-lg border border-[var(--border)]">
               <h3 className="font-semibold mb-2 text-[var(--text)] relative">
@@ -233,7 +235,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -294,7 +296,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -404,7 +406,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem]  text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -431,7 +433,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                         <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {exp?.company}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)] capitalize">
+                        <td className=" border-t text-gray-400 border-[var(--border)] capitalize">
                           {exp?.role}
                         </td>
                         <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
@@ -440,7 +442,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                         <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
                           {formatDateToIndian(exp?.end_date)}
                         </td>
-                        <td className="p-2 border-t text-gray-400 border-[var(--border)] uppercase">
+                        <td className="p-3 border-t text-gray-400 border-[var(--border)] uppercase">
                           {exp?.end_date.slice(0, 4) -
                             exp?.start_date.slice(0, 4)}
                         </td>
@@ -471,7 +473,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="NavScroll max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
