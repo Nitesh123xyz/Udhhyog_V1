@@ -79,8 +79,20 @@ const formSchema = z.object({
   marital_status: z.string().optional().nullable(),
   incentive: z.number().optional().nullable(),
   email: z.string().email("Invalid email address"),
-  phone_no: z.string().optional().or(z.literal("")).nullable(),
-  whatsapp_no: z.string().optional().or(z.literal("")).nullable(),
+  phone_no: z
+    .string()
+    .min(10, "phone number must be at least 10 digits")
+    .max(10, "phone number cannot exceed 10 digits")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
+  whatsapp_no: z
+    .string()
+    .min(10, "whatsApp number must be at least 10 digits")
+    .max(10, "whatsApp number cannot exceed 10 digits")
+    .optional()
+    .or(z.literal(""))
+    .nullable(),
   dob: z.string().optional().nullable(),
   blood_group: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
@@ -816,7 +828,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               }}
               className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
             >
-              <Save size={18} className="text-[var(--text)]" />
+              <Save size={18} className="text-white" />
             </button>
           </div>
         </div>
@@ -830,9 +842,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
             <button
               type="button"
               onClick={() => docsField.append({ type: "", doc: "", url: "" })}
-              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-green-400"
+              className="text-sm p-2.5 rounded-full text-white bg-green-500"
             >
-              <Plus size={16} />
+              <Plus size={18} />
             </button>
           </div>
 
@@ -863,7 +875,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                     onClick={() => docsField.remove(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <X size={14} className="text-[var(--text)]" />
+                    <X size={18} className="text-white" />
                   </button>
                 </div>
                 {errors.documents?.[i] && (
@@ -890,9 +902,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               onClick={() =>
                 emField.append({ name: "", relation: "", phone_no: "" })
               }
-              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-green-400"
+              className="text-sm p-2.5 rounded-full text-white bg-green-500"
             >
-              <Plus size={16} />
+              <Plus size={18} />
             </button>
           </div>
 
@@ -935,14 +947,14 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                     onClick={() => UpdateUserEmergencyInformation(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <Save size={18} className="text-[var(--text)]" />
+                    <Save size={18} className="text-white" />
                   </button>
                   <button
                     type="button"
                     onClick={() => emField.remove(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <X size={18} className="text-[var(--text)]" />
+                    <X size={18} className="text-white" />
                   </button>
                 </div>
               </div>
@@ -967,9 +979,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   year: 0,
                 })
               }
-              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-green-400"
+              className="text-sm p-2.5 rounded-full text-white bg-green-500"
             >
-              <Plus size={16} />
+              <Plus size={18} />
             </button>
           </div>
 
@@ -1025,14 +1037,14 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                       onClick={() => UpdateUserEducationInformation(i)}
                       className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
                     >
-                      <Save size={18} className="text-[var(--text)]" />
+                      <Save size={18} className="text-white" />
                     </button>
                     <button
                       type="button"
                       onClick={() => eduField.remove(i)}
                       className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                     >
-                      <X size={18} className="text-[var(--text)]" />
+                      <X size={18} className="text-white" />
                     </button>
                   </div>
                 </div>
@@ -1058,9 +1070,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   occupation: "",
                 })
               }
-              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-green-400"
+              className="cursor-pointer text-sm p-2.5 rounded-full text-white bg-green-500"
             >
-              <Plus size={16} />
+              <Plus size={18} />
             </button>
           </div>
 
@@ -1112,14 +1124,14 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                     onClick={() => UpdateUserFamilyInformation(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <Save size={18} className="text-[var(--text)]" />
+                    <Save size={18} className="text-white" />
                   </button>
                   <button
                     type="button"
                     onClick={() => famField.remove(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <X size={18} className="text-[var(--text)]" />
+                    <X size={18} className="text-white" />
                   </button>
                 </div>
               </div>
@@ -1145,9 +1157,9 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                   year: 0,
                 })
               }
-              className="text-sm p-2 lg:p-3 rounded-full border border-[var(--border)] text-[var(--icon_text)] bg-green-400"
+              className="text-sm p-2.5 rounded-full text-white bg-green-500"
             >
-              <Plus size={16} />
+              <Plus size={18} />
             </button>
           </div>
 
@@ -1201,14 +1213,14 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
                     onClick={() => UpdateUserExperienceInformation(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <Save size={18} className="text-[var(--text)]" />
+                    <Save size={18} className="text-white" />
                   </button>
                   <button
                     type="button"
                     onClick={() => expField.remove(i)}
                     className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
                   >
-                    <X size={18} className="text-[var(--text)]" />
+                    <X size={18} className="text-white" />
                   </button>
                 </div>
               </div>

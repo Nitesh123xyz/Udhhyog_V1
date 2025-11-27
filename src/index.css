@@ -27,6 +27,7 @@ body {
   --letSideNavbarBg: rgba(255, 255, 255, 0.1);
   --border: #d1d5db;
   --foreground: #000000;
+  --transparent-30: #80ffffff;
   --transparent-50: #80ffffff;
   --divide: #eeeeee;
   --icon: #000;
@@ -49,6 +50,7 @@ body {
   --letSideNavbarBg: #1e2939;
   --border: #4b5563;
   --foreground: #f9fafb;
+  --transparent-30: #ffffff4d;
   --transparent-50: #000;
   --divide: #757575;
   --icon: #fff;
