@@ -5,7 +5,6 @@ import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
 import MultilayerAuth from "../pages/2FA/MultilayerAuth";
-import TeamTable from "../pages/teams/TeamTable";
 // ---------------------------------------------------
 
 const UserTableInfo = lazy(() => import("../pages/user/User"));
@@ -16,6 +15,7 @@ const ResetPassword = lazy(() =>
 );
 const Setting = lazy(() => import("../pages/Setting"));
 const PageNotFound = lazy(() => import("../pages/PageNotFound"));
+const TeamManage = lazy(() => import("../pages/teams/TeamManage"));
 
 const router = createBrowserRouter([
   {
@@ -82,9 +82,9 @@ const router = createBrowserRouter([
         path: "/teams",
         element: (
           <ProtectedRoute>
-            {/* <PermissionGate>
-            </PermissionGate> */}
-            <TeamTable />
+            <PermissionGate>
+              <TeamManage />
+            </PermissionGate>
           </ProtectedRoute>
         ),
         caseSensitive: true,

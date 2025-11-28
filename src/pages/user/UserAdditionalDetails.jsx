@@ -61,8 +61,6 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
     education,
   } = data?.body || {};
 
-  console.log(data?.body);
-
   const handleRefetch = useCallback(() => {
     refetch();
   }, [refetch]);

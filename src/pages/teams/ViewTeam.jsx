@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 
-const TaskAccordion = () => {
+const ViewTeam = ({ setStep, teamId }) => {
   const [openSection, setOpenSection] = useState(null);
 
   const [people, setPeople] = useState([
@@ -20,6 +20,8 @@ const TaskAccordion = () => {
     { id: "Credit", title: "Credit" },
     { id: "Recovery", title: "Recovery" },
   ];
+
+  console.log(teamId);
 
   const toggleSection = (id) => {
     if (id === "unassigned") return;
@@ -273,4 +275,4 @@ const TaskAccordion = () => {
   );
 };
 
-export default TaskAccordion;
+export default ViewTeam;

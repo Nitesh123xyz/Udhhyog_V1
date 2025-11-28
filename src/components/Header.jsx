@@ -33,8 +33,6 @@ const Header = ({
   const { token } = useAuth();
   const dispatch = useDispatch();
 
-  console.log(title);
-
   useEffect(() => {
     // Skip first render
     if (isFirstRender.current) {

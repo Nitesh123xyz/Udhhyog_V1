@@ -30,7 +30,6 @@ const AllProfileMenu = () => {
   //   --------------------------------------------
 
   const handleSelectMenu = (item) => {
-    console.log(item);
     setSelected(item);
     setOpen(false);
     dispatch(setProfileMenuList(item?.emp_id));

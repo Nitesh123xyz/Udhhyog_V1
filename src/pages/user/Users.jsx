@@ -32,7 +32,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
   const [getUserInfo, { isLoading }] = useGetUsersMutation();
   const [getQueryInfo, { isLoading: queryLoading }] = useQueryUsersMutation();
   const { searchLoading } = useSelector((state) => state.UtileSlice);
-  console.log(searchLoading);
+
   const { token } = useAuth();
   const loading = Boolean(isLoading || queryLoading || searchLoading);
 
@@ -142,8 +142,6 @@ const Users = ({ step, setStep, setEmployeesId }) => {
       </>
     );
   };
-
-  console.log(rows);
 
   // ------------------------------------------------------
   return (

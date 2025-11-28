@@ -183,8 +183,6 @@ const Permission = () => {
       return;
     }
 
-    console.log(changedMap);
-
     const diffs = Object.values(changedMap);
     if (diffs.length === 0) {
       toast.success("No changes to save.");
@@ -224,7 +222,6 @@ const Permission = () => {
       }
     }
   };
-  console.log(permissionDataList);
 
   const sortedRows = permissionDataList
     ? permissionDataList?.sort((a, b) => a.page_id - b.page_id)

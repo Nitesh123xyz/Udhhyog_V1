@@ -450,7 +450,7 @@ const AddUserDetails = ({ step, setStep }) => {
         ...data,
         token: token,
       }).unwrap();
-      console.log(result);
+
       if (result?.status === 200) {
         toast.success("User Added Successfully");
         setStep(1);
@@ -496,9 +496,7 @@ const AddUserDetails = ({ step, setStep }) => {
     if (valid && nextTabId) {
       enableTab(nextTabId);
       setActiveTab(nextTabId);
-    } else {
-      console.log("Validation failed for", activeTab);
-    }
+    } 
   };
 
   const handleBack = () => {

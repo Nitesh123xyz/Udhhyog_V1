@@ -26,8 +26,6 @@ export const useMenu = () => {
       const menuItems = transformMenu(Array.isArray(menu) ? menu : []);
       setMenuList(menuItems);
       setUserInfo({ emp_name, emp_profile });
-    } else {
-      console.log("Menu fetch failed:");
     }
     setLoading(false);
   };
