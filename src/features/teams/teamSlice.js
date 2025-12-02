@@ -35,7 +35,34 @@ export const TeamsSlice = createApi({
         body,
       }),
     }),
+    AddUserTeamHead: builder.mutation({
+      query: (teamData) => ({
+        url: "/add-user-team-head",
+        method: "POST",
+        body: teamData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    DeleteUserTeamHead: builder.mutation({
+      query: (teamData) => ({
+        url: "/del-user-team-head",
+        method: "POST",
+        body: teamData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllTeamQuery, useViewTeamQuery } = TeamsSlice;
+export const {
+  useGetAllTeamQuery,
+  useViewTeamQuery,
+  useAddUserTeamHeadMutation,
+  useDeleteUserTeamHeadMutation,
+} = TeamsSlice;

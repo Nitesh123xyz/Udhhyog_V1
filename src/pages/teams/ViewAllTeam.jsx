@@ -24,10 +24,8 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
     });
   }, [teams, query]);
 
-  console.log(teams);
-
   return (
-    <div className="min-h-screen lg:min-h-[calc(100vh-60px)] p-4 md:p-6 lg:p-8 bg-[var(--background)] rounded-lg">
+    <div className="min-h-screen md:min-h-[calc(100vh-0px)] p-4 md:p-6 lg:p-8 bg-[var(--background)] rounded-lg">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
@@ -76,7 +74,6 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filtered?.map((member) => {
-            console.log(member);
             return (
               <article
                 key={member?.team_id}

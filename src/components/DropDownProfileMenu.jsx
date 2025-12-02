@@ -14,10 +14,37 @@ import {
 } from "../utils/StoreSessionInfo";
 import FontSwitch from "../components/FontSwitch";
 import TextScaler from "./TextScaler";
-
+import useAuth from "../hooks/useAuth";
+import { useUsersPreferenceQuery } from "../features/users/usersSlice";
+import base32 from "hi-base32";
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
+  const { token } = useAuth();
   const boxRef = useRef(null);
   const [themeMode, setTheme] = useState(getThemeMode());
+  const preferenceSetting = {
+    token: token,
+    thememode: "light",
+    appfontweight: "font-default",
+    appscale: "1",
+    photo_url: "abc",
+  };
+  const encoded = base32.encode(JSON.stringify(preferenceSetting));
+
+  const { currentData } = useUsersPreferenceQuery({ data: encoded });
+  const res = currentData?.body?.data; // ← This must be a Base32 string
+
+  let decoded = null;
+
+  if (typeof res === "string" && /^[A-Z2-7]+=*$/i.test(res)) {
+    try {
+      decoded = JSON.parse(base32.decode(res));
+      console.log("Decoded:", decoded);
+    } catch (err) {
+      console.error("Base32 decode failed:", err);
+    }
+  } else {
+    console.warn("Response is NOT base32:", res);
+  }
 
   // -------------------------------------------------------
 

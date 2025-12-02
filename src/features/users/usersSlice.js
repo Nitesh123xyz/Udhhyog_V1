@@ -13,6 +13,17 @@ export const UsersSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
+    UsersPreference: builder.query({
+      query: (preferenceInfo) => ({
+        url: "/user-preference",
+        method: "POST",
+        body: preferenceInfo,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
     GetUsers: builder.mutation({
       query: (Token) => ({
         url: "/users",
@@ -141,6 +152,7 @@ export const UsersSlice = createApi({
 });
 
 export const {
+  useUsersPreferenceQuery,
   useGetUsersMutation,
   useSearchUsersMutation,
   useQueryUsersMutation,
