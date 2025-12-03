@@ -114,7 +114,7 @@ const ChangePassword = ({ sharing_otp }) => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
-      <div className="absolute inset-0 opacity-60">
+      <div className="absolute inset-0 opacity-80">
         <Animation />
       </div>
 
@@ -131,12 +131,12 @@ const ChangePassword = ({ sharing_otp }) => {
 
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           <div className="text-center mb-6 sm:mb-6">
-            <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
+            <h1 className="text-gray-600 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
-            <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
+            <p className="text-gray-500 text-[0.8rem] sm:text-base mt-2">
               Reset your password <br />
-              <span className="text-[0.7rem] sm:text-xs">
+              <span className="text-[0.7rem] sm:text-xs text-red-500">
                 Don't Refresh the Page
               </span>
             </p>
@@ -156,7 +156,7 @@ const ChangePassword = ({ sharing_otp }) => {
                 type={showPassword.input1 ? "text" : "password"}
                 placeholder="Password"
                 autoComplete="new-password"
-                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
+                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl placeholder-gray-500 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
                   errors.password ? "border-red-500" : ""
                 }`}
                 {...ResetPassword("password")}
@@ -165,7 +165,7 @@ const ChangePassword = ({ sharing_otp }) => {
 
               {passwordsMatch ? (
                 <span
-                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-green-400"
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-blue-600"
                   aria-label="Passwords match"
                 >
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -176,7 +176,7 @@ const ChangePassword = ({ sharing_otp }) => {
                   onClick={() =>
                     setShowPassword((pre) => ({ ...pre, input1: !pre.input1 }))
                   }
-                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-500 transition-colors hover:text-gray-800"
                   aria-label={
                     showPassword.input1
                       ? "Hide confirm password"
@@ -209,7 +209,7 @@ const ChangePassword = ({ sharing_otp }) => {
                 type={showPassword.input2 ? "text" : "password"}
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
+                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl placeholder-gray-500 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors ${
                   errors.confirmPassword ? "border-red-500" : ""
                 }`}
                 {...ResetPassword("confirmPassword")}
@@ -222,7 +222,7 @@ const ChangePassword = ({ sharing_otp }) => {
               */}
               {passwordsMatch ? (
                 <span
-                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-green-400"
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-blue-600"
                   aria-label="Passwords match"
                 >
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -233,7 +233,7 @@ const ChangePassword = ({ sharing_otp }) => {
                   onClick={() =>
                     setShowPassword((pre) => ({ ...pre, input2: !pre.input2 }))
                   }
-                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                  className="absolute top-0 translate-y-[100%] right-0 pr-3 sm:pr-4 flex items-center text-gray-500 transition-colors hover:text-gray-800"
                   aria-label={
                     showPassword.input2
                       ? "Hide confirm password"
@@ -267,7 +267,7 @@ const ChangePassword = ({ sharing_otp }) => {
                 >
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
-                      allPassed ? "bg-green-500" : "bg-white/30"
+                      allPassed ? "bg-blue-500" : "bg-blue-500"
                     }`}
                     style={{ width: `${strengthPct}%` }}
                     aria-hidden
@@ -278,15 +278,15 @@ const ChangePassword = ({ sharing_otp }) => {
                 <div className="mt-2 flex items-center gap-2">
                   <ShieldCheck
                     className={`w-4 h-4 ${
-                      allPassed ? "text-green-400" : "text-gray-400"
+                      allPassed ? "text-gray-800" : "text-gray-800"
                     }`}
                   />
                   <span
                     className={`text-xs ${
-                      allPassed ? "text-green-400" : "text-gray-300"
+                      allPassed ? "text-gray-800" : "text-gray-800"
                     }`}
                   >
-                    Strength: {strengthPct}%
+                    Strength: <span className="text-red-700">{strengthPct}%</span>
                   </span>
                 </div>
               </div>
@@ -300,13 +300,13 @@ const ChangePassword = ({ sharing_otp }) => {
                 {requirements.map((r) => (
                   <li key={r.id} className="flex items-center gap-2">
                     {r.test ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
                     ) : (
                       <Circle className="w-4 h-4 text-gray-400" />
                     )}
                     <span
                       className={`text-xs ${
-                        r.test ? "text-green-300" : "text-gray-300"
+                        r.test ? "text-gray-800" : "text-gray-800"
                       }`}
                     >
                       {r.label}
@@ -320,11 +320,11 @@ const ChangePassword = ({ sharing_otp }) => {
             <button
               type="submit"
               disabled={!canSubmit}
-              className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl text-white backdrop-blur-sm text-sm sm:text-base font-medium transition-all
+              className={`cursor-pointer w-full py-3 sm:py-4 rounded-lg sm:rounded-xl backdrop-blur-sm text-sm sm:text-base font-medium transition-all
               ${
                 !canSubmit
-                  ? "bg-white/5 border border-white/10 cursor-not-allowed opacity-60"
-                  : "bg-white/1 border border-white/20 hover:bg-white/10 hover:border-white/30"
+                  ? "bg-white/5 border border-white/10 text-gray-400 cursor-not-allowed opacity-60"
+                  : "bg-white/1 border border-white/20 text-gray-600 hover:bg-white/10 hover:border-white/30"
               }`}
             >
               {isLoading ? (
@@ -340,7 +340,7 @@ const ChangePassword = ({ sharing_otp }) => {
             <div className="text-center">
               <Link
                 to="/"
-                className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
+                className="text-gray-500 text-xs sm:text-sm transition-colors hover:text-gray-800 not-only:inline-flex items-center justify-center flex-wrap gap-1"
               >
                 <span className="break-words">
                   Udhhyog - One Stop Shop for All Industrial Needs

@@ -32,7 +32,7 @@ export const showCustomToast = (message, icon, title = "Notification") => {
       </div>
       <div
         onClick={() => toast.dismiss(t.id)}
-        className="absolute right-1.5 top-1 p-1 cursor-pointer rounded-full bg-white/10"
+        className="absolute right-1.5 top-1 p-1 cursor-pointer rounded-full bg-gray-300"
       >
         <X className="text-white w-3 h-3" />
       </div>

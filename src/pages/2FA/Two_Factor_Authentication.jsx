@@ -2,7 +2,7 @@ import React, { lazy, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTwoFactorAuthenticationMutation } from "../../features/auth/authSlice";
 import { fetchWithErrorHandling } from "../../utils/ApiResponse";
 import { showCustomToast } from "../../components/CustomToast";
@@ -155,7 +155,7 @@ const Two_Factor_Authentication = ({ authData }) => {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
-      <div className="absolute inset-0 opacity-60">
+      <div className="absolute inset-0 opacity-80">
         <Animation />
       </div>
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
@@ -171,11 +171,11 @@ const Two_Factor_Authentication = ({ authData }) => {
 
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           <div className="text-center mb-5 sm:mb-5">
-            <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
+            <h1 className="text-gray-600 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
             {!authData?.twofa_url && (
-              <p className="text-gray-100 text-[1rem] my-3">
+              <p className="text-gray-500 text-[1rem] my-3">
                 ! Enter Code to Authenticate
               </p>
             )}
@@ -239,7 +239,7 @@ const Two_Factor_Authentication = ({ authData }) => {
                   onPaste={handlePaste}
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="w-full h-10 sm:h-12 text-center bg-white/1 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base"
+                  className="w-full h-10 sm:h-12 text-center bg-white/1 border border-white/20 rounded-lg focus:outline-none backdrop-blur-sm text-sm sm:text-base"
                 />
               ))}
             </div>
@@ -248,11 +248,11 @@ const Two_Factor_Authentication = ({ authData }) => {
               id="submit-2fa"
               type="submit"
               disabled={btnDisabled}
-              className={`w-full py-3 sm:py-3 border rounded-lg text-sm sm:text-base font-medium transition-all
+              className={`cursor-pointer w-full py-3 sm:py-3 border rounded-lg text-sm sm:text-base font-medium transition-all
           ${
             btnDisabled
               ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
-              : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40"
+              : "bg-white/10 border-white/30 text-gray-600 hover:bg-white/20 hover:border-white/40"
           }`}
             >
               {isLoading ? (
@@ -266,11 +266,11 @@ const Two_Factor_Authentication = ({ authData }) => {
             </button>
 
             <div className="text-center">
-              <a className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1">
+              <Link className="text-gray-500 cursor-pointer text-xs sm:text-sm transition-colors hover:text-gray-800 inline-flex items-center justify-center flex-wrap gap-1">
                 <span className="break-words">
                   Udhhyog - One Stop Shop for All Industrial Needs
                 </span>
-              </a>
+              </Link>
             </div>
           </form>
         </div>

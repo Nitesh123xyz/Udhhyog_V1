@@ -56,7 +56,7 @@ const ForgotPassword = ({ setStep }) => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
-      <div className="absolute inset-0 opacity-60">
+      <div className="absolute inset-0 opacity-80">
         <Animation />
       </div>
 
@@ -74,10 +74,10 @@ const ForgotPassword = ({ setStep }) => {
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-8">
-            <h1 className="text-[1.3rem] sm:text-[2rem] font-bold text-white mb-3">
+            <h1 className="text-[1.3rem] sm:text-[2rem] font-bold text-gray-600 mb-3">
               UDHHYOG CRM V1
             </h1>
-            <p className="text-gray-100 max-w-[12rem] md:max-w-[16rem] mx-auto text-[10px] md:text-sm sm:text-base capitalize">
+            <p className="text-gray-500 max-w-[12rem] md:max-w-[16rem] mx-auto text-[10px] md:text-sm sm:text-base capitalize">
               Forgot your password Please enter your email address
             </p>
           </div>
@@ -93,7 +93,7 @@ const ForgotPassword = ({ setStep }) => {
               <input
                 type="text"
                 placeholder="Email"
-                className="w-full pl-10 sm:pl-12 py-3 sm:py-4  bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 placeholder:text-[11px] md:placeholder:text-[16px] focus:outline-none backdrop-blur-sm text-xs md:text-md sm:text-base focus:border-white/40 transition-colors"
+                className="w-full pl-10 sm:pl-12 py-3 sm:py-4  bg-white/1 border border-white/20 rounded-lg sm:rounded-xl placeholder-gray-500 placeholder:text-[11px] md:placeholder:text-[16px] focus:outline-none backdrop-blur-sm text-xs md:text-md sm:text-base focus:border-white/40 transition-colors"
                 {...ForgotUserPassword("email")}
               />
             </div>
@@ -105,7 +105,7 @@ const ForgotPassword = ({ setStep }) => {
               ${
                 btnDisabled
                   ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
-                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40 cursor-pointer"
+                  : "bg-white/10 border-white/30 text-gray-600 hover:bg-white/20 hover:border-white/40 cursor-pointer"
               }
              `}
             >
@@ -124,7 +124,7 @@ const ForgotPassword = ({ setStep }) => {
             <div className="text-center">
               <Link
                 to="/"
-                className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
+                className="text-gray-500 text-xs sm:text-sm transition-colors hover:text-gray-800 inline-flex items-center justify-center flex-wrap gap-1"
               >
                 <ArrowLeft size={14} className="inline sm:w-4 sm:h-4" />
                 <span className="text-[11px] md:text-[15px]">

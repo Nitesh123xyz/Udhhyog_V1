@@ -9,48 +9,6 @@ export const getLeftSideNavigationMenu = () =>
   JSON.parse(sessionStorage.getItem(MenuKey)) || [];
 
 // ------------------------------------------------------
-
-const FontWeightKey = "AppFontWeight";
-export const setAppFontWeight = (FontWeight) => {
-  FontWeight
-    ? localStorage.setItem(FontWeightKey, FontWeight)
-    : localStorage.removeItem(FontWeightKey);
-};
-export const getAppFontWeight = () =>
-  localStorage.getItem(FontWeightKey) || "font-default";
-
-// ------------------------------------------------------
-
-export const SCALE_KEY = "app_scale";
-
-/** returns a number (scale), falls back to 1 */
-export function getAppScale() {
-  try {
-    const v = localStorage.getItem(SCALE_KEY);
-    return v ? parseFloat(v) : 1;
-  } catch (e) {
-    return 1;
-  }
-}
-
-export function setAppScale(scale) {
-  try {
-    localStorage.setItem(SCALE_KEY, String(scale));
-  } catch (e) {}
-}
-
-// ------------------------------------------------------
-
-const ThemeKey = "ThemeMode";
-
-export const setThemeMode = (Theme) => {
-  Theme
-    ? localStorage.setItem(ThemeKey, Theme)
-    : localStorage.removeItem(ThemeKey);
-};
-export const getThemeMode = () => localStorage.getItem(ThemeKey) || "light";
-
-// ------------------------------------------------------
 const UserKey = "UserInfo";
 
 export const setUserInfo = (UserInfo) => {
@@ -96,21 +54,8 @@ export const clearSessionExpire = () => {
 // ------------------------------------------------------
 
 export const clearSession = () => {
-  const theme = localStorage.getItem("ThemeMode");
   sessionStorage.clear();
   localStorage.clear();
-  if (theme) {
-    localStorage.setItem("ThemeMode", theme);
-  }
-};
-
-export const clearAllSession = () => {
-  const theme = localStorage.getItem("ThemeMode");
-  sessionStorage.clear();
-  localStorage.clear();
-  if (theme) {
-    localStorage.setItem("ThemeMode", theme);
-  }
 };
 
 // ------------------------------------------------------

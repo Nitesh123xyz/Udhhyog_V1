@@ -23,7 +23,7 @@ const Animation = () => {
       autoPlay: true,
       background: {
         color: {
-          value: "black",
+          value: "#fff",
         },
         image: "",
         position: "",
@@ -36,7 +36,7 @@ const Animation = () => {
         cover: {
           opacity: 1,
           color: {
-            value: "white",
+            value: "",
           },
         },
         enable: false,
@@ -161,17 +161,17 @@ const Animation = () => {
             area: {
               gradient: {
                 start: {
-                  value: "#fff",
+                  value: "#ffffff",
                 },
                 stop: {
-                  value: "#000",
+                  value: "#000000",
                 },
               },
               radius: 1000,
             },
             shadow: {
               color: {
-                value: "#000",
+                value: "#000000",
               },
               length: 2000,
             },
@@ -209,7 +209,7 @@ const Animation = () => {
           },
         },
         color: {
-          value: "#ffffff",
+          value: "#000",
           animation: {
             h: {
               count: 0,
@@ -484,7 +484,7 @@ const Animation = () => {
         links: {
           blink: false,
           color: {
-            value: "#ffffff",
+            value: "#000",
           },
           consent: false,
           distance: 150,

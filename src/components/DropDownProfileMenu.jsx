@@ -7,51 +7,56 @@ import {
   CaseSensitive,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import {
-  clearAllSession,
-  getThemeMode,
-  setThemeMode,
-} from "../utils/StoreSessionInfo";
+import { clearSession } from "../utils/StoreSessionInfo";
 import FontSwitch from "../components/FontSwitch";
 import TextScaler from "./TextScaler";
 import useAuth from "../hooks/useAuth";
-import { useUsersPreferenceQuery } from "../features/users/usersSlice";
+import {
+  useGetUsersPreferenceQuery,
+  useUpdateUsersPreferenceMutation,
+} from "../features/users/usersSlice";
 import base32 from "hi-base32";
+import toast from "react-hot-toast";
 const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
   const { token } = useAuth();
   const boxRef = useRef(null);
-  const [themeMode, setTheme] = useState(getThemeMode());
-  const preferenceSetting = {
-    token: token,
-    thememode: "light",
-    appfontweight: "font-default",
-    appscale: "1",
-    photo_url: "abc",
-  };
-  const encoded = base32.encode(JSON.stringify(preferenceSetting));
+  const [themeMode, setTheme] = useState();
+  const [font, setFont] = useState();
+  const [scale, setScale] = useState();
+  const [UpdatePreference] = useUpdateUsersPreferenceMutation();
 
-  const { currentData } = useUsersPreferenceQuery({ data: encoded });
-  const res = currentData?.body?.data; // ← This must be a Base32 string
+  // -------------------------------------------------------
 
-  let decoded = null;
+  // getting user preferences
 
-  if (typeof res === "string" && /^[A-Z2-7]+=*$/i.test(res)) {
-    try {
-      decoded = JSON.parse(base32.decode(res));
-      console.log("Decoded:", decoded);
-    } catch (err) {
-      console.error("Base32 decode failed:", err);
+  const encoded = base32.encode(JSON.stringify({ token: token }));
+  const { currentData } = useGetUsersPreferenceQuery({
+    data: encoded,
+  });
+  const res = currentData?.body?.data;
+
+  useEffect(() => {
+    if (!res) return;
+    if (typeof res === "string" && /^[A-Z2-7]+=*$/i.test(res)) {
+      try {
+        const decoded = JSON.parse(base32.decode(res));
+        setTheme(decoded?.thememode);
+        setFont(decoded?.appfontweight);
+        setScale(decoded?.appscale);
+      } catch (err) {
+        toast.error("Base32 decode failed:", err);
+      }
+    } else {
+      toast.error("Response is NOT base32:", res);
     }
-  } else {
-    console.warn("Response is NOT base32:", res);
-  }
+  }, [res]);
 
   // -------------------------------------------------------
 
   const handleClick = (item) => {
     if (!item.clickable) return;
     if (item.isLogout) {
-      clearAllSession();
+      clearSession();
       window.location.href = "/";
     } else if (item.path) {
       window.location.href = item.path;
@@ -75,10 +80,23 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
 
   // -------------------------------------------------------
 
-  const handleToggleTheme = () => {
+  const handleToggleTheme = async () => {
     const newMode = themeMode === "light" ? "dark" : "light";
     setTheme(newMode);
-    setThemeMode(newMode);
+    const preferenceSetting = {
+      token: token,
+      thememode: newMode,
+      appfontweight: font,
+      appscale: scale,
+      photo_url: "abc",
+    };
+    const encoded = base32.encode(JSON.stringify(preferenceSetting));
+    const { status } = await UpdatePreference({
+      data: encoded,
+    }).unwrap();
+    if (status === 200) {
+      toast.success(`${newMode} Mode Enable`);
+    }
   };
 
   useEffect(() => {
@@ -187,7 +205,12 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       onMouseDown={(e) => e.stopPropagation()}
                       className="ml-3"
                     >
-                      <FontSwitch />
+                      <FontSwitch
+                        themeMode={themeMode}
+                        font={font}
+                        setFont={setFont}
+                        scale={scale}
+                      />
                     </div>
                   )}
 
@@ -197,7 +220,12 @@ const DropDownProfileMenu = ({ openPopup, setOpenPopup }) => {
                       onMouseDown={(e) => e.stopPropagation()}
                       className="ml-3"
                     >
-                      <TextScaler />
+                      <TextScaler
+                        themeMode={themeMode}
+                        scale={scale}
+                        setScale={setScale}
+                        font={font}
+                      />
                     </div>
                   )}
                 </button>

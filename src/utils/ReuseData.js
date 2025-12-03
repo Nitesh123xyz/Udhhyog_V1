@@ -91,6 +91,76 @@ export const BLOOD_GROUP = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // ---------------------------------------------------
 
+// Colors in view team
+
+export const COLOR_LIST = [
+  { name: "Blue", colorname: "blue", value: "blue-500", hexcode: "#1F75FE" },
+  { name: "Green", colorname: "green", value: "green-500", hexcode: "#10B981" },
+  { name: "Red", colorname: "red", value: "red-500", hexcode: "#EF4444" },
+  {
+    name: "Purple",
+    colorname: "purple",
+    value: "purple-500",
+    hexcode: "#8B5CF6",
+  },
+  { name: "Amber", colorname: "amber", value: "amber-500", hexcode: "#F59E0B" },
+  { name: "Slate", colorname: "slate", value: "slate-500", hexcode: "#64748B" },
+  { name: "Teal", colorname: "teal", value: "teal-500", hexcode: "#14B8A6" },
+  {
+    name: "Indigo",
+    colorname: "indigo",
+    value: "indigo-500",
+    hexcode: "#6366F1",
+  },
+  { name: "Pink", colorname: "pink", value: "pink-500", hexcode: "#EC4899" },
+  {
+    name: "Yellow",
+    colorname: "yellow",
+    value: "yellow-400",
+    hexcode: "#FBBF24",
+  },
+  { name: "Cyan", colorname: "cyan", value: "cyan-500", hexcode: "#06B6D4" },
+  { name: "Lime", colorname: "lime", value: "lime-500", hexcode: "#84CC16" },
+  { name: "Rose", colorname: "rose", value: "rose-500", hexcode: "#FB7185" },
+  {
+    name: "Orange",
+    colorname: "orange",
+    value: "orange-500",
+    hexcode: "#FB923C",
+  },
+  {
+    name: "Violet",
+    colorname: "violet",
+    value: "violet-500",
+    hexcode: "#7C3AED",
+  },
+  { name: "Brown", colorname: "brown", value: "brown-500", hexcode: "#8B5E3C" },
+  { name: "Olive", colorname: "olive", value: "olive-500", hexcode: "#6B8E23" },
+  { name: "Mint", colorname: "mint", value: "mint-500", hexcode: "#3EB489" },
+  { name: "Sky", colorname: "sky", value: "sky-500", hexcode: "#38BDF8" },
+  { name: "Steel", colorname: "steel", value: "steel-500", hexcode: "#4B5563" },
+  {
+    name: "Charcoal",
+    colorname: "charcoal",
+    value: "charcoal-500",
+    hexcode: "#2D3748",
+  },
+  {
+    name: "Teal Dark",
+    colorname: "teal-dark",
+    value: "teal-700",
+    hexcode: "#0F766E",
+  },
+  {
+    name: "Mustard",
+    colorname: "mustard",
+    value: "mustard-500",
+    hexcode: "#D97706",
+  },
+];
+
+// ---------------------------------------------------
+
 // Theme Mode
 
 export const ActiveTheme = [

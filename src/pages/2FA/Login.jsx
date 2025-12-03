@@ -75,7 +75,7 @@ const Login = ({ setStep, setAuthData }) => {
   return (
     <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
       {/* Background Animation */}
-      <div className="absolute inset-0 opacity-60">
+      <div className="absolute inset-0 opacity-80">
         <Animation />
       </div>
 
@@ -94,10 +94,10 @@ const Login = ({ setStep, setAuthData }) => {
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
           {/* Header */}
           <div className="text-center mb-6 sm:mb-6">
-            <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
+            <h1 className="text-gray-600 text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
-            <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
+            <p className="text-gray-500 text-[0.8rem] sm:text-base mt-2">
               Log in to your account
             </p>
           </div>
@@ -114,7 +114,7 @@ const Login = ({ setStep, setAuthData }) => {
                 type="text"
                 placeholder="Email"
                 autoComplete="off"
-                className="w-full pl-10 sm:pl-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors"
+                className="w-full pl-10 sm:pl-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl placeholder-gray-500 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors"
                 {...LoginUser("email")}
               />
             </div>
@@ -128,13 +128,13 @@ const Login = ({ setStep, setAuthData }) => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 autoComplete="off"
-                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl text-white placeholder-gray-300 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors`}
+                className={`w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-4 bg-white/1 border border-white/20 rounded-lg sm:rounded-xl placeholder-gray-500 focus:outline-none backdrop-blur-sm text-sm sm:text-base focus:border-white/40 transition-colors`}
                 {...LoginUser("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-400 hover:text-white transition-colors"
+                className="cursor-pointer absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-gray-500 transition-colors hover:text-gray-800"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -147,7 +147,7 @@ const Login = ({ setStep, setAuthData }) => {
             <div className="flex mb-3 mt-0 items-end justify-end text-xs sm:text-sm">
               <Link
                 to="/reset-password"
-                className="text-gray-100 hover:text-white transition-colors"
+                className="text-gray-500 cursor-pointer transition-colors hover:text-gray-800"
               >
                 Forgot password?
               </Link>
@@ -160,7 +160,7 @@ const Login = ({ setStep, setAuthData }) => {
               ${
                 btnDisabled
                   ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
-                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40 cursor-pointer"
+                  : "bg-white/10 border-white/30 text-gray-600 hover:bg-white/20 hover:border-white/40 cursor-pointer"
               }
              `}
             >
@@ -177,7 +177,7 @@ const Login = ({ setStep, setAuthData }) => {
             <div className="text-center">
               <Link
                 to="/"
-                className="text-gray-100 text-xs sm:text-sm transition-colors hover:text-white inline-flex items-center justify-center flex-wrap gap-1"
+                className="text-gray-500 cursor-pointer text-xs sm:text-sm transition-colors hover:text-gray-800 inline-flex items-center justify-center flex-wrap gap-1"
               >
                 <span className="break-words">
                   Udhhyog - One Stop Shop for All Industrial Needs

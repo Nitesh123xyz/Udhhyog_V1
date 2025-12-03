@@ -182,7 +182,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
     <>
       <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
         {/* Background Animation */}
-        <div className="absolute inset-0 opacity-60">
+        <div className="absolute inset-0 opacity-80">
           <Animation />
         </div>
 
@@ -199,10 +199,10 @@ const Otp = ({ setStep, setSharingOtp }) => {
 
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
             <div className="text-center mb-6 sm:mb-6">
-              <h1 className="text-gray-100 text-[1.3rem] sm:text-[2rem] font-bold">
+              <h1 className="text-gray-600 text-[1.3rem] sm:text-[2rem] font-bold">
                 UDHHYOG CRM V1
               </h1>
-              <p className="text-gray-100 text-[0.8rem] sm:text-base mt-2">
+              <p className="text-gray-500 text-[0.8rem] sm:text-base mt-2">
                 OTP Verification
               </p>
             </div>
@@ -232,7 +232,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
                     onPaste={handlePaste}
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    className="w-[2rem] flex-1 sm:w-[3rem] px-0.5 py-2 sm:px-3 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-white text-center text-base focus:outline-none backdrop-blur-sm focus:border-white/40"
+                    className="w-[2rem] flex-1 sm:w-[3rem] px-0.5 py-2 sm:px-3 sm:py-3 bg-white/10 border border-white/20 rounded-lg text-center text-base focus:outline-none backdrop-blur-sm focus:border-white/40"
                   />
                 ))}
               </div>
@@ -272,7 +272,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
               ${
                 btnDisabled
                   ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
-                  : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/40 cursor-pointer"
+                  : "bg-white/10 border-white/30 text-gray-600 hover:bg-white/20 hover:border-white/40 cursor-pointer"
               }
              `}
               >
@@ -289,7 +289,7 @@ const Otp = ({ setStep, setSharingOtp }) => {
               <div className="text-center">
                 <Link
                   to="/"
-                  className="text-gray-100 text-xs sm:text-sm hover:text-white inline-flex items-center gap-1"
+                  className="text-gray-500 text-xs sm:text-sm transition-colors hover:text-gray-800 inline-flex items-center gap-1"
                 >
                   Udhhyog - One Stop Shop for All Industrial Needs
                 </Link>

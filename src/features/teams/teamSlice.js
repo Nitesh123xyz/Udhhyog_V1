@@ -13,6 +13,17 @@ export const TeamsSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
+    AddTeam: builder.mutation({
+      query: (teamInfo) => ({
+        url: "/add-team",
+        method: "POST",
+        body: teamInfo,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
     GetAllTeam: builder.query({
       query: (Token) => ({
         url: "/view-all-team",
@@ -61,6 +72,7 @@ export const TeamsSlice = createApi({
 });
 
 export const {
+  useAddTeamMutation,
   useGetAllTeamQuery,
   useViewTeamQuery,
   useAddUserTeamHeadMutation,
