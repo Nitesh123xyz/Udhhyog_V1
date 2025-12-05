@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-export const TeamsSlice = createApi({
-  reducerPath: "teamsApi",
+export const DepartmentSlice = createApi({
+  reducerPath: "departmentApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_BASE_URL,
     responseHandler: async (response) => {
@@ -13,9 +13,9 @@ export const TeamsSlice = createApi({
     },
   }),
   endpoints: (builder) => ({
-    GetAllTeam: builder.query({
+    GetAllDepartment: builder.query({
       query: (Token) => ({
-        url: "/view-all-team",
+        url: "/view-all-department",
         method: "POST",
         body: { token: Token },
       }),
@@ -24,9 +24,9 @@ export const TeamsSlice = createApi({
         body,
       }),
     }),
-    AddTeam: builder.mutation({
+    ViewDepartment: builder.query({
       query: (teamInfo) => ({
-        url: "/add-team",
+        url: "/view-department",
         method: "POST",
         body: teamInfo,
       }),
@@ -35,9 +35,9 @@ export const TeamsSlice = createApi({
         body,
       }),
     }),
-    EditTeam: builder.mutation({
+    AddDepartment: builder.mutation({
       query: (teamInfo) => ({
-        url: "/edit-team",
+        url: "/add-department",
         method: "POST",
         body: teamInfo,
       }),
@@ -46,31 +46,9 @@ export const TeamsSlice = createApi({
         body,
       }),
     }),
-    ViewTeam: builder.query({
+    EditDepartment: builder.mutation({
       query: (teamData) => ({
-        url: "/view-team",
-        method: "POST",
-        body: teamData,
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body,
-      }),
-    }),
-    AddUserTeamHead: builder.mutation({
-      query: (teamData) => ({
-        url: "/add-user-team-head",
-        method: "POST",
-        body: teamData,
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body,
-      }),
-    }),
-    DeleteUserTeamHead: builder.mutation({
-      query: (teamData) => ({
-        url: "/del-user-team-head",
+        url: "/edit-department",
         method: "POST",
         body: teamData,
       }),
@@ -83,10 +61,8 @@ export const TeamsSlice = createApi({
 });
 
 export const {
-  useAddTeamMutation,
-  useEditTeamMutation,
-  useGetAllTeamQuery,
-  useViewTeamQuery,
-  useAddUserTeamHeadMutation,
-  useDeleteUserTeamHeadMutation,
-} = TeamsSlice;
+  useGetAllDepartmentQuery,
+  useViewDepartmentQuery,
+  useAddDepartmentMutation,
+  useEditDepartmentMutation,
+} = DepartmentSlice;

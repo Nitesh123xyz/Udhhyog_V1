@@ -1,147 +1,39 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Search,
-  Users,
-  UserPlus,
-  ChevronDown,
-  Check,
-  X,
-  Pencil,
-} from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useEffect, useMemo, useState } from "react";
+import { Search, Users, UserPlus, X, Pencil } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useAddTeamMutation,
-  useGetAllTeamQuery,
   useEditTeamMutation,
 } from "../../features/teams/teamSlice";
 import useAuth from "../../hooks/useAuth";
-import { COLOR_LIST } from "../../utils/ReuseData";
 import "../../css/commonLayout.css";
 import toast from "react-hot-toast";
+import {
+  useAddDepartmentMutation,
+  useEditDepartmentMutation,
+  useViewDepartmentQuery,
+} from "../../features/department/DepartmentSlice";
 const AddMemberSchema = z.object({
   name: z.string().min(2, "Name is required"),
   photo_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  color_code: z
-    .string()
-    .min(1, "Choose a color")
-    .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Invalid hex color"),
 });
 
 const defaultValues = {
   name: "",
   photo_url: "",
-  color_code: "",
 };
 
-function ColorDropdown({ value, onChange, error, presentColor }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  const usedColors = useMemo(() => {
-    return presentColor?.map((m) => m.color_code) || [];
-  }, [presentColor]);
-
-  const availableColors = useMemo(() => {
-    return COLOR_LIST.filter((c) => {
-      if (c.hexcode === value) return true;
-      return !usedColors.includes(c.hexcode);
-    });
-  }, [usedColors, value]);
-
-  const selected =
-    availableColors.find((c) => c.hexcode === value) ||
-    availableColors[0] ||
-    COLOR_LIST[0];
-
-  useEffect(() => {
-    function onOutside(e) {
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onOutside);
-    return () => document.removeEventListener("mousedown", onOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <label className="block text-sm font-medium text-[var(--text)] mb-2">
-        Color
-      </label>
-
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen((s) => !s)}
-        className="NavScroll w-full flex items-center justify-between gap-3 border border-[var(--border)] rounded-md px-3 py-2 bg-transparent text-[var(--text)]"
-      >
-        <div className="flex items-center gap-3 NavScroll">
-          <div
-            className="h-5 w-5 rounded-full ring-1"
-            style={{ backgroundColor: selected.hexcode }}
-            aria-hidden
-          />
-          <div className="text-sm">
-            <div className="font-medium">{selected.name}</div>
-            <div className="text-xs text-gray-400">{selected.hexcode}</div>
-          </div>
-        </div>
-
-        <ChevronDown className="h-4 w-4 opacity-70" />
-      </button>
-
-      {open && (
-        <div
-          role="listbox"
-          aria-label="Choose color"
-          className="NavScroll absolute z-30 mt-1 w-full max-h-60 overflow-y-auto rounded-md border border-[var(--border)] bg-[var(--background)] shadow-lg"
-        >
-          {availableColors.map((c) => {
-            const isSelected = c.hexcode === value;
-            return (
-              <div
-                role="option"
-                aria-selected={isSelected}
-                key={c.hexcode}
-                onClick={() => {
-                  onChange(c.hexcode);
-                  setOpen(false);
-                }}
-                className={`flex items-center justify-between gap-3 px-3 py-2 cursor-pointer hover:bg-[var(--border)]/20 ${
-                  isSelected ? "bg-[var(--border)]/30" : ""
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="h-5 w-5 rounded-full ring-1"
-                    style={{ backgroundColor: c.hexcode }}
-                    aria-hidden
-                  />
-                  <div>
-                    <div className="text-sm text-[var(--text)]">{c.name}</div>
-                    <div className="text-xs text-gray-400">{c.hexcode}</div>
-                  </div>
-                </div>
-                {isSelected && <Check className="h-4 w-4 text-[var(--text)]" />}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
-    </div>
-  );
-}
-
-const ViewAllTeam = ({ setStep, setTeamId }) => {
+const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
   const { token } = useAuth();
-  const { currentData, refetch } = useGetAllTeamQuery(token);
-  const serverTeams = currentData?.body?.view ?? [];
-  const [addTeamMember] = useAddTeamMutation();
-  const [updateTeamMember] = useEditTeamMutation();
+  const { data: currentData, refetch } = useViewDepartmentQuery({
+    ...DepartmentInfo,
+    token,
+  });
+  const serverTeams = currentData?.body?.profile ?? [];
+  const [addDepartment] = useAddDepartmentMutation();
+  const [updateDepartment] = useEditDepartmentMutation();
   const [teams, setTeams] = useState(serverTeams || []);
   const [query, setQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -156,16 +48,14 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
     const q = query.trim().toLowerCase();
     if (q === "") return teams;
     return teams.filter((t) => {
-      const name = (t.name || "").toLowerCase();
-      const role = (t.role || "").toLowerCase();
-      const email = (t.email || "").toLowerCase();
-      return name.includes(q) || role.includes(q) || email.includes(q);
+      const name = (t.user_name || "").toLowerCase();
+      const role = (t.team_name || "").toLowerCase();
+      return name.includes(q) || role.includes(q);
     });
   }, [teams, query]);
 
   const {
     register,
-    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -183,14 +73,14 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
   // ---------- SEPARATE FUNCTIONS ----------
 
   const handleAddMember = async (payload) => {
-    const { status } = await addTeamMember(payload).unwrap();
+    const { status } = await addDepartment(payload).unwrap();
     if (status === 200) {
       toast.success("Member added");
     }
   };
 
   const handleUpdateMember = async (payload) => {
-    const { status } = await updateTeamMember(payload).unwrap();
+    const { status } = await updateDepartment(payload).unwrap();
     if (status === 200) {
       toast.success("Member updated");
     }
@@ -203,7 +93,6 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
       token: token,
       name: data.name,
       photo_url: data.photo_url || "",
-      color_code: data.color_code,
     };
 
     const payload = editingMember
@@ -239,7 +128,6 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
     reset({
       name: member?.name || "",
       photo_url: member?.photo_url || "",
-      color_code: member?.color_code || "",
     });
     setIsModalOpen(true);
   };
@@ -259,7 +147,7 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
           <div className="flex items-center gap-3">
             <Users className="h-6 w-6 text-[var(--text)]" />
             <h2 className="text-2xl font-semibold text-[var(--text)]">
-              View All Team Members
+              View Department
             </h2>
           </div>
 
@@ -303,12 +191,10 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
           {filtered?.map((member) => {
             return (
               <article
-                key={member?.team_id}
-                className="group relative rounded-xl p-5 cursor-pointer"
-                aria-label={`Team member ${member.name}`}
-                style={{ backgroundColor: member?.color_code || "transparent" }}
+                key={member?.user_id}
+                className="group relative rounded-xl  p-5 cursor-pointer border border-[var(--border)] bg-[var(--background)] hover:shadow-2xl hover:border-blue-400 transition-all duration-200"
                 onClick={() => {
-                  setTeamId?.(member?.team_id);
+                  setTeamId?.(member?.user_id);
                   setStep?.(2);
                 }}
               >
@@ -320,7 +206,7 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
                           ? member.photo_url
                           : "https://picsum.photos/seed/default/200/200"
                       }
-                      alt={member.name || "Team member"}
+                      alt="team member"
                       className="h-16 w-16 rounded-full object-cover shadow-md ring-2 ring-white"
                     />
                   </div>
@@ -330,19 +216,14 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
                       className="text-base text-[var(--text)] truncate"
                       title={member.name}
                     >
-                      {member.name}
+                      {member.user_name}
                     </h4>
-                    {member.manager_name && (
-                      <p
-                        className="text-sm text-[var(--text)] truncate"
-                        title={`Reports to: ${member.manager_name}`}
-                      >
-                        Manager Name :{" "}
-                        <span className="text-gray-300">
-                          {member.manager_name}
-                        </span>
-                      </p>
-                    )}
+                    <h5
+                      className="text-base text-[var(--text)] truncate"
+                      title={member.team_name}
+                    >
+                      {member.team_name}
+                    </h5>
                   </div>
                 </div>
 
@@ -427,21 +308,6 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
                 )}
               </div>
 
-              <div>
-                <Controller
-                  control={control}
-                  name="color_code"
-                  render={({ field }) => (
-                    <ColorDropdown
-                      value={field.value}
-                      onChange={field.onChange}
-                      error={errors.color_code?.message}
-                      presentColor={teams}
-                    />
-                  )}
-                />
-              </div>
-
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
@@ -476,4 +342,4 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
   );
 };
 
-export default ViewAllTeam;
+export default ViewDepartment;

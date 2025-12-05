@@ -5,6 +5,7 @@ import ProtectedRoute from "../Middlewares/ProtectedRoute";
 import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
 import MultilayerAuth from "../pages/2FA/MultilayerAuth";
+import ManageDepartment from "../pages/department/ManageDepartment";
 // ---------------------------------------------------
 
 const UserTableInfo = lazy(() => import("../pages/user/User"));
@@ -68,11 +69,12 @@ const router = createBrowserRouter([
         caseSensitive: true,
       },
       {
-        path: "/profile",
+        path: "/department",
         element: (
           <ProtectedRoute>
             <PermissionGate>
-              <Setting />
+              {/* <Setting /> */}
+              <ManageDepartment />
             </PermissionGate>
           </ProtectedRoute>
         ),

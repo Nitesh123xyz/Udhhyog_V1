@@ -4,6 +4,7 @@ import { utilsSlice } from "../features/utils/utilsSlice";
 import { pagePermissionSlice } from "../features/permission_page/page_permission";
 import { UsersSlice } from "../features/users/usersSlice";
 import { TeamsSlice } from "../features/teams/teamSlice";
+import { DepartmentSlice } from "../features/department/DepartmentSlice";
 import expendNavbarReducer from "../utils/ExpendNavbar";
 import UtileSliceReducer from "../utils/Utils";
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     [utilsSlice.reducerPath]: utilsSlice.reducer,
     [UsersSlice.reducerPath]: UsersSlice.reducer,
     [TeamsSlice.reducerPath]: TeamsSlice.reducer,
+    [DepartmentSlice.reducerPath]: DepartmentSlice.reducer,
     [pagePermissionSlice.reducerPath]: pagePermissionSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -22,6 +24,7 @@ export const store = configureStore({
       utilsSlice.middleware,
       UsersSlice.middleware,
       TeamsSlice.middleware,
+      DepartmentSlice.middleware,
       pagePermissionSlice.middleware
     ),
 });
