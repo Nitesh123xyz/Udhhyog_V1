@@ -2,7 +2,7 @@ import { useState } from "react";
 import ViewTeam from "./ViewTeam";
 import ViewAllTeam from "./ViewAllTeam";
 
-const TeamManage = () => {
+const ManageTeam = () => {
   const [step, setStep] = useState(1);
   const [teamId, setTeamId] = useState(null);
   return (
@@ -13,4 +13,4 @@ const TeamManage = () => {
   );
 };
 
-export default TeamManage;
+export default ManageTeam;

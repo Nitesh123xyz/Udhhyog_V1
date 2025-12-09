@@ -40,6 +40,7 @@ body {
   --activeBg: #f3f4f6;
   --activeText: #000;
   --logo_circle: #dfd8bb;
+  --box_border_hover: #4b5563;
   /*font scaling */
   --app-base-font: 16;
 }
@@ -63,6 +64,7 @@ body {
   --activeBg: rgba(255, 255, 255, 0.1);
   --activeText: #ffffff;
   --logo_circle: #4b5563;
+  --box_border_hover: white;
   /*font scaling */
   --app-base-font: 16;
 }

@@ -14,9 +14,8 @@ const Dashboard = lazy(() => import("../pages/Dashboard"));
 const ResetPassword = lazy(() =>
   import("../pages/reset-password/ResetPassword")
 );
-const Setting = lazy(() => import("../pages/Setting"));
 const PageNotFound = lazy(() => import("../pages/PageNotFound"));
-const TeamManage = lazy(() => import("../pages/teams/TeamManage"));
+const ManageTeam = lazy(() => import("../pages/teams/ManageTeam"));
 
 const router = createBrowserRouter([
   {
@@ -73,7 +72,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PermissionGate>
-              {/* <Setting /> */}
               <ManageDepartment />
             </PermissionGate>
           </ProtectedRoute>
@@ -85,7 +83,7 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PermissionGate>
-              <TeamManage />
+              <ManageTeam />
             </PermissionGate>
           </ProtectedRoute>
         ),

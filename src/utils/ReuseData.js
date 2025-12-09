@@ -164,30 +164,7 @@ export const COLOR_LIST = [
 export const DepartmentHeading = [
   { id: 0, name: "empid", label: "Profile_Id", status: true, active: false },
   { id: 1, name: "name", label: "Name", status: true, active: false },
-  { id: 2, name: "jobtitle", label: "Job_Title", status: true, active: false },
-  {
-    id: 3,
-    name: "department",
-    label: "Department",
-    status: true,
-    active: false,
-  },
-  { id: 4, name: "salary", label: "Salary", status: true, active: false },
-  {
-    id: 5,
-    name: "joindate",
-    label: "Joining_Date",
-    status: true,
-    active: false,
-  },
-  {
-    id: 6,
-    name: "emptype",
-    label: "Employment_Type",
-    status: true,
-    active: false,
-  },
-  { id: 7, name: "active", label: "Status", status: true, active: false },
+  { id: 2, name: "action", label: "Action", status: true, active: false },
 ];
 
 // ---------------------------------------------------

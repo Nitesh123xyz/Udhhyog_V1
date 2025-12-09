@@ -16,13 +16,11 @@ import {
   useViewDepartmentQuery,
 } from "../../features/department/DepartmentSlice";
 const AddMemberSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  photo_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  name: z.string().min(2, "User Name is required"),
 });
 
 const defaultValues = {
   name: "",
-  photo_url: "",
 };
 
 const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
@@ -92,7 +90,6 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
     const basePayload = {
       token: token,
       name: data.name,
-      photo_url: data.photo_url || "",
     };
 
     const payload = editingMember
@@ -127,7 +124,6 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
     setEditingMember(member);
     reset({
       name: member?.name || "",
-      photo_url: member?.photo_url || "",
     });
     setIsModalOpen(true);
   };
@@ -140,6 +136,8 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
   console.log("Viewport Width: " + viewportWidth + "px");
   console.log("Viewport Height: " + viewportHeight + "px");
 
+  console.log(filtered);
+
   return (
     <div className="min-h-screen md:min-h-[calc(100vh-60px)] p-4 md:p-6 lg:p-8 bg-[var(--background)] rounded-t-lg">
       <div className="max-w-7xl mx-auto">
@@ -151,14 +149,20 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
             </h2>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span
+              onClick={() => setStep(1)}
+              className="py-2 px-5 rounded-lg hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text)] bg-opacity-20 text-sm font-medium cursor-pointer transition-all"
+            >
+              Back
+            </span>
+
             <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--border)] bg-opacity-20">
               <span className="text-sm font-medium text-[var(--text)]">
                 {filtered.length === 1 ? "Member" : "Members"} (
                 {filtered.length})
               </span>
             </div>
-
             <button
               onClick={openAddModal}
               className="cursor-pointer flex items-center gap-2 rounded-lg px-4 py-2 bg-blue-400 backdrop-blur-sm text-white hover:bg-blue-500 transition-all duration-200"
@@ -192,25 +196,13 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
             return (
               <article
                 key={member?.user_id}
-                className="group relative rounded-xl  p-5 cursor-pointer border border-[var(--border)] bg-[var(--background)] hover:shadow-2xl hover:border-blue-400 transition-all duration-200"
+                className="group relative rounded-xl  p-5 cursor-pointer border border-[var(--border)] bg-[var(--background)] transition-all duration-200 hover:scale-95 hover:border-[var(--box_border_hover)]"
                 onClick={() => {
                   setTeamId?.(member?.user_id);
                   setStep?.(2);
                 }}
               >
                 <div className="flex flex-col items-center text-center gap-3">
-                  <div className="relative">
-                    <img
-                      src={
-                        member?.photo_url
-                          ? member.photo_url
-                          : "https://picsum.photos/seed/default/200/200"
-                      }
-                      alt="team member"
-                      className="h-16 w-16 rounded-full object-cover shadow-md ring-2 ring-white"
-                    />
-                  </div>
-
                   <div className="w-full space-y-1">
                     <h4
                       className="text-base text-[var(--text)] truncate"
@@ -278,32 +270,15 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Name
+                  User Name
                 </label>
                 <input
                   {...register("name")}
                   className="w-full rounded-md border border-[var(--border)] px-3 py-2 text-[var(--text)] bg-transparent outline-none"
-                  placeholder="Full name"
                 />
                 {errors.name && (
                   <p className="text-xs text-red-400 mt-1">
                     {errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[var(--text)] mb-1">
-                  Photo URL
-                </label>
-                <input
-                  {...register("photo_url")}
-                  className="w-full rounded-md border border-[var(--border)] px-3 py-2 text-[var(--text)] bg-transparent outline-none"
-                  placeholder="https://example.com/photo.jpg (optional)"
-                />
-                {errors.photo_url && (
-                  <p className="text-xs text-red-400 mt-1">
-                    {errors.photo_url.message}
                   </p>
                 )}
               </div>
@@ -315,7 +290,7 @@ const ViewDepartment = ({ setStep, setTeamId, DepartmentInfo }) => {
                     setIsModalOpen(false);
                     reset(defaultValues);
                   }}
-                  className="cursor-pointer px-4 py-2 rounded-md border hover:bg-[var(--border)] border-[var(--border)] text-[var(--text)]"
+                  className="cursor-pointer px-4 py-2 rounded-md border hover:bg-[var(--border)] border-[var(--border)] text-[var(--text)] transition-all"
                 >
                   Cancel
                 </button>

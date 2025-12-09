@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ArrowDownUp } from "lucide-react";
+import { ArrowDownUp, Pencil, Trash, X } from "lucide-react";
 import { DepartmentHeading } from "../../utils/ReuseData";
-import { StatusBtn } from "../../components/StatusBtn";
 import Pagination from "../../components/Pagination";
 import Header from "../../components/Header";
 import {
@@ -13,10 +12,33 @@ import useAuth from "../../hooks/useAuth";
 import { formatDateToIndian, formatRupees } from "../../utils/formatter";
 import Loader from "../../components/Loader";
 import { useSelector } from "react-redux";
-import { useGetAllDepartmentQuery } from "../../features/department/DepartmentSlice";
+import {
+  useAddDepartmentMutation,
+  useEditDepartmentMutation,
+  useGetAllDepartmentQuery,
+} from "../../features/department/DepartmentSlice";
+import DepartmentHeader from "../../components/DepartmentHeader";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import z from "zod";
+import {
+  useAddTeamMutation,
+  useEditTeamMutation,
+} from "../../features/teams/teamSlice";
+import toast from "react-hot-toast";
+
+const AddMemberSchema = z.object({
+  name: z.string().min(2, "User Name is required"),
+});
+
+const defaultValues = {
+  name: "",
+};
 
 const Department = ({ step, setStep, setDepartmentInfo }) => {
   const { token } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
   // const [rows, setRows] = useState([]);
   const [order, setOrder] = useState("_a");
   const [currentPage, setCurrentPage] = useState(1);
@@ -31,7 +53,7 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
     useState(DepartmentHeading);
 
   // ------------------------------------------------------
-  const { data, isLoading } = useGetAllDepartmentQuery(token);
+  const { data, isLoading, refetch } = useGetAllDepartmentQuery(token);
   const rows = data?.body?.view || [];
   console.log(rows);
   // console.log(getUserInfo);
@@ -39,7 +61,9 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
   const { searchLoading } = useSelector((state) => state.UtileSlice);
 
   const loading = Boolean(isLoading || queryLoading || searchLoading);
-
+  const isEditMode = Boolean(editingMember);
+  const [addDepartment] = useAddDepartmentMutation();
+  const [updateDepartment] = useEditDepartmentMutation();
   // ------------------------------------------------------------------
 
   const handleUserInfo = async () => {
@@ -51,6 +75,41 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
     // } catch (error) {
     //   console.log(error);
     // }
+  };
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(AddMemberSchema),
+    defaultValues,
+  });
+
+  // ------------------------------------------------------------------
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingMember(null);
+    reset(defaultValues);
+  };
+
+  const openAddModal = (e) => {
+    e.stopPropagation();
+    setEditingMember(null);
+    reset(defaultValues);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (e, member) => {
+    e.stopPropagation();
+    setEditingMember(member);
+    reset({
+      name: member?.name || "",
+    });
+    setIsModalOpen(true);
   };
 
   // ------------------------------------------------------------------
@@ -147,20 +206,52 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
     );
   };
 
+  const handleAddMember = async (payload) => {
+    const { status } = await addDepartment(payload).unwrap();
+    if (status === 200) {
+      toast.success("Member added");
+    }
+  };
+
+  const handleUpdateMember = async (payload) => {
+    const { status } = await updateDepartment(payload).unwrap();
+    if (status === 200) {
+      toast.success("Member updated");
+    }
+  };
+
+  const onSubmit = async (data) => {
+    const basePayload = {
+      token: token,
+      name: data.name,
+    };
+
+    const payload = editingMember
+      ? { ...basePayload, team_id: editingMember.team_id }
+      : basePayload;
+
+    try {
+      if (editingMember) {
+        await handleUpdateMember(payload);
+      } else {
+        await handleAddMember(payload);
+      }
+
+      refetch();
+      closeModal();
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        editingMember ? "Failed to update member" : "Failed to add member"
+      );
+      console.error(error);
+    }
+  };
+
   // ------------------------------------------------------
   return (
     <>
-      <Header
-        rows={rows}
-        step={step}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        currentActive={currentActive}
-        handleUserInfo={handleUserInfo}
-        // setRows={setRows}
-        setStep={setStep}
-        title="users"
-      />
+      <DepartmentHeader openAddModal={openAddModal} />
 
       <section className="max-w-screen">
         <div
@@ -208,34 +299,20 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
                           </span>
                         </div>
                       </td>
-
                       <td
-                        className={`px-3 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+                        className={`pl-5 py-4 whitespace-nowrap text-xs rounded-r-2xl text-[var(--text)]`}
                       >
-                        {employee?.job_title}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {employee?.department}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
-                      >
-                        {formatRupees(employee.salary)}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                      >
-                        {formatDateToIndian(employee?.joining_date)}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {employee?.employement_type}
-                      </td>
-                      <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
-                        <StatusBtn Status={employee?.active} />
+                        <div className="flex gap-1">
+                          <div
+                            onClick={(e) => openEditModal(e)}
+                            className="cursor-pointer hover:bg-white/30 p-2 rounded-full  transition-all duration-300"
+                          >
+                            <Pencil size={15} />
+                          </div>
+                          <div className="cursor-pointer hover:bg-white/30 p-2 rounded-full  transition-all duration-300">
+                            <Trash size={15} />
+                          </div>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -251,6 +328,77 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
                 )}
               </tbody>
             </table>
+
+            {isModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div
+                  className="absolute inset-0 bg-black/20"
+                  onClick={() => setIsModalOpen(false)}
+                  aria-hidden
+                />
+                <div className="relative z-10 w-full max-w-md rounded-lg bg-[var(--background)] border border-[var(--border)] p-6 shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-[var(--text)]">
+                      {isEditMode ? "Edit Team Member" : "Add Team Member"}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        reset(defaultValues);
+                      }}
+                      className="text-sm text-[var(--text)] p-1.5 bg-[var(--border)] rounded-full cursor-pointer"
+                      aria-label="Close"
+                    >
+                      <X size={15} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[var(--text)] mb-1">
+                        User Name
+                      </label>
+                      <input
+                        {...register("name")}
+                        className="w-full rounded-md border border-[var(--border)] px-3 py-2 text-[var(--text)] bg-transparent outline-none"
+                      />
+                      {errors.name && (
+                        <p className="text-xs text-red-400 mt-1">
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsModalOpen(false);
+                          reset(defaultValues);
+                        }}
+                        className="cursor-pointer px-4 py-2 rounded-md border hover:bg-[var(--border)] border-[var(--border)] text-[var(--text)] transition-all"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="cursor-pointer px-4 py-2 rounded-md bg-blue-400 hover:bg-blue-500 text-white disabled:opacity-60"
+                      >
+                        {isSubmitting
+                          ? isEditMode
+                            ? "Updating..."
+                            : "Saving..."
+                          : isEditMode
+                          ? "Update Member"
+                          : "Add Member"}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Pagination */}
