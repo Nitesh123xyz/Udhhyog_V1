@@ -48,11 +48,22 @@ export const utilsSlice = createApi({
         body,
       }),
     }),
-    ReVerifySession: builder.mutation({
+    reVerifySession: builder.mutation({
       query: (Token) => ({
         url: "/re-verify-session",
         method: "POST",
         body: { token: Token },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    navigationCollector: builder.mutation({
+      query: (navigationInfo) => ({
+        url: "/navigation",
+        method: "POST",
+        body: navigationInfo,
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,
@@ -67,4 +78,5 @@ export const {
   useAllProfileMenuMutation,
   useListDepartMentQuery,
   useReVerifySessionMutation,
+  useNavigationCollectorMutation,
 } = utilsSlice;

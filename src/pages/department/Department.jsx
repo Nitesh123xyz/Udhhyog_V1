@@ -2,14 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ArrowDownUp, Pencil, Trash, X } from "lucide-react";
 import { DepartmentHeading } from "../../utils/ReuseData";
 import Pagination from "../../components/Pagination";
-import Header from "../../components/Header";
-import {
-  useGetUsersMutation,
-  useQueryUsersMutation,
-} from "../../features/users/usersSlice";
-
+import { useQueryUsersMutation } from "../../features/users/usersSlice";
 import useAuth from "../../hooks/useAuth";
-import { formatDateToIndian, formatRupees } from "../../utils/formatter";
 import Loader from "../../components/Loader";
 import { useSelector } from "react-redux";
 import {
@@ -21,10 +15,6 @@ import DepartmentHeader from "../../components/DepartmentHeader";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
-import {
-  useAddTeamMutation,
-  useEditTeamMutation,
-} from "../../features/teams/teamSlice";
 import toast from "react-hot-toast";
 
 const AddMemberSchema = z.object({
@@ -35,17 +25,15 @@ const defaultValues = {
   name: "",
 };
 
-const Department = ({ step, setStep, setDepartmentInfo }) => {
+const Department = ({ setStep, setDepartmentInfo }) => {
   const { token } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
-  // const [rows, setRows] = useState([]);
   const [order, setOrder] = useState("_a");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  // server-side pagination: rows contains only current page items
   const [TotalPages, setTotalPages] = useState(0);
   const [currentSort, setCurrentSort] = useState(null);
   const [currentActive, setCurrentActive] = useState(null);
@@ -55,8 +43,7 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
   // ------------------------------------------------------
   const { data, isLoading, refetch } = useGetAllDepartmentQuery(token);
   const rows = data?.body?.view || [];
-  console.log(rows);
-  // console.log(getUserInfo);
+
   const [getQueryInfo, { isLoading: queryLoading }] = useQueryUsersMutation();
   const { searchLoading } = useSelector((state) => state.UtileSlice);
 
@@ -66,20 +53,8 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
   const [updateDepartment] = useEditDepartmentMutation();
   // ------------------------------------------------------------------
 
-  const handleUserInfo = async () => {
-    // 10 Default Api Data
-    // try {
-    //   const { body } = await getUserInfo(token).unwrap();
-    //   setRows(body?.emp_data || []);
-    //   setTotalPages(body?.t_rows || 0);
-    // } catch (error) {
-    //   console.log(error);
-    // }
-  };
-
   const {
     register,
-    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -97,14 +72,14 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
   };
 
   const openAddModal = (e) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     setEditingMember(null);
     reset(defaultValues);
     setIsModalOpen(true);
   };
 
   const openEditModal = (e, member) => {
-    e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation();
     setEditingMember(member);
     reset({
       name: member?.name || "",
@@ -128,14 +103,12 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
 
       const { body } = await getQueryInfo(queryUser).unwrap();
 
-      // setRows(body?.emp_data || []);
       setTotalPages(body?.t_rows || 0);
 
       if ((body?.emp_data?.length || 0) === 0 && pageNo !== 1) {
         setCurrentPage(1);
         const retryQuery = { ...queryUser, page_no: 1 };
         const { body: retryBody } = await getQueryInfo(retryQuery).unwrap();
-        // setRows(retryBody?.emp_data || []);
         setTotalPages(retryBody?.t_rows || 0);
       }
     } catch (error) {
@@ -206,45 +179,54 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
     );
   };
 
+  // ------------------------------------------------------
   const handleAddMember = async (payload) => {
     const { status } = await addDepartment(payload).unwrap();
-    if (status === 200) {
-      toast.success("Member added");
-    }
+    return status;
   };
 
   const handleUpdateMember = async (payload) => {
     const { status } = await updateDepartment(payload).unwrap();
-    if (status === 200) {
-      toast.success("Member updated");
-    }
+    return status;
   };
 
   const onSubmit = async (data) => {
-    const basePayload = {
-      token: token,
-      name: data.name,
-    };
-
-    const payload = editingMember
-      ? { ...basePayload, team_id: editingMember.team_id }
-      : basePayload;
-
     try {
       if (editingMember) {
-        await handleUpdateMember(payload);
+        const updatePayload = {
+          token: token,
+          id_profile: editingMember?.id_profile,
+          new_name: data.name,
+          old_name: editingMember?.name,
+        };
+
+        const status = await handleUpdateMember(updatePayload);
+        if (status === 200) {
+          toast.success("Member updated");
+        } else {
+          toast.error("Failed to update member");
+        }
       } else {
-        await handleAddMember(payload);
+        const addPayload = {
+          token: token,
+          name: data.name,
+        };
+
+        const status = await handleAddMember(addPayload);
+        if (status === 200) {
+          toast.success("Member added");
+        } else {
+          toast.error("Failed to add member");
+        }
       }
 
-      refetch();
+      await refetch();
       closeModal();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error(
         editingMember ? "Failed to update member" : "Failed to add member"
       );
-      console.error(error);
     }
   };
 
@@ -304,12 +286,16 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
                       >
                         <div className="flex gap-1">
                           <div
-                            onClick={(e) => openEditModal(e)}
+                            onClick={(e) => openEditModal(e, employee)}
                             className="cursor-pointer hover:bg-white/30 p-2 rounded-full  transition-all duration-300"
+                            title="Edit"
                           >
                             <Pencil size={15} />
                           </div>
-                          <div className="cursor-pointer hover:bg-white/30 p-2 rounded-full  transition-all duration-300">
+                          <div
+                            className="cursor-pointer hover:bg-white/30 p-2 rounded-full  transition-all duration-300"
+                            title="Delete"
+                          >
                             <Trash size={15} />
                           </div>
                         </div>
@@ -333,7 +319,7 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                 <div
                   className="absolute inset-0 bg-black/20"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => closeModal()}
                   aria-hidden
                 />
                 <div className="relative z-10 w-full max-w-md rounded-lg bg-[var(--background)] border border-[var(--border)] p-6 shadow-lg">
@@ -342,10 +328,7 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
                       {isEditMode ? "Edit Team Member" : "Add Team Member"}
                     </h3>
                     <button
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        reset(defaultValues);
-                      }}
+                      onClick={() => closeModal()}
                       className="text-sm text-[var(--text)] p-1.5 bg-[var(--border)] rounded-full cursor-pointer"
                       aria-label="Close"
                     >
@@ -372,10 +355,7 @@ const Department = ({ step, setStep, setDepartmentInfo }) => {
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
-                        onClick={() => {
-                          setIsModalOpen(false);
-                          reset(defaultValues);
-                        }}
+                        onClick={() => closeModal()}
                         className="cursor-pointer px-4 py-2 rounded-md border hover:bg-[var(--border)] border-[var(--border)] text-[var(--text)] transition-all"
                       >
                         Cancel

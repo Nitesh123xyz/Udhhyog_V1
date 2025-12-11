@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavarMobileOpenClose } from "../utils/ExpendNavbar";
 import { useState } from "react";
 import DropDownProfileMenu from "./DropDownProfileMenu";
-import { getUserInfo } from "../utils/StoreSessionInfo";
 
 const TopNavbar = ({ setIsExpanded }) => {
   const dispatch = useDispatch();
   const width = window.innerWidth;
   const [openPopup, setOpenPopup] = useState(false);
-  const { emp_name, emp_profile } = getUserInfo() || {};
+  const { emp_name, emp_profile } =
+    useSelector((state) => state.UtileSlice?.userInfo) || {};
 
   const handleToggle = () => {
     if (width > 992) return;
@@ -18,14 +18,17 @@ const TopNavbar = ({ setIsExpanded }) => {
   };
 
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
-  // const current = JSON.parse(localStorage.getItem("CurrentLabel"));
+
   return (
     <>
       <header
         className={`bg-[var(--background)] backdrop-blur-md rounded-lg flex items-center justify-between px-2 py-2 shadow-md max-w-screen md:max-w-full`}
       >
         <div className="flex gap-2 items-center">
-          <Menu onClick={handleToggle} className="w-6 h-6 text-[var(--text)] block lg:hidden" />
+          <Menu
+            onClick={handleToggle}
+            className="w-6 h-6 text-[var(--text)] block lg:hidden"
+          />
 
           <h2
             className={`text-[var(--text)] uppercase text-sm lg:text-lg ml-0.5`}

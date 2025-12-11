@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Search, Download, Plus, RefreshCw, X } from "lucide-react";
+import { Search, Plus, RefreshCw, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useAuth from "../hooks/useAuth";
@@ -155,11 +155,6 @@ const Header = ({
                     transition: "transform 600ms",
                   }}
                 />
-              </div>
-            )}
-            {step !== 1 && (
-              <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
-                <Download size={15} className="text-gray-800" />
               </div>
             )}
           </div>

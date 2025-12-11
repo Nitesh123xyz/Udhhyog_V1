@@ -9,18 +9,6 @@ export const getLeftSideNavigationMenu = () =>
   JSON.parse(sessionStorage.getItem(MenuKey)) || [];
 
 // ------------------------------------------------------
-const UserKey = "UserInfo";
-
-export const setUserInfo = (UserInfo) => {
-  UserInfo
-    ? sessionStorage.setItem(UserKey, JSON.stringify(UserInfo))
-    : sessionStorage.removeItem(UserKey);
-};
-
-export const getUserInfo = () =>
-  JSON.parse(sessionStorage.getItem(UserKey)) || null;
-
-// ------------------------------------------------------
 
 const SessionExpireKey = "SessionExpire";
 
@@ -34,7 +22,7 @@ export const getSessionExpire = () => {
 
 export const setSessionExpire = (value) => {
   if (typeof value === "boolean") {
-    localStorage.setItem(SessionExpireKey, JSON.stringify(value));
+    localStorage.setItem(SessionExpireKey, JSON.stringify(true));
   } else {
     localStorage.removeItem(SessionExpireKey);
   }

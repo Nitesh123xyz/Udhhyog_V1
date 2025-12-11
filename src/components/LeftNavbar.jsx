@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronRight, ChevronDown, PinOff, Pin, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   NavarMobileOpenClose,
   PinBar,
   trackCurrentTabAndLink,
 } from "../utils/ExpendNavbar";
 import "../css/commonLayout.css";
+import { useNavigationCollectorMutation } from "../features/utils/utilsSlice";
+import useAuth from "../hooks/useAuth";
+import { setPreviousOneNavigation } from "../utils/Utils";
 
 const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
+  const [NavigationStore] = useNavigationCollectorMutation();
+  const info = useSelector((state) => state.UtileSlice?.previousNavigation);
+
   const leaveTimer = useRef(null);
   const [pineBar, setPineBar] = useState(false);
   const [expandedSections, setExpandedSections] = useState({});
@@ -19,6 +25,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
     {}
   );
 
+  const { token } = useAuth();
   const width = window.innerWidth;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -120,9 +127,15 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
 
     // ---------------------------------------------------------------
 
-    const handleRowClick = (e) => {
+    const handleRowClick = async (e) => {
       if (e.target.closest("[data-no-nav]")) return;
       if (item.clickable && item.path) {
+        dispatch(setPreviousOneNavigation(item.label));
+        await NavigationStore({
+          token,
+          from_page: info,
+          to_page: item.label,
+        });
         navigate(item.path);
         dispatch(trackCurrentTabAndLink({ ChildTabLabel: item.label }));
         if (MobileNav) handleToggle();
@@ -132,7 +145,6 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
     // ---------------------------------------------------------------
 
     const handleChevronClick = (e, item) => {
-      // e.stopPropagation();
       dispatch(trackCurrentTabAndLink({ ParentTabLabel: item.label }));
       if (level === 0) toggleSection(index);
       else if (level === 1) toggleSubSection(parentIndices[0], index);
@@ -174,14 +186,7 @@ const LeftNavbar = ({ isExpanded, setIsExpanded, MobileNav, menuList }) => {
               className={`${isExpanded ? "" : "hidden"} text-[var(--text)]`}
             >
               {item.clickable ? (
-                <Link
-                  to={item.path}
-                  // onClick={(e) => {
-                  //   e.stopPropagation();
-
-                  //   if (MobileNav) handleToggle();
-                  // }}
-                >
+                <Link to={item.path}>
                   <span>{item.label}</span>
                 </Link>
               ) : (

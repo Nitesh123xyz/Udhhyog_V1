@@ -11,17 +11,13 @@ const ManageDepartment = () => {
   return (
     <>
       {step === 1 && (
-        <Department
-          step={step}
-          setStep={setStep}
-          setDepartmentInfo={setDepartmentInfo}
-        />
+        <Department setStep={setStep} setDepartmentInfo={setDepartmentInfo} />
       )}
       {step === 2 && (
         <ViewDepartment
+          DepartmentInfo={DepartmentInfo}
           step={step}
           setStep={setStep}
-          DepartmentInfo={DepartmentInfo}
         />
       )}
     </>

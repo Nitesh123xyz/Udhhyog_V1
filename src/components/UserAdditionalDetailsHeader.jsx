@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, Plus, Trash, UserPen } from "lucide-react";
+import { ArrowLeft, Plus, Trash, UserPen } from "lucide-react";
 
 const UserAdditionalDetailsHeader = ({ step, setStep, setOpenDialog }) => {
   const handleDeleteUser = () => {
@@ -46,12 +46,6 @@ const UserAdditionalDetailsHeader = ({ step, setStep, setOpenDialog }) => {
               className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
             >
               <Trash size={15} className="text-gray-800" />
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="cursor-pointer w-8 h-8 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm">
-              <Download size={15} className="text-gray-800" />
             </div>
           )}
         </div>

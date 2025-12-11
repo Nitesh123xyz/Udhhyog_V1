@@ -5,11 +5,13 @@ import transformMenu from "../utils/ReuseData";
 import {
   getLeftSideNavigationMenu,
   setLeftSideNavigationMenu,
-  setUserInfo,
 } from "../utils/StoreSessionInfo";
 import useAuth from "../hooks/useAuth";
+import { setUserRelatedInfo } from "../utils/Utils";
+import { useDispatch } from "react-redux";
 
 export const useMenu = () => {
+  const dispatch = useDispatch();
   const [menuList, setMenuList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [LeftSideNavigationMenu] = useLeftSideNavigationMenuMutation();
@@ -25,7 +27,7 @@ export const useMenu = () => {
       setLeftSideNavigationMenu(Array.isArray(menu) ? menu : []);
       const menuItems = transformMenu(Array.isArray(menu) ? menu : []);
       setMenuList(menuItems);
-      setUserInfo({ emp_name, emp_profile });
+      dispatch(setUserRelatedInfo({ emp_name, emp_profile }));
     }
     setLoading(false);
   };

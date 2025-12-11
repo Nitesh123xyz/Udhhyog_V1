@@ -1,11 +1,15 @@
 import { Plus } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const DepartmentHeader = ({ openAddModal = () => {} }) => {
+  const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
   return (
     <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 transition-all duration-300">
       <div className="flex items-center gap-3 ml-1">
         <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg">
-          DepartMent
+          {CurrentLabel?.ChildTabLabel !== ""
+            ? CurrentLabel?.ChildTabLabel
+            : "Department"}
         </h2>
       </div>
       <div className="flex">
