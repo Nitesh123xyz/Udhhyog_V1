@@ -6,9 +6,10 @@ import PermissionGate from "../Middlewares/PermissionGate";
 import MainLoader from "../components/Loader";
 import MultilayerAuth from "../pages/2FA/MultilayerAuth";
 import ManageDepartment from "../pages/department/ManageDepartment";
+import ReVerifySession from "../components/ReVerifySession";
 // ---------------------------------------------------
 
-const UserTableInfo = lazy(() => import("../pages/user/User"));
+const ManageUser = lazy(() => import("../pages/user/ManageUser"));
 const Permissions = lazy(() => import("../pages/Permission"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const ResetPassword = lazy(() =>
@@ -26,6 +27,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<MainLoader />}>
             <MultilayerAuth />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/re-verify-session",
+        element: (
+          <Suspense fallback={<MainLoader />}>
+            <ReVerifySession />
           </Suspense>
         ),
       },
@@ -50,7 +59,7 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PermissionGate>
-              <UserTableInfo />
+              <ManageUser />
             </PermissionGate>
           </ProtectedRoute>
         ),

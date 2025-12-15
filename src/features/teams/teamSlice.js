@@ -79,6 +79,17 @@ export const TeamsSlice = createApi({
         body,
       }),
     }),
+    AddTeamManager: builder.mutation({
+      query: (teamData) => ({
+        url: "/add-team-manager",
+        method: "POST",
+        body: teamData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
   }),
 });
 
@@ -89,4 +100,6 @@ export const {
   useViewTeamQuery,
   useAddUserTeamHeadMutation,
   useDeleteUserTeamHeadMutation,
+  // --------------------------
+  useAddTeamManagerMutation,
 } = TeamsSlice;

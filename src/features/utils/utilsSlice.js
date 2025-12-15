@@ -49,10 +49,10 @@ export const utilsSlice = createApi({
       }),
     }),
     reVerifySession: builder.mutation({
-      query: (Token) => ({
+      query: (reVerifyInfo) => ({
         url: "/re-verify-session",
         method: "POST",
-        body: { token: Token },
+        body: reVerifyInfo,
       }),
       transformResponse: (body, meta) => ({
         status: meta?.response?.status ?? 0,

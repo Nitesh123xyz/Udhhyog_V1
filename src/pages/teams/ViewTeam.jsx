@@ -7,6 +7,7 @@ import {
 } from "../../features/teams/teamSlice";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
+import AddTeamManager from "./AddTeamManager";
 
 const ViewTeam = ({ setStep, teamId }) => {
   const { token } = useAuth();
@@ -17,6 +18,7 @@ const ViewTeam = ({ setStep, teamId }) => {
   const { currentData, refetch } = useViewTeamQuery({ token, team_id: teamId });
   const [AssignedMember] = useAddUserTeamHeadMutation();
   const [RemoveMember] = useDeleteUserTeamHeadMutation();
+  const [openAddForm, setOpenAddForm] = useState(false);
 
   const { unassigned_data, assigned_data, members } = currentData?.body ?? {};
 
@@ -136,6 +138,12 @@ const ViewTeam = ({ setStep, teamId }) => {
                   <h2 className="text-lg md:text-xl font-semibold text-[var(--text)]">
                     {section.title}
                   </h2>
+                  <button
+                    onClick={() => setOpenAddForm(true)}
+                    className="cursor-pointer rounded-md px-2 py-1.5 bg-blue-400 backdrop-blur-sm text-white hover:bg-blue-500 transition-all duration-200"
+                  >
+                    Add Manager
+                  </button>
                 </div>
 
                 <div className="flex-1 bg-[var(--background)] p-4 overflow-y-auto">
@@ -167,7 +175,6 @@ const ViewTeam = ({ setStep, teamId }) => {
             </div>
           ))}
 
-        {/* RIGHT: Sections */}
         <div className="flex-1 flex flex-col md:flex-row gap-2 overflow-hidden">
           {sections
             .filter((s) => s.id !== "unassigned")
@@ -215,7 +222,6 @@ const ViewTeam = ({ setStep, teamId }) => {
                       !open ? "cursor-pointer" : ""
                     }`}
                   >
-                    {/* Collapsed view */}
                     {!open && (
                       <>
                         <div className="relative w-full h-full hidden sm:flex items-center justify-center gap-2 p-2">
@@ -246,7 +252,6 @@ const ViewTeam = ({ setStep, teamId }) => {
                       </>
                     )}
 
-                    {/* Expanded view */}
                     {open && (
                       <div className="w-full h-full flex flex-col">
                         <div className="p-4 border-b-1 bg-[var(--background)] border-[var(--border)] flex justify-between items-center">
@@ -291,7 +296,6 @@ const ViewTeam = ({ setStep, teamId }) => {
                                 )}
                               </div>
 
-                              {/* Search input */}
                               <input
                                 type="text"
                                 placeholder={`Search members for ${section.title}...`}
@@ -347,7 +351,6 @@ const ViewTeam = ({ setStep, teamId }) => {
                               )}
                             </div>
 
-                            {/* Assigned List */}
                             <div>
                               <h3 className="text-sm md:text-base font-semibold text-[var(--text)] mb-2">
                                 Assigned
@@ -404,6 +407,15 @@ const ViewTeam = ({ setStep, teamId }) => {
             })}
         </div>
       </div>
+      {openAddForm && (
+        <AddTeamManager
+          token={token}
+          teamId={teamId}
+          members={members}
+          Department={sections.filter((s) => s.id !== "unassigned")}
+          onClose={() => setOpenAddForm(false)}
+        />
+      )}
     </div>
   );
 };

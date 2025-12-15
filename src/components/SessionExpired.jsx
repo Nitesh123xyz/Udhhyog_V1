@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { clearSession, clearSessionExpire } from "../utils/StoreSessionInfo";
+import { useNavigate } from "react-router-dom";
 
 const SessionExpired = ({ sessionExpire, setIsSessionExpired }) => {
   const COUNTDOWN_SECONDS = 10;
@@ -7,6 +8,7 @@ const SessionExpired = ({ sessionExpire, setIsSessionExpired }) => {
   const [dismissed, setDismissed] = useState(false);
   const intervalRef = useRef(null);
   const loginBtnRef = useRef(null);
+  const navigation = useNavigate();
 
   // ----------------------------------------------------
   const clearTimer = () => {
@@ -29,6 +31,7 @@ const SessionExpired = ({ sessionExpire, setIsSessionExpired }) => {
     clearSessionExpire();
     setIsSessionExpired(false);
     setDismissed(true);
+    navigation("/re-verify-session");
   };
 
   // ----------------------------------------------------
@@ -112,7 +115,7 @@ const SessionExpired = ({ sessionExpire, setIsSessionExpired }) => {
               <button
                 ref={loginBtnRef}
                 onClick={goLogin}
-                className="inline-flex items-center justify-center rounded-lg bg-yellow-400 text-black h-11 px-4 outline-none"
+                className="inline-flex cursor-pointer items-center justify-center rounded-lg bg-yellow-400 text-black h-11 px-4 outline-none"
               >
                 Login
               </button>
@@ -120,7 +123,7 @@ const SessionExpired = ({ sessionExpire, setIsSessionExpired }) => {
               <button
                 onClick={continueSession}
                 disabled={timeLeft <= 0}
-                className={`inline-flex items-center justify-center rounded-lg h-11 px-4 focus:outline-none focus:ring-2 
+                className={`inline-flex cursor-pointer items-center justify-center rounded-lg h-11 px-4 focus:outline-none focus:ring-2 
                   ${
                     timeLeft > 0
                       ? "border border-white/20 bg-white/5 text-white hover:bg-white/10 focus:ring-white/40"

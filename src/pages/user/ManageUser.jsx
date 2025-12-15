@@ -4,7 +4,7 @@ import UserAdditionalDetails from "./UserAdditionalDetails";
 import UpdateUserDetails from "./UpdateUserDetails";
 import AddUserDetails from "./AddUserDetails";
 
-const UserTableInfo = () => {
+const ManageUser = () => {
   const [step, setStep] = useState(1);
   const [employeesId, setEmployeesId] = useState(null);
   return (
@@ -31,4 +31,4 @@ const UserTableInfo = () => {
   );
 };
 
-export default UserTableInfo;
+export default ManageUser;

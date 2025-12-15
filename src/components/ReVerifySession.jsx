@@ -1,16 +1,14 @@
-import React, { lazy, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
-import { fetchWithErrorHandling } from "../../utils/ApiResponse";
-import { showCustomToast } from "../../components/CustomToast";
+import { useNavigate } from "react-router-dom";
+import { fetchWithErrorHandling } from "../utils/ApiResponse";
+import { showCustomToast } from "../components/CustomToast";
 import { useDispatch } from "react-redux";
-import { setAccessToken } from "../../utils/Utils";
+import { setAccessToken } from "../utils/Utils";
 import { useReVerifySessionMutation } from "../features/utils/utilsSlice";
 import useAuth from "../hooks/useAuth";
-
-const Animation = lazy(() => import("../../components/Animation"));
 
 const VerificationSchema = z.object({
   authcode: z
@@ -19,9 +17,8 @@ const VerificationSchema = z.object({
     .regex(/^\d{6}$/, "Authentication code must be numeric"),
 });
 
-const ReVerifySession = ({ authData }) => {
+const ReVerifySession = () => {
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
   const dispatch = useDispatch();
   const { token } = useAuth();
   const {
@@ -142,21 +139,8 @@ const ReVerifySession = ({ authData }) => {
     inputsRef.current[Math.min(focusIndex, 5)]?.focus();
   };
 
-  // --------------------------------------------------
-  const handleCopy = () => {
-    const joined = authData?.twofa_secret;
-    navigator.clipboard.writeText(joined);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 600);
-  };
-
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8">
-      <div className="absolute inset-0 opacity-80">
-        <Animation />
-      </div>
+    <div className="min-h-screen relative overflow-hidden bg-[var(--background)] flex items-start lg:items-start justify-center px-4 md:py-[1rem] py-[4rem] sm:px-6 lg:px-8 rounded-lg">
       <div className="relative z-10 w-full max-w-sm sm:max-w-md">
         <div className="flex justify-center relative z-20">
           <div className="outline-4 outline-gray-200 rounded-full">
@@ -168,11 +152,12 @@ const ReVerifySession = ({ authData }) => {
           </div>
         </div>
 
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-white/16 relative -mt-6 sm:-mt-8">
+        <div className="rounded-2xl sm:rounded-3xl p-6 sm:p-8 pt-8 sm:pt-12 shadow-2xl border border-[var(--border)] relative -mt-6 sm:-mt-8">
           <div className="text-center mb-5 sm:mb-5">
-            <h1 className="text-gray-600 text-[1.3rem] sm:text-[2rem] font-bold">
+            <h1 className="text-[var(--text)] text-[1.3rem] sm:text-[2rem] font-bold">
               UDHHYOG CRM V1
             </h1>
+            <p className="text-[var(--text)]">Re - Authenticate</p>
           </div>
 
           <form
@@ -192,7 +177,7 @@ const ReVerifySession = ({ authData }) => {
                   onPaste={handlePaste}
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  className="w-full h-10 sm:h-12 text-center bg-white/1 border border-white/20 rounded-lg focus:outline-none backdrop-blur-sm text-sm sm:text-base"
+                  className="w-full h-10 sm:h-12 text-center text-[var(--text)] border border-[var(--border)] rounded-lg focus:outline-none backdrop-blur-sm text-sm sm:text-base"
                 />
               ))}
             </div>
@@ -204,27 +189,19 @@ const ReVerifySession = ({ authData }) => {
               className={`cursor-pointer w-full py-3 sm:py-3 border rounded-lg text-sm sm:text-base font-medium transition-all
           ${
             btnDisabled
-              ? "bg-white/5 border-white/10 text-gray-400 cursor-not-allowed"
-              : "bg-white/10 border-white/30 text-gray-600 hover:bg-white/20 hover:border-white/40"
+              ? "border-[var(--border)] text-gray-500 cursor-none"
+              : "bg-white/10 border-[var(--border)] text-[var(--text)]"
           }`}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full animate-spin mr-2"></div>
                   Submitting...
                 </div>
               ) : (
                 "Submit"
               )}
             </button>
-
-            <div className="text-center">
-              <Link className="text-gray-500 cursor-pointer text-xs sm:text-sm transition-colors hover:text-gray-800 inline-flex items-center justify-center flex-wrap gap-1">
-                <span className="break-words">
-                  Udhhyog - One Stop Shop for All Industrial Needs
-                </span>
-              </Link>
-            </div>
           </form>
         </div>
       </div>

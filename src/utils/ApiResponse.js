@@ -3,7 +3,6 @@ import { showCustomToast } from "../components/CustomToast";
 import { setSessionExpire } from "./StoreSessionInfo";
 
 export const fetchWithErrorHandling = async (fetchFunction = () => {}) => {
-  // const dispatch = useDispatch();
   try {
     const { status, body } = await fetchFunction();
 
