@@ -73,6 +73,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   job_title: z.string().optional().nullable(),
   job_status: z.string().optional().nullable(),
+  team_id: z.number().optional().nullable(),
   id_department: z.string().optional().nullable(),
   salary: z.union([z.string(), z.number()]).optional().nullable(),
   joining_date: z.string().optional().nullable(),
@@ -159,6 +160,7 @@ const mapServerToForm = (server = {}) => {
     name: server.name ?? "",
     job_title: server.job_title ?? "",
     job_status: server.job_status ?? "",
+    team_id: server.team_id ?? null,
     id_department:
       derivedId !== null && derivedId !== undefined && derivedId !== ""
         ? String(derivedId)
@@ -304,6 +306,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
         name: "",
         job_title: "",
         job_status: "",
+        team_id: null,
         id_department: "",
         salary: "",
         joining_date: "",
@@ -521,6 +524,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
 
   // --------------------------------------------------------
 
+  const currentTeamId = watch("team_id");
   const currentIdDepartment = watch("id_department");
   const currentJobTitle = watch("job_title");
   const currentJobStatus = watch("job_status");
@@ -622,6 +626,32 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-[var(--text)]">
+                Team
+              </label>
+              <div className="relative">
+                <select
+                  {...updateUserForm("id_department")}
+                  className="w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-[var(--background)] text-[var(--text)] outline-none appearance-none"
+                >
+                  <option value="">Select Team</option>
+                  {renderSentinelOption(currentTeamId)}
+                  {dep_data.map((dep) => (
+                    <option
+                      key={dep?.dep_id ?? dep?.id}
+                      value={String(dep?.dep_id ?? dep?.id)}
+                    >
+                      {dep?.department ?? dep?.name}
+                    </option>
+                  ))}
+                </select>
+
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--text)]">
+                  <ArrowDown size={16} />
+                </span>
+              </div>
+            </div>
             <div>
               <label className="block text-sm font-medium text-[var(--text)]">
                 Department

@@ -29,7 +29,10 @@ import { z } from "zod";
 import useAuth from "../../hooks/useAuth";
 import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
 import { useAddUserMutation } from "../../features/users/usersSlice";
-import { useListDepartMentQuery } from "../../features/utils/utilsSlice";
+import {
+  useListDepartMentQuery,
+  useListTeamQuery,
+} from "../../features/utils/utilsSlice";
 import toast from "react-hot-toast";
 import "../../css/commonLayout.css";
 import {
@@ -131,6 +134,7 @@ const schema = z.object({
       "Password must include One uppercase, lowercase, number & One special character"
     ),
   id_department: z.number().min(1, "Department is required"),
+  team_id: z.number().min(1, "Team is required"),
   joining_date: z.string().min(1, "Joining date is required"),
   whatsapp_no: z
     .string()
@@ -194,6 +198,7 @@ const defaultValues = {
   firstname: "",
   lastname: "",
   password: "",
+  team_id: 0,
   id_department: 0,
   joining_date: "",
   whatsapp_no: "",
@@ -253,8 +258,8 @@ const InputField = ({
       ${error ? "border-red-500" : "border-[var(--border)]"}`}
         >
           <option value="">Select {label}</option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
+          {options.map((opt, index) => (
+            <option key={index} value={opt}>
               {opt}
             </option>
           ))}
@@ -299,6 +304,8 @@ const AddUserDetails = ({ step, setStep }) => {
   const [addUserDetailsInformation, { isLoading }] = useAddUserMutation();
   const { token } = useAuth();
   const { data } = useListDepartMentQuery(token);
+  const { data: teamListData } = useListTeamQuery(token);
+  const { team_data = [] } = teamListData?.body || {};
   const { dep_data = [] } = data?.body || {};
 
   const {
@@ -350,6 +357,7 @@ const AddUserDetails = ({ step, setStep }) => {
           !!vals.job_title &&
           !!vals.job_status &&
           !!vals.joining_date &&
+          !!vals.team_id &&
           !!vals.id_department &&
           vals.salary > 0 &&
           // contact
@@ -417,6 +425,7 @@ const AddUserDetails = ({ step, setStep }) => {
       "job_title",
       "job_status",
       "joining_date",
+      "team_id",
       "id_department",
       "salary",
       "incentive",
@@ -496,7 +505,7 @@ const AddUserDetails = ({ step, setStep }) => {
     if (valid && nextTabId) {
       enableTab(nextTabId);
       setActiveTab(nextTabId);
-    } 
+    }
   };
 
   const handleBack = () => {
@@ -598,7 +607,6 @@ const AddUserDetails = ({ step, setStep }) => {
                       />
                     )}
                   />
-
                   <Controller
                     control={control}
                     name="job_title"
@@ -643,6 +651,31 @@ const AddUserDetails = ({ step, setStep }) => {
                         error={errors?.joining_date?.message}
                       />
                     )}
+                  />
+                  <Controller
+                    control={control}
+                    name="team_id"
+                    render={({ field }) => {
+                      const selectedDep = team_data.find(
+                        (dep) => dep?.team_id === field.value
+                      );
+                      return (
+                        <InputField
+                          label="Team"
+                          value={selectedDep?.name ?? ""}
+                          onChange={(selectedName) => {
+                            const team = team_data?.find(
+                              (d) => d.name === selectedName
+                            );
+                            field.onChange(team ? team.team_id : 0);
+                          }}
+                          options={team_data?.map((d) => d?.name)}
+                          required
+                          Icon={Building2}
+                          error={errors?.team_id?.message}
+                        />
+                      );
+                    }}
                   />
                   <Controller
                     control={control}

@@ -48,6 +48,17 @@ export const utilsSlice = createApi({
         body,
       }),
     }),
+    listTeam: builder.query({
+      query: (Token) => ({
+        url: "/list-team",
+        method: "POST",
+        body: { token: Token },
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
     reVerifySession: builder.mutation({
       query: (reVerifyInfo) => ({
         url: "/re-verify-session",
@@ -77,6 +88,7 @@ export const {
   useLeftSideNavigationMenuMutation,
   useAllProfileMenuMutation,
   useListDepartMentQuery,
+  useListTeamQuery,
   useReVerifySessionMutation,
   useNavigationCollectorMutation,
 } = utilsSlice;

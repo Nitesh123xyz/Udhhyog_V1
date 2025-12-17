@@ -136,7 +136,7 @@ function ColorDropdown({ value, onChange, error, presentColor }) {
   );
 }
 
-const ViewAllTeam = ({ setStep, setTeamId }) => {
+const ViewAllTeam = ({ setStep, setTeamId, setTeamName }) => {
   const { token } = useAuth();
   const { currentData, refetch } = useGetAllTeamQuery(token);
   const serverTeams = currentData?.body?.view ?? [];
@@ -309,6 +309,7 @@ const ViewAllTeam = ({ setStep, setTeamId }) => {
                 style={{ backgroundColor: member?.color_code || "transparent" }}
                 onClick={() => {
                   setTeamId?.(member?.team_id);
+                  setTeamName?.(member?.name);
                   setStep?.(2);
                 }}
               >

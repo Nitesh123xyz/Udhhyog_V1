@@ -1,5 +1,13 @@
 import React, { useMemo, useState } from "react";
-import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  CircleUserRound,
+  Settings,
+  UserPlus,
+  X,
+} from "lucide-react";
 import {
   useAddUserTeamHeadMutation,
   useDeleteUserTeamHeadMutation,
@@ -9,7 +17,7 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import AddTeamManager from "./AddTeamManager";
 
-const ViewTeam = ({ setStep, teamId }) => {
+const ViewTeam = ({ setStep, teamId, teamName }) => {
   const { token } = useAuth();
   const [openSection, setOpenSection] = useState(null);
   const [selectedMembers, setSelectedMembers] = useState({});
@@ -23,12 +31,15 @@ const ViewTeam = ({ setStep, teamId }) => {
   const { unassigned_data, assigned_data, members } = currentData?.body ?? {};
 
   const sections = [
-    { id: "unassigned", title: "Unassigned" },
-    { id: "sale", title: "Sale" },
-    { id: "purchase", title: "Purchase" },
-    { id: "Account", title: "Account" },
-    { id: "Credit", title: "Credit" },
-    { id: "Recovery", title: "Recovery" },
+    { id: "unassigned", title: "UNASSIGNED" },
+    { id: "sale", title: "SALE" },
+    { id: "purchase", title: "PURCHASE" },
+    { id: "dispatch", title: "DISPATCH" },
+    { id: "accounts", title: "ACCOUNTS" },
+    { id: "credit", title: "CREDIT" },
+    { id: "recovery", title: "RECOVERY" },
+    { id: "tech", title: "TECH" },
+    { id: "marketing", title: "MARKETING" },
   ];
 
   const toggleSection = (id) => {
@@ -111,16 +122,33 @@ const ViewTeam = ({ setStep, teamId }) => {
 
   return (
     <div className="bg-[var(--background)] p-3 rounded-lg min-h-screen">
-      <div className="flex items-center gap-2.5">
-        <div
-          onClick={() => setStep(1)}
-          className="cursor-pointer p-2 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
-        >
-          <ArrowLeft size={15} className="text-gray-800" />
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2.5 items-center">
+          <div
+            onClick={() => setStep(1)}
+            className="cursor-pointer p-2 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
+          >
+            <ArrowLeft size={15} className="text-gray-800" />
+          </div>
+          <h1 className="text-2xl md:text-2xl font-bold text-[var(--text)]">
+            {teamName}
+          </h1>
         </div>
-        <h1 className="text-2xl md:text-2xl font-bold text-[var(--text)]">
-          Task Management
-        </h1>
+
+        <div className="flex justify-center items-center gap-2.5">
+          <div
+            onClick={() => setOpenAddForm(true)}
+            className="cursor-pointer p-2 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
+          >
+            <UserPlus size={15} className="text-gray-800" />
+          </div>
+          <div
+            // onClick={() => setStep(1)}
+            className="cursor-pointer p-2 flex items-center justify-center bg-yellow-400 backdrop-blur-sm rounded-full shadow-sm"
+          >
+            <Settings size={15} className="text-gray-800" />
+          </div>
+        </div>
       </div>
 
       <hr className="text-gray-500 my-2" />
@@ -134,16 +162,10 @@ const ViewTeam = ({ setStep, teamId }) => {
               className="border border-[var(--border)] rounded-lg overflow-hidden transition-all duration-500 ease-in-out w-full md:w-1/4 flex flex-col"
             >
               <div className="bg-[var(--background)] h-full flex flex-col">
-                <div className="p-4 border-b-1 border-[var(--border)] flex justify-between items-center">
+                <div className="p-4 border-b-1 border-[var(--border)]">
                   <h2 className="text-lg md:text-xl font-semibold text-[var(--text)]">
                     {section.title}
                   </h2>
-                  <button
-                    onClick={() => setOpenAddForm(true)}
-                    className="cursor-pointer rounded-md px-2 py-1.5 bg-blue-400 backdrop-blur-sm text-white hover:bg-blue-500 transition-all duration-200"
-                  >
-                    Add Manager
-                  </button>
                 </div>
 
                 <div className="flex-1 bg-[var(--background)] p-4 overflow-y-auto">
@@ -209,7 +231,7 @@ const ViewTeam = ({ setStep, teamId }) => {
                   className={`border border-[var(--border)] rounded-lg transition-all duration-500 ease-in-out ${
                     open
                       ? "w-full md:flex-1 flex flex-col overflow-hidden"
-                      : "w-full md:w-20 h-16 md:h-auto flex md:flex-col overflow-visible"
+                      : "w-full md:w-24 h-16 md:h-auto flex md:flex-col overflow-visible"
                   }`}
                 >
                   <div
@@ -372,9 +394,6 @@ const ViewTeam = ({ setStep, teamId }) => {
                                         </p>
                                         <p className="text-sm md:text-base text-[var(--text)] font-medium">
                                           {person?.user_department}
-                                        </p>
-                                        <p className="text-xs md:text-sm text-[var(--text)] mt-1">
-                                          Assigned to {person?.teamdepartment}
                                         </p>
                                       </div>
 
