@@ -10,6 +10,7 @@ import ReVerifySession from "../components/ReVerifySession";
 // ---------------------------------------------------
 
 const ManageUser = lazy(() => import("../pages/user/ManageUser"));
+const ManageVendor = lazy(() => import("../pages/vendor/ManageVendor"));
 const Permissions = lazy(() => import("../pages/Permission"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const ResetPassword = lazy(() =>
@@ -93,6 +94,17 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <PermissionGate>
               <ManageTeam />
+            </PermissionGate>
+          </ProtectedRoute>
+        ),
+        caseSensitive: true,
+      },
+      {
+        path: "/vendors",
+        element: (
+          <ProtectedRoute>
+            <PermissionGate>
+              <ManageVendor />
             </PermissionGate>
           </ProtectedRoute>
         ),
