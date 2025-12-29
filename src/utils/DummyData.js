@@ -988,3 +988,45 @@ export const employeesHeading = [
   },
   { id: 7, name: "active", label: "Status", status: true, active: false },
 ];
+
+// ====================================================
+
+export const VendorHeading = [
+  { id: 0, name: "vendor_id", label: "Vendor_id", status: true, active: false },
+  {
+    id: 1,
+    name: "company_name",
+    label: "Company_Name",
+    status: true,
+    active: false,
+  },
+  {
+    id: 2,
+    name: "credit_time",
+    label: "Credit_Time",
+    status: true,
+    active: false,
+  },
+  {
+    id: 3,
+    name: "com_emailid",
+    label: "Compnay_Emailid",
+    status: true,
+    active: false,
+  },
+  {
+    id: 4,
+    name: "com_type",
+    label: "Company_Type",
+    status: true,
+    active: false,
+  },
+  {
+    id: 5,
+    name: "com_gst",
+    label: "Company_Gst",
+    status: true,
+    active: false,
+  },
+  { id: 6, name: "active", label: "Status", status: true, active: false },
+];

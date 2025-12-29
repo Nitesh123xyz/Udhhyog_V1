@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { User, Phone, Mail, Home, Landmark, FileText } from "lucide-react";
+import { User, Phone, Mail, Home, Landmark, FileText, X } from "lucide-react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,51 +8,20 @@ import useAuth from "../../hooks/useAuth";
 import { useAddVendorAdditionalDetailsMutation } from "../../features/vendor/vendorSlice";
 
 /* -------------------------------------------------------------------------- */
-/*                               InputField                                   */
-/* -------------------------------------------------------------------------- */
-
-const InputField = ({ label, value, onChange, type = "text", Icon, error }) => (
-  <div className="space-y-1">
-    <label className="flex items-center gap-2 text-sm font-medium text-[var(--text)]">
-      {Icon && <Icon size={16} />}
-      {label}
-    </label>
-
-    {type === "textarea" ? (
-      <textarea
-        rows={3}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-3 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--text)] outline-none"
-      />
-    ) : (
-      <input
-        type={type}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-3 border border-[var(--border)] rounded-lg bg-[var(--background)] text-[var(--text)] outline-none"
-      />
-    )}
-
-    {error && <p className="text-xs text-red-500">{error}</p>}
-  </div>
-);
-
-/* -------------------------------------------------------------------------- */
-/*                                  Schemas                                   */
+/*                                   Schemas                                  */
 /* -------------------------------------------------------------------------- */
 
 const contactSchema = z.object({
-  person_name: z.string().min(1),
-  designation: z.string().min(1),
-  phoneno1: z.string().min(10).max(10),
+  person_name: z.string().min(1, "Required"),
+  designation: z.string().min(1, "Required"),
+  phoneno1: z.string().length(10, "10 digits required"),
   phoneno2: z.string().optional(),
-  contact_emailid: z.string().email(),
+  contact_emailid: z.string().email("Invalid email"),
 });
 
 const addressSchema = z.object({
   vendor_address: z.string().min(1),
-  pincode: z.string().min(6).max(6),
+  pincode: z.string().length(6),
   add_type: z.string().min(1),
   short_name: z.string().min(1),
   gst: z.string().optional(),
@@ -72,13 +41,69 @@ const documentSchema = z.object({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                             Main Component                                  */
+/*                              UI Components                                  */
 /* -------------------------------------------------------------------------- */
 
-const AddVendorAdditionalDetails = ({ vendor_id }) => {
+const InputField = ({ label, value, onChange, error, type = "text", Icon }) => (
+  <div className="space-y-1">
+    <label className="flex items-center gap-2 text-sm font-medium text-[var(--text)]">
+      {Icon && <Icon size={16} />}
+      {label}
+    </label>
+
+    {type === "textarea" ? (
+      <textarea
+        rows={1}
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-3 border rounded-lg outline-none border-[var(--border)] text-[var(--text)]"
+      />
+    ) : (
+      <input
+        type={type}
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-3 py-3 border rounded-lg outline-none border-[var(--border)] text-[var(--text)]"
+      />
+    )}
+
+    {error && <p className="text-xs text-red-500">{error}</p>}
+  </div>
+);
+
+const Field = ({ control, name, label, type, Icon }) => (
+  <Controller
+    control={control}
+    name={name}
+    render={({ field, fieldState }) => (
+      <InputField
+        label={label}
+        type={type}
+        Icon={Icon}
+        value={field.value}
+        onChange={field.onChange}
+        error={fieldState.error?.message}
+      />
+    )}
+  />
+);
+
+/* -------------------------------------------------------------------------- */
+/*                                Main Component                               */
+/* -------------------------------------------------------------------------- */
+
+const STEPS = [
+  { key: "contact", label: "Contact", subaction: "vendor_contact" },
+  { key: "address", label: "Address", subaction: "vendor_address" },
+  { key: "bank", label: "Bank", subaction: "vendor_bankdetail" },
+  { key: "document", label: "Document", subaction: "vendor_document" },
+];
+
+const AddVendorAdditionalDetails = ({ vendor_id, open, onClose }) => {
   const { token } = useAuth();
   const [addVendor] = useAddVendorAdditionalDetailsMutation();
-  const [activeForm, setActiveForm] = useState("contact");
+
+  const [step, setStep] = useState(0);
 
   const contactForm = useForm({ resolver: zodResolver(contactSchema) });
   const addressForm = useForm({ resolver: zodResolver(addressSchema) });
@@ -96,19 +121,29 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
     name: "documents",
   });
 
-  const submitSection = async (data, subaction, reset) => {
+  if (!open) return null;
+
+  /* ----------------------------- Submit Handler ----------------------------- */
+
+  const submitStep = async (data, subaction, reset, isLast = false) => {
     try {
       const res = await addVendor({
         token,
         vendor_id,
-        action: "ADD",
+        action: "add",
         subaction,
         ...data,
       }).unwrap();
 
       if (res?.status === 200) {
         toast.success("Added successfully");
-        reset && reset();
+        reset();
+
+        if (isLast) {
+          onClose?.();
+        } else {
+          setStep((s) => s + 1);
+        }
       }
     } catch {
       toast.error("Operation failed");
@@ -116,43 +151,40 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
   };
 
   return (
-    <div className="h-screen bg-[var(--background)] p-6 text-[var(--text)]">
-      <div className="rounded-xl shadow-lg p-6 border border-[var(--border)]">
-        {/* ===================== TOP BUTTONS ===================== */}
-        <div className="flex gap-3 border-b border-[var(--border)] pb-4 mb-6">
-          <TopButton
-            icon={User}
-            label="Contact"
-            active={activeForm === "contact"}
-            onClick={() => setActiveForm("contact")}
-          />
-          <TopButton
-            icon={Home}
-            label="Address"
-            active={activeForm === "address"}
-            onClick={() => setActiveForm("address")}
-          />
-          <TopButton
-            icon={FileText}
-            label="Document"
-            active={activeForm === "document"}
-            onClick={() => setActiveForm("document")}
-          />
-          <TopButton
-            icon={Landmark}
-            label="Bank"
-            active={activeForm === "bank"}
-            onClick={() => setActiveForm("bank")}
-          />
+    <div className="fixed inset-0 z-[999] bg-black/20 flex items-center rounded-lg justify-center">
+      <div className="relative w-full max-w-6xl bg-[var(--background)] rounded-lg p-6 h-[30rem]">
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="cursor-pointer absolute top-4 right-4 p-2 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
+        >
+          <X size={15} />
+        </button>
+
+        {/* Tabs*/}
+        <div className="flex gap-3 border-b border-[var(--border)] mb-6 pb-3">
+          {STEPS.map((s, i) => (
+            <button
+              key={s.key}
+              onClick={() => setStep(i)}
+              className={`p-3 rounded-lg transition ${
+                i === step
+                  ? "bg-[var(--border)] text-white"
+                  : "text-[var(--text)] hover:bg-[var(--permissionTable)]"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
         </div>
 
-        {activeForm === "contact" && (
-          <FormSection
-            title="Vendor Contact Details"
-            form={contactForm}
-            onSubmit={(d) =>
-              submitSection(d, "VENDOR_CONTACT", contactForm.reset)
-            }
+        {/* CONTACT */}
+        {step === 0 && (
+          <Section
+            title="Contact Details"
+            onAdd={contactForm.handleSubmit((d) =>
+              submitStep(d, "vendor_contact", contactForm.reset)
+            )}
           >
             <Field
               control={contactForm.control}
@@ -183,24 +215,23 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
               label="Phone No 2"
               Icon={Phone}
             />
-          </FormSection>
+          </Section>
         )}
 
-        {activeForm === "address" && (
-          <FormSection
-            title="Vendor Address Details"
-            form={addressForm}
-            onSubmit={(d) =>
-              submitSection(d, "VENDOR_ADDRESS", addressForm.reset)
-            }
+        {/* ADDRESS */}
+        {step === 1 && (
+          <Section
+            title="Address Details"
+            onAdd={addressForm.handleSubmit((d) =>
+              submitStep(d, "vendor_address", addressForm.reset)
+            )}
           >
             <Field
               control={addressForm.control}
-              name="vendor_address"
-              label="Address"
-              type="textarea"
-              Icon={Home}
+              name="add_type"
+              label="Address Type"
             />
+
             <Field
               control={addressForm.control}
               name="pincode"
@@ -208,74 +239,27 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
             />
             <Field
               control={addressForm.control}
-              name="add_type"
-              label="Address Type"
-            />
-            <Field
-              control={addressForm.control}
               name="short_name"
               label="Short Name"
             />
             <Field control={addressForm.control} name="gst" label="GST" />
-          </FormSection>
-        )}
-
-        {activeForm === "document" && (
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-[var(--text)]">
-              Vendor Documents
-            </h2>
-            {docFA.fields.map((_, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4"
-              >
-                <DocField
-                  form={documentForm}
-                  index={index}
-                  name="doc_type"
-                  label="Type"
-                />
-                <DocField
-                  form={documentForm}
-                  index={index}
-                  name="number"
-                  label="Number"
-                />
-                <DocField
-                  form={documentForm}
-                  index={index}
-                  name="url"
-                  label="URL"
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                docFA.append({ doc_type: "", number: "", url: "" })
-              }
-              className="text-sm underline text-[var(--text)]"
-            >
-              + Add another document
-            </button>
-            <SubmitButton
-              onClick={documentForm.handleSubmit(({ documents }) =>
-                documents.forEach((doc) =>
-                  submitSection(doc, "VENDOR_DOCUMENT")
-                )
-              )}
+            <Field
+              control={addressForm.control}
+              name="vendor_address"
+              label="Address"
+              type="textarea"
+              Icon={Home}
             />
-          </div>
+          </Section>
         )}
 
-        {activeForm === "bank" && (
-          <FormSection
-            title="Vendor Bank Details"
-            form={bankForm}
-            onSubmit={(d) =>
-              submitSection(d, "VENDOR_BANKDETAIL", bankForm.reset)
-            }
+        {/* BANK */}
+        {step === 2 && (
+          <Section
+            title="Bank Details"
+            onAdd={bankForm.handleSubmit((d) =>
+              submitStep(d, "vendor_bankdetail", bankForm.reset)
+            )}
           >
             <Field
               control={bankForm.control}
@@ -298,7 +282,76 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
               name="branch_name"
               label="Branch Name"
             />
-          </FormSection>
+          </Section>
+        )}
+
+        {/* DOCUMENT – LAST */}
+        {step === 3 && (
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-[var(--text)]">
+              Documents
+            </h2>
+
+            {docFA.fields.map((_, index) => (
+              <div key={index} className="grid grid-cols-3 gap-4 mb-4">
+                <Controller
+                  control={documentForm.control}
+                  name={`documents.${index}.doc_type`}
+                  render={({ field }) => (
+                    <InputField
+                      label="Type"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                <Controller
+                  control={documentForm.control}
+                  name={`documents.${index}.number`}
+                  render={({ field }) => (
+                    <InputField
+                      label="Number"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+                <Controller
+                  control={documentForm.control}
+                  name={`documents.${index}.url`}
+                  render={({ field }) => (
+                    <InputField
+                      label="URL"
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
+                />
+              </div>
+            ))}
+
+            <button
+              onClick={() =>
+                docFA.append({ doc_type: "", number: "", url: "" })
+              }
+              className="underline text-sm"
+            >
+              + Add another document
+            </button>
+
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={documentForm.handleSubmit(({ documents }) =>
+                  documents.forEach((doc) =>
+                    submitStep(doc, "vendor_document", documentForm.reset, true)
+                  )
+                )}
+                className="px-6 py-2 border rounded-lg font-semibold"
+              >
+                Add
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
@@ -306,65 +359,23 @@ const AddVendorAdditionalDetails = ({ vendor_id }) => {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                               UI Helpers                                   */
+/*                               Section Wrapper                               */
 /* -------------------------------------------------------------------------- */
 
-const TopButton = ({ icon: Icon, label, active, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`cursor-pointer flex items-center gap-2 px-5 py-3 rounded-lg transition ${
-      active ? "text-[var(--text)] bg-[var(--permissionTable)]" : "bg-transparent text-[var(--text)] hover:bg-[var(--permissionTable)]"
-    }`}
-  >
-    <Icon size={16} />
-    {label}
-  </button>
-);
-
-const FormSection = ({ title, form, onSubmit, children }) => (
+const Section = ({ title, children, onAdd }) => (
   <div>
     <h2 className="text-xl font-semibold mb-4 text-[var(--text)]">{title}</h2>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{children}</div>
-    <SubmitButton onClick={form.handleSubmit(onSubmit)} />
+
+    <div className="flex justify-end mt-6">
+      <button
+        onClick={onAdd}
+        className="cursor-pointer px-6 py-2 font-semibold text-[var(--text)] bg-blue-500 rounded-md hover:bg-blue-400 transition-colors "
+      >
+        Add
+      </button>
+    </div>
   </div>
-);
-
-const SubmitButton = ({ onClick }) => (
-  <div className="flex justify-end mt-6">
-    <button
-      onClick={onClick}
-      className="px-6 py-3 border border-[var(--border)] rounded-lg font-semibold text-[var(--text)]"
-    >
-      Add
-    </button>
-  </div>
-);
-
-const Field = ({ control, name, label, type, Icon }) => (
-  <Controller
-    control={control}
-    name={name}
-    render={({ field, fieldState }) => (
-      <InputField
-        label={label}
-        type={type}
-        Icon={Icon}
-        value={field.value}
-        onChange={field.onChange}
-        error={fieldState.error?.message}
-      />
-    )}
-  />
-);
-
-const DocField = ({ form, index, name, label }) => (
-  <Controller
-    control={form.control}
-    name={`documents.${index}.${name}`}
-    render={({ field }) => (
-      <InputField label={label} value={field.value} onChange={field.onChange} />
-    )}
-  />
 );
 
 export default AddVendorAdditionalDetails;

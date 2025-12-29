@@ -5,11 +5,13 @@ export const encodePayload = (data) => ({
 });
 
 export const decodePayload = (data) => {
-  if (!data) return null;
-  try {
-    const decoded = base32.decode(data);
-    return JSON.parse(decoded);
-  } catch {
-    return data;
+  if (!data) return;
+  if (typeof data === "string" && /^[A-Z2-7]+=*$/i.test(data)) {
+    try {
+      const decoded = JSON.parse(base32.decode(data));
+      return decoded;
+    } catch (err) {
+      console.log(err);
+    }
   }
 };

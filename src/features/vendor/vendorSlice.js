@@ -10,20 +10,38 @@ export const VendorSlice = createApi({
       return headers;
     },
     responseHandler: async (response) => {
-      return await response.text();
+      return (await response.json()) || response.text();
     },
   }),
+  tagTypes: ["Vendor"],
   endpoints: (builder) => ({
     ViewVendor: builder.query({
-      query: (preferenceInfo) => ({
+      query: (vendorInfo) => ({
         url: "/vendor",
         method: "POST",
-        body: encodePayload(preferenceInfo),
+        body: encodePayload(vendorInfo),
       }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
+      transformResponse: (body, meta) => {
+        return {
+          status: meta?.response?.status ?? 0,
+          body: decodePayload(body?.data),
+        };
+      },
+      providesTags: ["Vendor"],
+    }),
+    ViewVendorAdditionalInfo: builder.query({
+      query: (vendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(vendorInfo),
       }),
+      transformResponse: (body, meta) => {
+        return {
+          status: meta?.response?.status ?? 0,
+          body: decodePayload(body?.data),
+        };
+      },
+      providesTags: ["Vendor"],
     }),
 
     AddVendor: builder.mutation({
@@ -36,6 +54,7 @@ export const VendorSlice = createApi({
         status: meta?.response?.status ?? 0,
         body: decodePayload(body),
       }),
+      invalidatesTags: ["Vendor"],
     }),
     AddVendorAdditionalDetails: builder.mutation({
       query: (addVendorInfo) => ({
@@ -47,12 +66,14 @@ export const VendorSlice = createApi({
         status: meta?.response?.status ?? 0,
         body: decodePayload(body),
       }),
+      invalidatesTags: ["Vendor"],
     }),
   }),
 });
 
 export const {
   useViewVendorQuery,
+  useViewVendorAdditionalInfoQuery,
   useAddVendorMutation,
   useAddVendorAdditionalDetailsMutation,
 } = VendorSlice;

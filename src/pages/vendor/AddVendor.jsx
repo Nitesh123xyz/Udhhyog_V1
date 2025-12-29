@@ -16,10 +16,10 @@ import useAuth from "../../hooks/useAuth";
 
 const companyTypes = [
   "retailer",
-  "manufacturer",
-  "distributor",
+  "manufacture",
+  "distributer",
   "trader",
-  "transporter",
+  "transpoter",
 ];
 
 const schema = z.object({
@@ -34,7 +34,7 @@ const schema = z.object({
   com_gst: z.string().min(1, { message: "GST is required" }),
 });
 
-function AddVendorModal({ setOpenAddFrom }) {
+const AddVendor = ({ setOpenAddFrom }) => {
   const { token } = useAuth();
   const [AddVendor] = useAddVendorMutation();
 
@@ -230,6 +230,6 @@ function AddVendorModal({ setOpenAddFrom }) {
       </div>
     </div>
   );
-}
+};
 
-export default AddVendorModal;
+export default AddVendor;
