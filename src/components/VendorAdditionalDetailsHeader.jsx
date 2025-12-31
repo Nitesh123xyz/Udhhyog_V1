@@ -19,11 +19,7 @@ const VendorAdditionalDetailsHeader = ({
           <ArrowLeft size={15} className="text-gray-800" />
         </div>
         <h2 className="flex items-center gap-4 text-[var(--text)] uppercase text-sm lg:text-lg">
-          {step === 2
-            ? "Additional Details"
-            : step === 4
-            ? "Add User"
-            : "Update User"}
+          Additional Details
         </h2>
       </div>
       <div className="flex">

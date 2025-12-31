@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ViewVendor from "./ViewVendor";
 import ViewVendorAdditionalDetails from "./ViewVendorAdditionalDetails";
+import UpdateVendor from "./UpdateVendor";
 
 const ManageVendor = () => {
   const [step, setStep] = useState(1);
@@ -15,14 +16,7 @@ const ManageVendor = () => {
           vendorId={vendorId}
         />
       )}
-      {/* {step === 3 && (
-        <UpdateUserDetails
-          step={step}
-          setStep={setStep}
-          vendorId={vendorId}
-        />
-      )}
-      {step === 4 && <AddUserDetails step={step} setStep={setStep} />} */}
+      {step === 3 && <UpdateVendor setStep={setStep} vendorId={vendorId} />}
     </>
   );
 };
