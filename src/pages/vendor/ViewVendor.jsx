@@ -20,6 +20,9 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
   const [order, setOrder] = useState("_a");
   const [currentSort, setCurrentSort] = useState(null);
   const [currentActive, setCurrentActive] = useState(null);
@@ -211,6 +214,8 @@ const ViewVendor = ({ setStep, setVendorId }) => {
           <Pagination
             itemsPerPage={itemsPerPage}
             currentPage={currentPage}
+            startIndex={startIndex}
+            endIndex={endIndex}
             setCurrentPage={setCurrentPage}
             setItemsPerPage={(val) => {
               setItemsPerPage(Number(val));

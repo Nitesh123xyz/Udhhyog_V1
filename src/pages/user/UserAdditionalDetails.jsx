@@ -14,6 +14,7 @@ import { formatDateToIndian, formatRupees } from "../../utils/formatter";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
+import "../../css/commonLayout.css";
 const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [preview, setPreview] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -233,7 +234,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -294,7 +295,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -404,7 +405,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full min-w-[32rem]  text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -471,7 +472,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>

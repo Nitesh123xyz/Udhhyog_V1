@@ -12,6 +12,7 @@ import Loader from "../../components/Loader";
 import { useViewVendorAdditionalInfoQuery } from "../../features/vendor/vendorSlice";
 import VendorAdditionalDetailsHeader from "../../components/VendorAdditionalDetailsHeader";
 import AddVendorAdditionalDetails from "./AddVendorAdditionalDetails";
+import "../../css/commonLayout.css";
 const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
   const [open, setOpen] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -145,7 +146,7 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -225,7 +226,7 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
                 </h3>
               </div>
 
-              <div className="max-h-[250px] overflow-y-auto rounded-lg">
+              <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
                 <table className="w-full min-w-[32rem] text-sm table-auto border-collapse">
                   <thead>
                     <tr>
@@ -333,7 +334,7 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
               </h3>
             </div>
 
-            <div className="max-h-[250px] overflow-y-auto rounded-lg">
+            <div className="max-h-[250px] overflow-y-auto rounded-lg custom-scroll">
               <table className="w-full min-w-[45rem] text-sm table-auto border-collapse">
                 <thead>
                   <tr>
