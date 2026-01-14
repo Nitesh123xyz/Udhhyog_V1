@@ -29,6 +29,7 @@ export const VendorSlice = createApi({
       },
       providesTags: ["Vendor"],
     }),
+
     ViewVendorAdditionalInfo: builder.query({
       query: (vendorInfo) => ({
         url: "/vendor",
@@ -56,7 +57,73 @@ export const VendorSlice = createApi({
       }),
       invalidatesTags: ["Vendor"],
     }),
+
     AddVendorAdditionalDetails: builder.mutation({
+      query: (addVendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(addVendorInfo),
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body: decodePayload(body),
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
+
+    UpdateVendorBasic: builder.mutation({
+      query: (addVendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(addVendorInfo),
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body: decodePayload(body),
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
+
+    UpdateVendorContact: builder.mutation({
+      query: (addVendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(addVendorInfo),
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body: decodePayload(body),
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
+
+    UpdateVendorAddress: builder.mutation({
+      query: (addVendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(addVendorInfo),
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body: decodePayload(body),
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
+
+    UpdateVendorDocument: builder.mutation({
+      query: (addVendorInfo) => ({
+        url: "/vendor",
+        method: "POST",
+        body: encodePayload(addVendorInfo),
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body: decodePayload(body),
+      }),
+      invalidatesTags: ["Vendor"],
+    }),
+
+    UpdateVendorBank: builder.mutation({
       query: (addVendorInfo) => ({
         url: "/vendor",
         method: "POST",
@@ -76,4 +143,12 @@ export const {
   useViewVendorAdditionalInfoQuery,
   useAddVendorMutation,
   useAddVendorAdditionalDetailsMutation,
+
+  // -----------------------------------
+
+  useUpdateVendorBasicMutation,
+  useUpdateVendorContactMutation,
+  useUpdateVendorAddressMutation,
+  useUpdateVendorDocumentMutation,
+  useUpdateVendorBankMutation,
 } = VendorSlice;

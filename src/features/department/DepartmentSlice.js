@@ -57,6 +57,28 @@ export const DepartmentSlice = createApi({
         body,
       }),
     }),
+    AddUserDepartmentHierarchy: builder.mutation({
+      query: (teamData) => ({
+        url: "/add-user-dep-heirarchy",
+        method: "POST",
+        body: teamData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
+    DeleteUserDepartmentHierarchy: builder.mutation({
+      query: (teamData) => ({
+        url: "/del-user-dep-heirarchy",
+        method: "POST",
+        body: teamData,
+      }),
+      transformResponse: (body, meta) => ({
+        status: meta?.response?.status ?? 0,
+        body,
+      }),
+    }),
   }),
 });
 
@@ -65,4 +87,7 @@ export const {
   useViewDepartmentQuery,
   useAddDepartmentMutation,
   useEditDepartmentMutation,
+  // -----------------------------
+  useAddUserDepartmentHierarchyMutation,
+  useDeleteUserDepartmentHierarchyMutation,
 } = DepartmentSlice;
