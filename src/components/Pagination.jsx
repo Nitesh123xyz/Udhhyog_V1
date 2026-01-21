@@ -1,3 +1,5 @@
+import { ChevronDown } from "lucide-react";
+
 const Pagination = ({
   currentPage = 10,
   setItemsPerPage = () => {},
@@ -30,26 +32,34 @@ const Pagination = ({
       currentPage,
       currentPage + 1,
       "...",
-      totalPages
+      totalPages,
     );
   }
 
   return (
     <div className="px-6 py-4 border-t border-[var(--border)]">
       <div className="flex items-center justify-between">
-        <div className="flex gap-2.5 items-center">
+        <div className="flex items-center gap-2.5">
           <div className="text-[0.7rem] md:text-sm text-[var(--text)]">
             {TotalPages === 0 ? 0 : startIndex + 1} to{" "}
             {Math.min(endIndex, TotalPages)} of {TotalPages} results
           </div>
-          <select
-            onChange={(e) => setItemsPerPage(e.target.value)}
-            className="px-3 py-1 border border-[var(--border)] outline-none rounded-md text-[0.7rem] md:text-sm text-[var(--text)] bg-[var(--background)]"
-          >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-          </select>
+
+          <div className="relative">
+            <select
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              className="appearance-none px-3 pr-8 py-1 border border-[var(--border)] rounded-md text-[0.7rem] md:text-sm text-[var(--text)] bg-[var(--background)] outline-none cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+
+            <ChevronDown
+              size={14}
+              className=" pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-70"
+            />
+          </div>
         </div>
 
         {/* Pagination Buttons */}
@@ -75,7 +85,7 @@ const Pagination = ({
               >
                 {page}
               </button>
-            )
+            ),
           )}
         </div>
       </div>

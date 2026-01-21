@@ -14,7 +14,7 @@ import {
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
-import VendorAdditionalDetailsHeader from "../../components/VendorAdditionalDetailsHeader";
+import VendorAdditionalDetailsHeader from "../../components/vendor/VendorAdditionalDetailsHeader";
 import {
   useViewVendorAdditionalInfoQuery,
   useUpdateVendorBasicMutation,
@@ -34,7 +34,7 @@ const companyTypes = [
 ];
 
 const inputClass =
-  "w-full mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none";
+  "w- mt-1 px-3 py-2 rounded-md border border-[var(--border)] bg-transparent text-[var(--text)] outline-none";
 
 /* ================== ZOD SCHEMA ================== */
 
@@ -53,7 +53,7 @@ const schema = z.object({
       phoneno1: z.string().length(10),
       phoneno2: z.string().optional(),
       contact_emailid: z.string().email(),
-    })
+    }),
   ),
 
   address: z.array(
@@ -64,7 +64,7 @@ const schema = z.object({
       gst: z.string().optional(),
       pincode: z.string().length(6),
       add_type: z.string(),
-    })
+    }),
   ),
 
   bankdetail: z.array(
@@ -74,7 +74,7 @@ const schema = z.object({
       bank_name: z.string(),
       branch_name: z.string(),
       ifsc_code: z.string(),
-    })
+    }),
   ),
 });
 
@@ -120,7 +120,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
             address: [],
             bankdetail: [],
           },
-    [data]
+    [data],
   );
 
   const { register, control, reset, getValues } = useForm({
@@ -200,7 +200,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
   if (isLoading) return <Loader />;
 
   return (
-    <section className="bg-[var(--background)] rounded-t-lg border border-[var(--border)] p-2">
+    <section className="bg-[var(--background)] rounded-t-lg border border-[var(--border)] p-1">
       <VendorAdditionalDetailsHeader step={step} setStep={setStep} />
 
       {/* ================== BASIC ================== */}
@@ -235,7 +235,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
         <div className="flex justify-end mt-2">
           <button
             onClick={saveBasic}
-            className="cursor-pointer p-2 bg-blue-400 rounded-full shadow-sm"
+            className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
           >
             <Save size={18} className="text-white" />
           </button>
@@ -268,7 +268,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
         {contactsField.fields.map((_, i) => (
           <div
             key={i}
-            className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end mb-2"
+            className="grid grid-cols-1 sm:grid-cols-6 gap-2 items-end mb-2"
           >
             <input
               {...register(`contacts.${i}.person_name`)}
@@ -293,16 +293,18 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
 
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={() => saveContact(i)}
-                className="p-2 bg-blue-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <Save size={16} className="text-white" />
+                <Save size={18} className="text-white" />
               </button>
               <button
+                type="button"
                 onClick={() => contactsField.remove(i)}
-                className="p-2 bg-red-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <X size={16} className="text-white" />
+                <X size={18} className="text-white" />
               </button>
             </div>
           </div>
@@ -335,7 +337,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
         {addressField.fields.map((_, i) => (
           <div
             key={i}
-            className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end mb-2"
+            className="grid grid-cols-1 sm:grid-cols-6 gap-2 items-end mb-2"
           >
             <input
               {...register(`address.${i}.short_name`)}
@@ -358,15 +360,15 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
             <div className="flex gap-2">
               <button
                 onClick={() => saveAddress(i)}
-                className="p-2 bg-blue-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <Save size={16} className="text-white" />
+                <Save size={18} className="text-white" />
               </button>
               <button
                 onClick={() => addressField.remove(i)}
-                className="p-2 bg-red-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <X size={16} className="text-white" />
+                <X size={18} className="text-white" />
               </button>
             </div>
           </div>
@@ -398,7 +400,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
         {bankField.fields.map((_, i) => (
           <div
             key={i}
-            className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end mb-2"
+            className="grid grid-cols-1 sm:grid-cols-5 gap-2 items-end mb-2"
           >
             <input
               {...register(`bankdetail.${i}.bank_name`)}
@@ -420,15 +422,15 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
             <div className="flex gap-2">
               <button
                 onClick={() => saveBank(i)}
-                className="p-2 bg-blue-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-blue-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <Save size={16} className="text-white" />
+                <Save size={18} className="text-white" />
               </button>
               <button
                 onClick={() => bankField.remove(i)}
-                className="p-2 bg-red-400 rounded-full"
+                className="cursor-pointer p-2 lg:p-3 flex items-center justify-center bg-red-400 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <X size={16} className="text-white" />
+                <X size={18} className="text-white" />
               </button>
             </div>
           </div>

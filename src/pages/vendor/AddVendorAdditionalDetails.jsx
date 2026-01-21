@@ -156,13 +156,13 @@ const AddVendorAdditionalDetails = ({ vendor_id, open, onClose }) => {
         {/* Close */}
         <button
           onClick={onClose}
-          className="cursor-pointer absolute top-4 right-4 p-2 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
+          className="cursor-pointer absolute top-4 right-4 p-2.5 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
         >
           <X size={15} />
         </button>
 
         {/* Tabs*/}
-        <div className="flex gap-3 border-b border-[var(--border)] mb-6 pb-3">
+        <div className="flex gap-3 border-b border-[var(--border)] mb-6 pb-1.5">
           {STEPS.map((s, i) => (
             <button
               key={s.key}

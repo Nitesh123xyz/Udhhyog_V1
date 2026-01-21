@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 import { useViewVendorAdditionalInfoQuery } from "../../features/vendor/vendorSlice";
-import VendorAdditionalDetailsHeader from "../../components/VendorAdditionalDetailsHeader";
+import VendorAdditionalDetailsHeader from "../../components/vendor/VendorAdditionalDetailsHeader";
 import AddVendorAdditionalDetails from "./AddVendorAdditionalDetails";
 const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
   const [open, setOpen] = useState(false);
@@ -44,16 +44,6 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
     basic?.[0] || {};
   const { acc_no, bank_name, branch_name, ifsc_code } = bankdetail || [];
 
-  // -----------------------------------------------------------------------
-
-  // const handleRefetch = useCallback(() => {
-  //   refetch();
-  // }, [refetch]);
-
-  // useEffect(() => {
-  //   handleRefetch();
-  // }, [handleRefetch]);
-
   // -------------------------------------------------------
 
   const handleDeleteUserInfo = async (rowId, blockName) => {
@@ -69,7 +59,6 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
 
       if (status) {
         toast.success(`${blockName} deleted successfully`);
-        // refetch();
       } else {
         toast.error(`Failed to delete ${blockName}`);
       }

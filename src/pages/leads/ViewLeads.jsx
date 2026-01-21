@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
 import { useViewVendorQuery } from "../../features/vendor/vendorSlice";
 import AddVendor from "./AddVendor";
-import VendorHeader from "../../components/VendorHeader";
+import VendorHeader from "../../components/vendor/VendorHeader";
 
 const ViewVendor = ({ setStep, setVendorId }) => {
   const { token } = useAuth();
@@ -81,7 +81,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
       prev.map((it) => ({
         ...it,
         active: it.name === field.name,
-      }))
+      })),
     );
   };
 

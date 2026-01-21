@@ -14,7 +14,7 @@ import {
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
-import VendorAdditionalDetailsHeader from "../../components/VendorAdditionalDetailsHeader";
+import VendorAdditionalDetailsHeader from "../../components/vendor/VendorAdditionalDetailsHeader";
 import {
   useViewVendorAdditionalInfoQuery,
   useUpdateVendorBasicMutation,
@@ -53,7 +53,7 @@ const schema = z.object({
       phoneno1: z.string().length(10),
       phoneno2: z.string().optional(),
       contact_emailid: z.string().email(),
-    })
+    }),
   ),
 
   address: z.array(
@@ -64,7 +64,7 @@ const schema = z.object({
       gst: z.string().optional(),
       pincode: z.string().length(6),
       add_type: z.string(),
-    })
+    }),
   ),
 
   bankdetail: z.array(
@@ -74,7 +74,7 @@ const schema = z.object({
       bank_name: z.string(),
       branch_name: z.string(),
       ifsc_code: z.string(),
-    })
+    }),
   ),
 });
 
@@ -120,7 +120,7 @@ const UpdateVendor = ({ step, setStep, vendorId }) => {
             address: [],
             bankdetail: [],
           },
-    [data]
+    [data],
   );
 
   const { register, control, reset, getValues } = useForm({

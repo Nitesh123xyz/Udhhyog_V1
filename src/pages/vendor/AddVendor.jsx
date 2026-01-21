@@ -70,17 +70,14 @@ const AddVendor = ({ setOpenAddFrom }) => {
       const { originalStatus } = error || {};
       if (originalStatus === 401) {
         toast.error(
-          error?.data.slice(17)?.toUpperCase() || "Unauthorized access"
+          error?.data.slice(17)?.toUpperCase() || "Unauthorized access",
         );
       } else toast.error("Failed to add vendor");
     }
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
         className="bg-[var(--background)] text-[var(--text)] p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md md:max-w-4xl mx-4"
         onClick={(e) => e.stopPropagation()}
@@ -91,7 +88,7 @@ const AddVendor = ({ setOpenAddFrom }) => {
           </h2>
           <button
             onClick={onClose}
-            className="cursor-pointer absolute top-0 right-0 p-2 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
+            className="cursor-pointer absolute top-0 right-0 p-2.5 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
             aria-label="Close modal"
           >
             <X size={15} />

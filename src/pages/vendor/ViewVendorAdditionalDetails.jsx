@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader";
 import { useViewVendorAdditionalInfoQuery } from "../../features/vendor/vendorSlice";
-import VendorAdditionalDetailsHeader from "../../components/VendorAdditionalDetailsHeader";
+import VendorAdditionalDetailsHeader from "../../components/vendor/VendorAdditionalDetailsHeader";
 import AddVendorAdditionalDetails from "./AddVendorAdditionalDetails";
 import "../../css/commonLayout.css";
 const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
@@ -38,22 +38,13 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
     subaction: "one",
   };
 
-  const { data: Info } = useViewVendorAdditionalInfoQuery(BasicPayload);
+  const { data: Info, isLoading } =
+    useViewVendorAdditionalInfoQuery(BasicPayload);
 
   const { address, bankdetail, basic, contact, document } = Info?.body || {};
   const { companyname, com_emailid, com_gst, com_type, credittime } =
     basic?.[0] || {};
   const { acc_no, bank_name, branch_name, ifsc_code } = bankdetail || [];
-
-  // -----------------------------------------------------------------------
-
-  // const handleRefetch = useCallback(() => {
-  //   refetch();
-  // }, [refetch]);
-
-  // useEffect(() => {
-  //   handleRefetch();
-  // }, [handleRefetch]);
 
   // -------------------------------------------------------
 
@@ -70,7 +61,6 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
 
       if (status) {
         toast.success(`${blockName} deleted successfully`);
-        // refetch();
       } else {
         toast.error(`Failed to delete ${blockName}`);
       }
@@ -83,7 +73,7 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
   return (
     <>
       <section className="bg-[var(--background)] backdrop-blur-md rounded-t-lg  lg:rounded-lg px-2 py-1">
-        <div className="flex justify-end gap-3 mb-2">
+        <div className="flex justify-end gap-3">
           <VendorAdditionalDetailsHeader
             setOpen={setOpen}
             step={step}
@@ -91,7 +81,7 @@ const ViewVendorAdditionalDetails = ({ step, setStep, vendorId }) => {
             setOpenDialog={setOpenDialog}
           />
         </div>
-        {/* {isLoading && <Loader />} */}
+        {isLoading && <Loader />}
         <div className="mx-auto space-y-2 min-h-screen 2xl:min-h-[calc(100vh-130px)]">
           <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-3">
             <div className="p-2 rounded-lg border border-[var(--border)]">

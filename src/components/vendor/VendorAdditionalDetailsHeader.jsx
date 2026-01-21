@@ -10,7 +10,7 @@ const VendorAdditionalDetailsHeader = ({
     setOpenDialog(true);
   };
   return (
-    <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 mb-2 transition-all duration-300">
+    <div className="bg-[var(--background)] backdrop-blur-md border-b border-[var(--border)] rounded-t-lg w-full flex items-center justify-between px-1.5 py-1.5 mb-1.5 transition-all duration-300">
       <div className="flex items-center gap-3">
         <div
           onClick={() => setStep(1)}

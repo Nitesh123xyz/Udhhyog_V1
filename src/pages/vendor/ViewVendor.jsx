@@ -7,7 +7,7 @@ import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
 import { useViewVendorQuery } from "../../features/vendor/vendorSlice";
 import AddVendor from "./AddVendor";
-import VendorHeader from "../../components/VendorHeader";
+import VendorHeader from "../../components/vendor/VendorHeader";
 
 const ViewVendor = ({ setStep, setVendorId }) => {
   const { token } = useAuth();
@@ -15,7 +15,6 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   /* ----------------------------- UI STATE ----------------------------- */
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState(null);
-  const [hasSearched, setHasSearched] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -45,9 +44,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   };
 
   /* ---------------------------- RTK QUERY ------------------------------ */
-  const { data, isLoading } = useViewVendorQuery(queryVendor, {
-    skip: !hasSearched,
-  });
+  const { data, isLoading } = useViewVendorQuery(queryVendor);
 
   /* ----------------------- SYNC DATA → STATE --------------------------- */
   useEffect(() => {
@@ -62,7 +59,6 @@ const ViewVendor = ({ setStep, setVendorId }) => {
     const timer = setTimeout(() => {
       setQuery(searchInput.trim() === "" ? null : searchInput);
       setCurrentPage(1);
-      setHasSearched(true);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -84,7 +80,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
       prev.map((it) => ({
         ...it,
         active: it.name === field.name,
-      }))
+      })),
     );
   };
 
@@ -141,61 +137,12 @@ const ViewVendor = ({ setStep, setVendorId }) => {
               <tbody className={`divide-y  divide-[var(--border)]`}>
                 {rows && rows.length > 0 ? (
                   rows?.map((vendor) => (
-                    <tr
-                      onClick={() => {
-                        setStep(2);
-                        setVendorId(vendor?.vendor_id);
-                      }}
+                    <VendorListUi
                       key={vendor?.vendor_id}
-                      className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
-                    >
-                      <td
-                        className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
-                      >
-                        {vendor?.vendor_id}
-                      </td>
-                      <td className="px-0 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={
-                              vendor.avatar ||
-                              "https://cdn-icons-png.freepik.com/512/16524/16524724.png?uid=R213905709&ga=GA1.1.928608604.1757403767"
-                            }
-                            alt={vendor.name}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                          <span
-                            className={`text-xs text-[var(--text)] capitalize`}
-                          >
-                            {vendor.companyname}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {vendor?.credittime}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
-                      >
-                        {vendor.com_emailid}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                      >
-                        {vendor?.com_type}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {vendor?.com_gst}
-                      </td>
-                      <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
-                        <StatusBtn Status={vendor?.active} />
-                      </td>
-                    </tr>
+                      vendor={vendor}
+                      setStep={setStep}
+                      setVendorId={setVendorId}
+                    />
                   ))
                 ) : (
                   <tr>
@@ -227,6 +174,68 @@ const ViewVendor = ({ setStep, setVendorId }) => {
 
         {openAddForm && <AddVendor setOpenAddFrom={setOpenAddFrom} />}
       </section>
+    </>
+  );
+};
+
+// --------------------------------------- VendorListUi
+
+const VendorListUi = ({ vendor, setStep, setVendorId }) => {
+  return (
+    <>
+      <tr
+        onClick={() => {
+          setStep(2);
+          setVendorId(vendor?.vendor_id);
+        }}
+        key={vendor?.vendor_id}
+        className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
+      >
+        <td
+          className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
+        >
+          {vendor?.vendor_id}
+        </td>
+        <td className="px-0 py-4 whitespace-nowrap">
+          <div className="flex items-center space-x-3">
+            <img
+              src={
+                vendor.avatar ||
+                "https://cdn-icons-png.freepik.com/512/16524/16524724.png?uid=R213905709&ga=GA1.1.928608604.1757403767"
+              }
+              alt={vendor.name}
+              className="w-8 h-8 rounded-full object-cover"
+            />
+            <span className={`text-xs text-[var(--text)] capitalize`}>
+              {vendor.companyname}
+            </span>
+          </div>
+        </td>
+
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {vendor?.credittime}
+        </td>
+        <td
+          className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
+        >
+          {vendor.com_emailid}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+        >
+          {vendor?.com_type}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {vendor?.com_gst}
+        </td>
+        <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
+          <StatusBtn Status={vendor?.active} />
+        </td>
+      </tr>
     </>
   );
 };
