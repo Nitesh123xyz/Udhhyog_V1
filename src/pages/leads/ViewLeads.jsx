@@ -1,88 +1,65 @@
 import React, { useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
-import { VendorHeading } from "../../utils/DummyData";
+import { LeadsHeading } from "../../utils/ReuseData";
 import { StatusBtn } from "../../components/StatusBtn";
 import Pagination from "../../components/Pagination";
 import useAuth from "../../hooks/useAuth";
 import Loader from "../../components/Loader";
-import { useViewVendorQuery } from "../../features/vendor/vendorSlice";
 import AddVendor from "./AddVendor";
 import VendorHeader from "../../components/vendor/VendorHeader";
+import { useViewLeadsQuery } from "../../features/leads/leadsSlice";
 
-const ViewVendor = ({ setStep, setVendorId }) => {
+const ViewLeads = ({ setStep, setLeadsId }) => {
   const { token } = useAuth();
 
   /* ----------------------------- UI STATE ----------------------------- */
   const [searchInput, setSearchInput] = useState("");
+  const [searchKey, setSearchKey] = useState("all");
   const [query, setQuery] = useState(null);
-  const [hasSearched, setHasSearched] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const [order, setOrder] = useState("_a");
-  const [currentSort, setCurrentSort] = useState(null);
-  const [currentActive, setCurrentActive] = useState(null);
-
   const [rows, setRows] = useState([]);
   const [TotalPages, setTotalPages] = useState(0);
 
-  const [vendorHeaderData, setVendorHeaderData] = useState(VendorHeading);
   const [openAddForm, setOpenAddFrom] = useState(false);
+  const [sortingKey, setSortingKey] = useState("ASC");
+  const [sortingValue, setSortingValue] = useState("lead_id");
 
   /* ---------------------------- QUERY INPUT ---------------------------- */
   const queryVendor = {
     token,
-    pageno: String(currentPage),
-    pagesize: String(itemsPerPage),
-    sortkey: currentSort,
-    searchall: query ?? null,
-    action: "view",
-    subaction: "all",
+    pageno: currentPage,
+    pagesize: itemsPerPage,
+    searchkey: query ? searchKey : "all",
+    searchvalue: query ?? null,
+    sortkey: sortingKey,
+    sortcol: sortingValue,
+    action: "viewall",
   };
 
   /* ---------------------------- RTK QUERY ------------------------------ */
-  const { data, isLoading } = useViewVendorQuery(queryVendor, {
-    skip: !hasSearched,
-  });
+  const { data, isLoading } = useViewLeadsQuery(queryVendor);
+  console.log(data);
 
   /* ----------------------- SYNC DATA → STATE --------------------------- */
   useEffect(() => {
     if (data?.body) {
-      setRows(data.body.basic || []);
-      setTotalPages(data.body.trow || 0);
+      setRows(data?.body?.lead || []);
+      // setTotalPages(data. || 0);
     }
   }, [data]);
 
-  /* --------------------------- SEARCH DEBOUNCE ------------------------- */
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setQuery(searchInput.trim() === "" ? null : searchInput);
-      setCurrentPage(1);
-      setHasSearched(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchInput]);
-
   /* ----------------------------- SORTING ------------------------------- */
-  const handleSorting = (field) => {
-    if (!field?.status) return;
+  const handleSorting = (item) => {
+    if (!item.status) return;
+    const newOrder =
+      sortingValue === item.name && sortingKey === "ASC" ? "DESC" : "ASC";
 
-    const nextOrder = order === "_a" ? "_d" : "_a";
-    const sortValue = `${field.name}_${nextOrder === "_a" ? "a" : "d"}`;
-
-    setOrder(nextOrder);
-    setCurrentActive(field.name);
-    setCurrentSort(sortValue);
+    setSortingKey(newOrder);
+    setSortingValue(item.name);
     setCurrentPage(1);
-
-    setVendorHeaderData((prev) =>
-      prev.map((it) => ({
-        ...it,
-        active: it.name === field.name,
-      })),
-    );
   };
 
   /* -------------------------- TABLE HEADERS ---------------------------- */
@@ -90,7 +67,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   const SortingFields = () => {
     return (
       <>
-        {vendorHeaderData?.map((item) => {
+        {LeadsHeading?.map((item) => {
           return (
             <th
               key={item.name}
@@ -104,8 +81,8 @@ const ViewVendor = ({ setStep, setVendorId }) => {
                   <ArrowDownUp
                     size={16}
                     className={`inline-block transform transition-transform duration-300 ${
-                      item.name === currentActive
-                        ? order === "_a"
+                      item.name === sortingValue
+                        ? sortingKey === "ASC"
                           ? "rotate-180"
                           : "rotate-0"
                         : "rotate-0 opacity-40"
@@ -123,8 +100,11 @@ const ViewVendor = ({ setStep, setVendorId }) => {
 
   return (
     <>
-      <VendorHeader setQuery={setSearchInput} setOpenAddFrom={setOpenAddFrom} />
-
+      <VendorHeader
+        setOpenAddFrom={setOpenAddFrom}
+        setQuery={setQuery}
+        setSearchKey={setSearchKey}
+      />
       <section className="max-w-screen">
         <div
           className={`bg-[var(--background)] backdrop-blur-sm  overflow-hidden lg:rounded-b-lg`}
@@ -137,62 +117,13 @@ const ViewVendor = ({ setStep, setVendorId }) => {
               </thead>
               <tbody className={`divide-y  divide-[var(--border)]`}>
                 {rows && rows.length > 0 ? (
-                  rows?.map((vendor) => (
-                    <tr
-                      onClick={() => {
-                        setStep(2);
-                        setVendorId(vendor?.vendor_id);
-                      }}
-                      key={vendor?.vendor_id}
-                      className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
-                    >
-                      <td
-                        className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
-                      >
-                        {vendor?.vendor_id}
-                      </td>
-                      <td className="px-0 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={
-                              vendor.avatar ||
-                              "https://cdn-icons-png.freepik.com/512/16524/16524724.png?uid=R213905709&ga=GA1.1.928608604.1757403767"
-                            }
-                            alt={vendor.name}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                          <span
-                            className={`text-xs text-[var(--text)] capitalize`}
-                          >
-                            {vendor.companyname}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {vendor?.credittime}
-                      </td>
-                      <td
-                        className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
-                      >
-                        {vendor.com_emailid}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
-                      >
-                        {vendor?.com_type}
-                      </td>
-                      <td
-                        className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-                      >
-                        {vendor?.com_gst}
-                      </td>
-                      <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
-                        <StatusBtn Status={vendor?.active} />
-                      </td>
-                    </tr>
+                  rows?.map((Info) => (
+                    <RenderDataUi
+                      key={Info?.vendor_id}
+                      RenderInfo={Info}
+                      setStep={setStep}
+                      setLeadsId={setLeadsId}
+                    />
                   ))
                 ) : (
                   <tr>
@@ -226,4 +157,85 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   );
 };
 
-export default ViewVendor;
+const RenderDataUi = ({ RenderInfo, setStep, setLeadsId }) => {
+  const {
+    lead_id,
+    number,
+    companyname,
+    team_id,
+    emailid,
+    requirement,
+    source,
+    file,
+    assignedto,
+    date,
+    status,
+  } = RenderInfo || {};
+  return (
+    <>
+      <tr
+        onClick={() => {
+          setStep(2);
+          setLeadsId(lead_id);
+        }}
+        className="hover:bg-[var(--hoverTable)] transition-colors duration-200"
+      >
+        <td
+          className={`pl-8 py-4 whitespace-nowrap text-xs rounded-l-2xl text-[var(--text)]`}
+        >
+          {lead_id}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {number}
+        </td>
+        <td
+          className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
+        >
+          {companyname}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+        >
+          {team_id}
+        </td>
+        <td
+          className={`px-5 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {emailid}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {requirement}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {source}
+        </td>
+        <td
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {file}
+        </td>
+        <td
+          className={`px-10 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {assignedto}
+        </td>
+        <td
+          className={`px-6 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+        >
+          {date}
+        </td>
+        <td className="pl-5 py-4 whitespace-nowrap rounded-r-2xl">
+          <StatusBtn Status={status} />
+        </td>
+      </tr>
+    </>
+  );
+};
+
+export default ViewLeads;

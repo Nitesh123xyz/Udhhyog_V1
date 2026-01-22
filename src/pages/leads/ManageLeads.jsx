@@ -1,24 +1,23 @@
 import { useState } from "react";
-import ViewVendor from "./ViewVendor";
-import ViewVendorAdditionalDetails from "./ViewVendorAdditionalDetails";
-import UpdateVendor from "./UpdateVendor";
+import ViewLeads from "./ViewLeads";
 
-const ManageVendor = () => {
+const ManageLeads = () => {
   const [step, setStep] = useState(1);
-  const [vendorId, setVendorId] = useState(null);
+  const [leadsId, setLeadsId] = useState(null);
+
   return (
     <>
-      {step === 1 && <ViewVendor setStep={setStep} setVendorId={setVendorId} />}
-      {step === 2 && (
+      {step === 1 && <ViewLeads setStep={setStep} setLeadsId={setLeadsId} />}
+      {/* {step === 2 && (
         <ViewVendorAdditionalDetails
           step={step}
           setStep={setStep}
-          vendorId={vendorId}
+          leadsId={leadsId}
         />
       )}
-      {step === 3 && <UpdateVendor setStep={setStep} vendorId={vendorId} />}
+      {step === 3 && <UpdateVendor setStep={setStep} leadsId={leadsId} />} */}
     </>
   );
 };
 
-export default ManageVendor;
+export default ManageLeads;

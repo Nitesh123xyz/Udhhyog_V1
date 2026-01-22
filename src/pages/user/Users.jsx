@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
-import { employeesHeading } from "../../utils/DummyData";
+import { employeesHeading } from "../../utils/ReuseData";
 import { StatusBtn } from "../../components/StatusBtn";
 import Pagination from "../../components/Pagination";
 import Header from "../../components/Header";
@@ -102,7 +102,7 @@ const Users = ({ step, setStep, setEmployeesId }) => {
       prev.map((it) => ({
         ...it,
         active: it.name === field.name,
-      }))
+      })),
     );
 
     handleQueryUser(sortValue, 1);

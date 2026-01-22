@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ArrowDownUp } from "lucide-react";
-import { VendorHeading } from "../../utils/DummyData";
+import { VendorHeading } from "../../utils/ReuseData";
 import { StatusBtn } from "../../components/StatusBtn";
 import Pagination from "../../components/Pagination";
 import useAuth from "../../hooks/useAuth";
@@ -137,7 +137,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
               <tbody className={`divide-y  divide-[var(--border)]`}>
                 {rows && rows.length > 0 ? (
                   rows?.map((vendor) => (
-                    <VendorListUi
+                    <RenderDataUi
                       key={vendor?.vendor_id}
                       vendor={vendor}
                       setStep={setStep}
@@ -180,7 +180,7 @@ const ViewVendor = ({ setStep, setVendorId }) => {
 
 // --------------------------------------- VendorListUi
 
-const VendorListUi = ({ vendor, setStep, setVendorId }) => {
+const RenderDataUi = ({ vendor, setStep, setVendorId }) => {
   return (
     <>
       <tr

@@ -5,6 +5,7 @@ import { pagePermissionSlice } from "../features/permission_page/page_permission
 import { UsersSlice } from "../features/users/usersSlice";
 import { TeamsSlice } from "../features/teams/teamSlice";
 import { VendorSlice } from "../features/vendor/vendorSlice";
+import { LeadsSlice } from "../features/leads/leadsSlice";
 import { DepartmentSlice } from "../features/department/DepartmentSlice";
 import expendNavbarReducer from "../utils/ExpendNavbar";
 import UtileSliceReducer from "../utils/Utils";
@@ -17,6 +18,7 @@ export const store = configureStore({
     [UsersSlice.reducerPath]: UsersSlice.reducer,
     [TeamsSlice.reducerPath]: TeamsSlice.reducer,
     [VendorSlice.reducerPath]: VendorSlice.reducer,
+    [LeadsSlice.reducerPath]: LeadsSlice.reducer,
     [DepartmentSlice.reducerPath]: DepartmentSlice.reducer,
     [pagePermissionSlice.reducerPath]: pagePermissionSlice.reducer,
   },
@@ -27,7 +29,8 @@ export const store = configureStore({
       UsersSlice.middleware,
       TeamsSlice.middleware,
       VendorSlice.middleware,
+      LeadsSlice.middleware,
       DepartmentSlice.middleware,
-      pagePermissionSlice.middleware
+      pagePermissionSlice.middleware,
     ),
 });

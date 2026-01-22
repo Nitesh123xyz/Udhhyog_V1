@@ -27,7 +27,7 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useAuth from "../../hooks/useAuth";
-import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
+import UserAdditionalDetailsHeader from "../../components/user/UserAdditionalDetailsHeader";
 import { useAddUserMutation } from "../../features/users/usersSlice";
 import {
   useListDepartMentQuery,
@@ -131,7 +131,7 @@ const schema = z.object({
     .min(5, "Password must be at least 5 characters")
     .regex(
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{5,}$/,
-      "Password must include One uppercase, lowercase, number & One special character"
+      "Password must include One uppercase, lowercase, number & One special character",
     ),
   id_department: z.number().min(1, "Department is required"),
   team_id: z.number().min(1, "Team is required"),
@@ -336,7 +336,7 @@ const AddUserDetails = ({ step, setStep }) => {
       { id: "family", label: "Family", icon: Users },
       { id: "experience", label: "Experience", icon: Briefcase },
     ],
-    []
+    [],
   );
 
   const [enabledTabs, setEnabledTabs] = useState(["basic"]);
@@ -474,18 +474,18 @@ const AddUserDetails = ({ step, setStep }) => {
 
   const isCurrentTabFilled = useMemo(
     () => isTabFilledFromValues(watchedValues, activeTab),
-    [watchedValues, activeTab]
+    [watchedValues, activeTab],
   );
 
   const allTabsFilled = useMemo(
     () => tabs.every((t) => isTabFilledFromValues(watchedValues, t.id)),
-    [watchedValues, tabs]
+    [watchedValues, tabs],
   );
 
   const lastTabId = tabs[tabs.length - 1].id;
   const lastTabFilled = useMemo(
     () => isTabFilledFromValues(watchedValues, lastTabId),
-    [watchedValues, lastTabId]
+    [watchedValues, lastTabId],
   );
   const canSend = allTabsFilled && lastTabFilled;
 
@@ -543,8 +543,8 @@ const AddUserDetails = ({ step, setStep }) => {
                       activeTab === tab.id
                         ? "text-[var(--text)] bg-[var(--permissionTable)]"
                         : enabled
-                        ? "text-[var(--text)] hover:bg-[var(--permissionTable)]"
-                        : "text-gray-400 cursor-not-allowed opacity-60"
+                          ? "text-[var(--text)] hover:bg-[var(--permissionTable)]"
+                          : "text-gray-400 cursor-not-allowed opacity-60"
                     }`}
                   disabled={!enabled}
                 >
@@ -657,7 +657,7 @@ const AddUserDetails = ({ step, setStep }) => {
                     name="team_id"
                     render={({ field }) => {
                       const selectedDep = team_data.find(
-                        (dep) => dep?.team_id === field.value
+                        (dep) => dep?.team_id === field.value,
                       );
                       return (
                         <InputField
@@ -665,7 +665,7 @@ const AddUserDetails = ({ step, setStep }) => {
                           value={selectedDep?.name ?? ""}
                           onChange={(selectedName) => {
                             const team = team_data?.find(
-                              (d) => d.name === selectedName
+                              (d) => d.name === selectedName,
                             );
                             field.onChange(team ? team.team_id : 0);
                           }}
@@ -682,7 +682,7 @@ const AddUserDetails = ({ step, setStep }) => {
                     name="id_department"
                     render={({ field }) => {
                       const selectedDep = dep_data.find(
-                        (dep) => dep.dep_id === field.value
+                        (dep) => dep.dep_id === field.value,
                       );
                       return (
                         <InputField
@@ -690,7 +690,7 @@ const AddUserDetails = ({ step, setStep }) => {
                           value={selectedDep?.department ?? ""}
                           onChange={(selectedName) => {
                             const dep = dep_data.find(
-                              (d) => d.department === selectedName
+                              (d) => d.department === selectedName,
                             );
                             field.onChange(dep ? dep.dep_id : 0);
                           }}
@@ -1184,7 +1184,7 @@ const AddUserDetails = ({ step, setStep }) => {
                                   : val;
                               const num = Number(raw);
                               field.onChange(
-                                Number.isFinite(num) ? Math.trunc(num) : 0
+                                Number.isFinite(num) ? Math.trunc(num) : 0,
                               );
                             }}
                             type="number"

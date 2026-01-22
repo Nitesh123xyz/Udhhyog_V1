@@ -4,7 +4,7 @@ import ImageSlider from "../../components/ImageSlider";
 import { Trash } from "lucide-react";
 import DialogBox from "../../components/DialogBox";
 import ScrollTop from "../../utils/ScrollTop";
-import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
+import UserAdditionalDetailsHeader from "../../components/user/UserAdditionalDetailsHeader";
 import {
   useDeleteUserMutation,
   useUsersAdditionalDetailsQuery,

@@ -7,14 +7,15 @@ import MainLoader from "../components/Loader";
 import MultilayerAuth from "../pages/2FA/MultilayerAuth";
 import ManageDepartment from "../pages/department/ManageDepartment";
 import ReVerifySession from "../components/ReVerifySession";
+import ManageLeads from "../pages/leads/ManageLeads";
 // ---------------------------------------------------
 
 const ManageUser = lazy(() => import("../pages/user/ManageUser"));
 const ManageVendor = lazy(() => import("../pages/vendor/ManageVendor"));
 const Permissions = lazy(() => import("../pages/Permission"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
-const ResetPassword = lazy(() =>
-  import("../pages/reset-password/ResetPassword")
+const ResetPassword = lazy(
+  () => import("../pages/reset-password/ResetPassword"),
 );
 const PageNotFound = lazy(() => import("../pages/PageNotFound"));
 const ManageTeam = lazy(() => import("../pages/teams/ManageTeam"));
@@ -105,6 +106,17 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <PermissionGate>
               <ManageVendor />
+            </PermissionGate>
+          </ProtectedRoute>
+        ),
+        caseSensitive: true,
+      },
+      {
+        path: "/leads",
+        element: (
+          <ProtectedRoute>
+            <PermissionGate>
+              <ManageLeads />
             </PermissionGate>
           </ProtectedRoute>
         ),

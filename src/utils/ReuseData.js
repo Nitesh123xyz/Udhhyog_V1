@@ -47,7 +47,7 @@ function transformMenu(apiMenu) {
   });
 
   Object.values(byParent).forEach((arr) =>
-    arr.sort((a, b) => a.page_id - b.page_id)
+    arr.sort((a, b) => a.page_id - b.page_id),
   );
 
   function buildNode(item) {
@@ -174,4 +174,165 @@ export const DepartmentHeading = [
 export const ActiveTheme = [
   { label: "light", value: true, color: "white" },
   { label: "dark", value: false, color: "black" },
+];
+
+// ---------------------------------------------------
+
+// Employees Heading Data
+
+export const employeesHeading = [
+  { id: 0, name: "empid", label: "Emp_id", status: true, active: false },
+  { id: 1, name: "name", label: "Name", status: true, active: false },
+  { id: 2, name: "jobtitle", label: "Job_Title", status: true, active: false },
+  {
+    id: 3,
+    name: "department",
+    label: "Department",
+    status: true,
+    active: false,
+  },
+  { id: 4, name: "salary", label: "Salary", status: true, active: false },
+  {
+    id: 5,
+    name: "joindate",
+    label: "Joining_Date",
+    status: true,
+    active: false,
+  },
+  {
+    id: 6,
+    name: "emptype",
+    label: "Employment_Type",
+    status: true,
+    active: false,
+  },
+  { id: 7, name: "active", label: "Status", status: true, active: false },
+];
+
+// ---------------------------------------------------
+
+// Vendor Heading Data
+
+export const VendorHeading = [
+  { id: 0, name: "vendor_id", label: "Vendor_id", status: true, active: false },
+  {
+    id: 1,
+    name: "company_name",
+    label: "Company_Name",
+    status: true,
+    active: false,
+  },
+  {
+    id: 2,
+    name: "credit_time",
+    label: "Credit_Time",
+    status: true,
+    active: false,
+  },
+  {
+    id: 3,
+    name: "com_emailid",
+    label: "Compnay_Emailid",
+    status: true,
+    active: false,
+  },
+  {
+    id: 4,
+    name: "com_type",
+    label: "Company_Type",
+    status: true,
+    active: false,
+  },
+  {
+    id: 5,
+    name: "com_gst",
+    label: "Company_Gst",
+    status: true,
+    active: false,
+  },
+  { id: 6, name: "active", label: "Status", status: true, active: false },
+];
+
+// ---------------------------------------------------
+
+// Leads Heading Data
+
+export const LeadsHeading = [
+  {
+    id: 0,
+    name: "lead_id",
+    label: "Lead ID",
+    status: true,
+    active: false,
+  },
+  {
+    id: 1,
+    name: "number",
+    label: "Phone Number",
+    status: true,
+    active: false,
+  },
+  {
+    id: 2,
+    name: "companyname",
+    label: "Company Name",
+    status: true,
+    active: false,
+  },
+  {
+    id: 3,
+    name: "team_id",
+    label: "Team ID",
+    status: true,
+    active: false,
+  },
+  {
+    id: 4,
+    name: "emailid",
+    label: "Email ID",
+    status: true,
+    active: false,
+  },
+  {
+    id: 5,
+    name: "requirement",
+    label: "Requirement",
+    status: true,
+    active: false,
+  },
+  {
+    id: 6,
+    name: "source",
+    label: "Source",
+    status: true,
+    active: false,
+  },
+  {
+    id: 7,
+    name: "file",
+    label: "Attachment",
+    status: true,
+    active: false,
+  },
+  {
+    id: 8,
+    name: "assignedto",
+    label: "Assigned To",
+    status: true,
+    active: false,
+  },
+  {
+    id: 9,
+    name: "date",
+    label: "Date",
+    status: true,
+    active: false,
+  },
+  {
+    id: 10,
+    name: "status",
+    label: "Status",
+    status: true,
+    active: false,
+  },
 ];

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import UserAdditionalDetailsHeader from "../../components/UserAdditionalDetailsHeader";
+import UserAdditionalDetailsHeader from "../../components/user/UserAdditionalDetailsHeader";
 import useAuth from "../../hooks/useAuth";
 import {
   useUpdateUserBasicMutation,
@@ -109,7 +109,7 @@ const formSchema = z.object({
         name: z.string().optional().nullable(),
         relation: z.string().optional().nullable(),
         phone_no: z.string().optional().nullable(),
-      })
+      }),
     )
     .optional()
     .nullable(),
@@ -383,7 +383,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
     if (mapped.job_title) {
       const normalized = String(mapped.job_title).trim().toLowerCase();
       const matched = JOB_TITLES.find(
-        (t) => t.trim().toLowerCase() === normalized
+        (t) => t.trim().toLowerCase() === normalized,
       );
       if (!matched && String(mapped.job_title).trim() !== "") {
         mapped.job_title = makeSentinel(String(mapped.job_title).trim());
@@ -393,7 +393,7 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
     if (mapped.job_status) {
       const normalized = String(mapped.job_status).trim().toLowerCase();
       const matched = JOB_STATUSES.find(
-        (s) => s.trim().toLowerCase() === normalized
+        (s) => s.trim().toLowerCase() === normalized,
       );
       if (!matched && String(mapped.job_status).trim() !== "") {
         mapped.job_status = makeSentinel(String(mapped.job_status).trim());
@@ -403,11 +403,11 @@ const UpdateUserDetails = ({ step, setStep, employeesId }) => {
     if (mapped.marital_status) {
       const normalized = String(mapped.marital_status).trim().toLowerCase();
       const matched = MARITAL_STATUSES.find(
-        (s) => s.trim().toLowerCase() === normalized
+        (s) => s.trim().toLowerCase() === normalized,
       );
       if (!matched && String(mapped.marital_status).trim() !== "") {
         mapped.marital_status = makeSentinel(
-          String(mapped.marital_status).trim()
+          String(mapped.marital_status).trim(),
         );
       }
     }
