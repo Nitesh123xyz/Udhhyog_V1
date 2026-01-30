@@ -30,9 +30,9 @@ export const LeadsSlice = createApi({
       providesTags: ["Leads"],
     }),
 
-    ViewVendorAdditionalInfo: builder.query({
+    ViewLeadsAdditionalInfo: builder.query({
       query: (vendorInfo) => ({
-        url: "/vendor",
+        url: "/leads",
         method: "POST",
         body: encodePayload(vendorInfo),
       }),
@@ -42,12 +42,12 @@ export const LeadsSlice = createApi({
           body: decodePayload(body?.data),
         };
       },
-      providesTags: ["Vendor"],
+      providesTags: ["Leads"],
     }),
 
-    AddVendor: builder.mutation({
+    AddLeads: builder.mutation({
       query: (addVendorInfo) => ({
-        url: "/vendor",
+        url: "/leads",
         method: "POST",
         body: encodePayload(addVendorInfo),
       }),
@@ -55,12 +55,11 @@ export const LeadsSlice = createApi({
         status: meta?.response?.status ?? 0,
         body: decodePayload(body),
       }),
-      invalidatesTags: ["Vendor"],
+      invalidatesTags: ["Leads"],
     }),
-
-    AddVendorAdditionalDetails: builder.mutation({
+    UpdateLeads: builder.mutation({
       query: (addVendorInfo) => ({
-        url: "/vendor",
+        url: "/leads",
         method: "POST",
         body: encodePayload(addVendorInfo),
       }),
@@ -68,87 +67,14 @@ export const LeadsSlice = createApi({
         status: meta?.response?.status ?? 0,
         body: decodePayload(body),
       }),
-      invalidatesTags: ["Vendor"],
-    }),
-
-    UpdateVendorBasic: builder.mutation({
-      query: (addVendorInfo) => ({
-        url: "/vendor",
-        method: "POST",
-        body: encodePayload(addVendorInfo),
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
-      }),
-      invalidatesTags: ["Vendor"],
-    }),
-
-    UpdateVendorContact: builder.mutation({
-      query: (addVendorInfo) => ({
-        url: "/vendor",
-        method: "POST",
-        body: encodePayload(addVendorInfo),
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
-      }),
-      invalidatesTags: ["Vendor"],
-    }),
-
-    UpdateVendorAddress: builder.mutation({
-      query: (addVendorInfo) => ({
-        url: "/vendor",
-        method: "POST",
-        body: encodePayload(addVendorInfo),
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
-      }),
-      invalidatesTags: ["Vendor"],
-    }),
-
-    UpdateVendorDocument: builder.mutation({
-      query: (addVendorInfo) => ({
-        url: "/vendor",
-        method: "POST",
-        body: encodePayload(addVendorInfo),
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
-      }),
-      invalidatesTags: ["Vendor"],
-    }),
-
-    UpdateVendorBank: builder.mutation({
-      query: (addVendorInfo) => ({
-        url: "/vendor",
-        method: "POST",
-        body: encodePayload(addVendorInfo),
-      }),
-      transformResponse: (body, meta) => ({
-        status: meta?.response?.status ?? 0,
-        body: decodePayload(body),
-      }),
-      invalidatesTags: ["Vendor"],
+      invalidatesTags: ["Leads"],
     }),
   }),
 });
 
 export const {
   useViewLeadsQuery,
-  useViewVendorAdditionalInfoQuery,
-  useAddVendorMutation,
-  useAddVendorAdditionalDetailsMutation,
-
-  // -----------------------------------
-
-  useUpdateVendorBasicMutation,
-  useUpdateVendorContactMutation,
-  useUpdateVendorAddressMutation,
-  useUpdateVendorDocumentMutation,
-  useUpdateVendorBankMutation,
+  useViewLeadsAdditionalInfoQuery,
+  useAddLeadsMutation,
+  useUpdateLeadsMutation,
 } = LeadsSlice;

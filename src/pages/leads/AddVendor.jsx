@@ -4,39 +4,36 @@ import * as z from "zod";
 import {
   Building,
   Mail,
-  Clock,
+  Phone,
   FileText,
-  ShoppingBag,
+  Hash,
   X,
-  ChevronDown,
+  MessageSquare,
+  Calendar,
+  Activity,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { useAddVendorMutation } from "../../features/vendor/vendorSlice";
+import { useAddLeadsMutation } from "../../features/leads/leadsSlice";
 import useAuth from "../../hooks/useAuth";
 
-const companyTypes = [
-  "retailer",
-  "manufacture",
-  "distributer",
-  "trader",
-  "transpoter",
-];
+const statusOptions = ["pending", "active", "completed", "rejected"];
 
 const schema = z.object({
   companyname: z.string().min(1, { message: "Company name is required" }),
-  com_type: z.enum(companyTypes, {
-    message: "Please select a valid company type",
-  }),
-  com_emailid: z.string().email({ message: "Invalid email address" }),
-  credittime: z
+  number: z.string().min(10, { message: "Valid phone number is required" }),
+  emailid: z.string().email({ message: "Invalid email address" }),
+  source: z.string().min(1, { message: "Source ID is required" }),
+  requirement: z
     .string()
-    .regex(/^\d+$/, { message: "Credit time must be a number" }),
-  com_gst: z.string().min(1, { message: "GST is required" }),
+    .min(1, { message: "Requirement details are required" }),
+  file: z.string().min(1, { message: "File/URL is required" }),
+  date: z.string().min(1, { message: "Date is required" }),
+  status: z.enum(statusOptions, { message: "Please select a status" }),
 });
 
 const AddVendor = ({ setOpenAddFrom }) => {
   const { token } = useAuth();
-  const [AddVendor] = useAddVendorMutation();
+  const [addLead] = useAddLeadsMutation();
 
   const onClose = () => {
     setOpenAddFrom(false);
@@ -49,6 +46,11 @@ const AddVendor = ({ setOpenAddFrom }) => {
     reset,
   } = useForm({
     resolver: zodResolver(schema),
+    defaultValues: {
+      source: "",
+      status: "pending",
+      date: new Date().toISOString().split("T")[0], // Defaults to today
+    },
   });
 
   const onFormSubmit = async (data) => {
@@ -57,42 +59,32 @@ const AddVendor = ({ setOpenAddFrom }) => {
         ...data,
         token,
         action: "add",
-        subaction: "basic_vendor",
       };
 
-      const { status } = await AddVendor(payload).unwrap();
-      if (status === 200) {
-        toast.success("Vendor Added successfully!");
+      const { status: apiStatus } = await addLead(payload).unwrap();
+      if (apiStatus === 200) {
+        toast.success("Lead Added successfully!");
         reset();
         onClose();
       }
     } catch (error) {
-      const { originalStatus } = error || {};
-      if (originalStatus === 401) {
-        toast.error(
-          error?.data.slice(17)?.toUpperCase() || "Unauthorized access"
-        );
-      } else toast.error("Failed to add vendor");
+      toast.error(error?.data?.message || "Failed to add lead");
     }
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
-        className="bg-[var(--background)] text-[var(--text)] p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md md:max-w-4xl mx-4"
+        className="bg-[var(--background)] text-[var(--text)] p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md md:max-w-4xl mx-4 overflow-y-auto max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-center border-b-2 border-[var(--border)] inline-block pb-1 uppercase">
-            Add Vendor
+            Add New Lead
           </h2>
           <button
             onClick={onClose}
             className="cursor-pointer absolute top-0 right-0 p-2 rounded-full bg-[var(--border)] text-[var(--text)] hover:opacity-80 transition-opacity"
-            aria-label="Close modal"
           >
             <X size={15} />
           </button>
@@ -100,6 +92,7 @@ const AddVendor = ({ setOpenAddFrom }) => {
 
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Company Name */}
             <div>
               <label className="block mb-2 text-sm font-medium">
                 Company Name
@@ -119,98 +112,146 @@ const AddVendor = ({ setOpenAddFrom }) => {
               )}
             </div>
 
+            {/* Phone Number */}
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Company Type
+                Phone Number
               </label>
-              <div className="relative">
-                <select
-                  {...register("com_type")}
-                  className="w-full appearance-none bg-transparent border border-[var(--border)] rounded-lg px-3 py-3 pl-12 pr-10 text-[var(--text)] outline-0 cursor-pointer transition-all"
-                >
-                  <option className="bg-[var(--background)]" value="">
-                    Select Company Type
-                  </option>
-                  {companyTypes.map((type) => (
-                    <option
-                      className="bg-[var(--background)]"
-                      key={type}
-                      value={type}
-                    >
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </option>
-                  ))}
-                </select>
-
-                <ShoppingBag className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
-
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
+              <div className="flex items-center border border-[var(--border)] rounded-lg">
+                <Phone className="w-5 h-5 mx-3 text-gray-500" />
+                <input
+                  {...register("number")}
+                  className="flex-1 py-3 pr-4 outline-none bg-transparent"
+                  placeholder="Enter phone number"
+                />
               </div>
-
-              {errors.com_type && (
+              {errors.number && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.com_type.message}
+                  {errors.number.message}
                 </p>
               )}
             </div>
 
+            {/* Email ID */}
             <div>
-              <label className="block mb-2 text-sm font-medium">
-                Company Email
-              </label>
+              <label className="block mb-2 text-sm font-medium">Email ID</label>
               <div className="flex items-center border border-[var(--border)] rounded-lg">
                 <Mail className="w-5 h-5 mx-3 text-gray-500" />
                 <input
-                  {...register("com_emailid")}
-                  type="email"
+                  {...register("emailid")}
                   className="flex-1 py-3 pr-4 outline-none bg-transparent"
-                  placeholder="Enter company email"
+                  placeholder="email@example.com"
                 />
               </div>
-              {errors.com_emailid && (
+              {errors.emailid && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.com_emailid.message}
+                  {errors.emailid.message}
                 </p>
               )}
             </div>
 
+            {/* Source ID */}
             <div>
               <label className="block mb-2 text-sm font-medium">
-                Credit Time (days)
+                Source ID
               </label>
               <div className="flex items-center border border-[var(--border)] rounded-lg">
-                <Clock className="w-5 h-5 mx-3 text-gray-500" />
+                <Hash className="w-5 h-5 mx-3 text-gray-500" />
                 <input
-                  {...register("credittime")}
                   type="text"
+                  {...register("source")}
                   className="flex-1 py-3 pr-4 outline-none bg-transparent"
-                  placeholder="e.g., 45"
+                  placeholder="Enter numeric source ID"
                 />
               </div>
-              {errors.credittime && (
+              {errors.source && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.credittime.message}
+                  {errors.source.message}
+                </p>
+              )}
+            </div>
+
+            {/* Date Field */}
+            <div>
+              <label className="block mb-2 text-sm font-medium">Date</label>
+              <div className="flex items-center border border-[var(--border)] rounded-lg">
+                <Calendar className="w-5 h-5 mx-3 text-gray-500" />
+                <input
+                  type="date"
+                  {...register("date")}
+                  className="flex-1 py-3 pr-4 outline-none bg-transparent"
+                />
+              </div>
+              {errors.date && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.date.message}
+                </p>
+              )}
+            </div>
+
+            {/* Status Field */}
+            <div>
+              <label className="block mb-2 text-sm font-medium">Status</label>
+              <div className="flex items-center border border-[var(--border)] rounded-lg">
+                <Activity className="w-5 h-5 mx-3 text-gray-500" />
+                <select
+                  {...register("status")}
+                  className="flex-1 py-3 pr-4 outline-none bg-transparent capitalize"
+                >
+                  {statusOptions.map((opt) => (
+                    <option
+                      key={opt}
+                      value={opt}
+                      className="bg-[var(--background)]"
+                    >
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {errors.status && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.status.message}
                 </p>
               )}
             </div>
           </div>
 
-          <div className="md:col-span-2">
+          {/* Requirement */}
+          <div>
             <label className="block mb-2 text-sm font-medium">
-              Company GST Number
+              Requirement
+            </label>
+            <div className="flex items-center border border-[var(--border)] rounded-lg">
+              <MessageSquare className="w-5 h-5 mx-3 text-gray-500" />
+              <input
+                {...register("requirement")}
+                className="flex-1 py-3 pr-4 outline-none bg-transparent"
+                placeholder="Enter requirements"
+              />
+            </div>
+            {errors.requirement && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.requirement.message}
+              </p>
+            )}
+          </div>
+
+          {/* File Link */}
+          <div>
+            <label className="block mb-2 text-sm font-medium">
+              File / Attachment Link
             </label>
             <div className="flex items-center border border-[var(--border)] rounded-lg">
               <FileText className="w-5 h-5 mx-3 text-gray-500" />
               <input
-                {...register("com_gst")}
+                {...register("file")}
                 className="flex-1 py-3 pr-4 outline-none bg-transparent"
-                placeholder="Enter GST number"
+                placeholder="Enter file path"
               />
             </div>
-            {errors.com_gst && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.com_gst.message}
-              </p>
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-1">{errors.file.message}</p>
             )}
           </div>
 
@@ -218,16 +259,9 @@ const AddVendor = ({ setOpenAddFrom }) => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="cursor-pointer px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-400 transition-colors font-medium disabled:opacity-70 flex items-center gap-2"
             >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Adding...
-                </>
-              ) : (
-                "Add Vendor"
-              )}
+              {isSubmitting ? "Adding..." : "Add Lead"}
             </button>
           </div>
         </form>

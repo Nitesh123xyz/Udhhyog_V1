@@ -2,23 +2,17 @@ import React, { useState } from "react";
 import { Search, Plus, X, ChevronDown } from "lucide-react";
 import { useSelector } from "react-redux";
 
-const VendorHeader = ({ setOpenAddFrom, setQuery, setSearchKey }) => {
+const CommonHeader = ({
+  searchOptions,
+  setOpenAddFrom,
+  setQuery,
+  setSearchKey,
+}) => {
   const [openSearch, setOpenSearch] = useState(false);
   const [localInput, setLocalInput] = useState("");
   const [selectedKey, setSelectedKey] = useState("all");
 
   const { CurrentLabel } = useSelector((state) => state.ExpendNavbar);
-
-  const searchOptions = [
-    { name: "all", value: "All" },
-    { name: "lead_id", value: "Lead ID" },
-    { name: "companyname", value: "Company Name" },
-    { name: "number", value: "Number" },
-    { name: "emailid", value: "Email ID" },
-    { name: "source", value: "Source" },
-    { name: "requirement", value: "Requirement" },
-    { name: "assignedto", value: "Assigned To" },
-  ];
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -103,4 +97,4 @@ const VendorHeader = ({ setOpenAddFrom, setQuery, setSearchKey }) => {
   );
 };
 
-export default VendorHeader;
+export default CommonHeader;

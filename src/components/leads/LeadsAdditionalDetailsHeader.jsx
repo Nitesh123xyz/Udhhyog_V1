@@ -1,6 +1,6 @@
 import { ArrowLeft, Plus, Trash, UserPen } from "lucide-react";
 
-const VendorAdditionalDetailsHeader = ({
+const LeadsAdditionalDetailsHeader = ({
   setOpen,
   step,
   setStep,
@@ -54,4 +54,4 @@ const VendorAdditionalDetailsHeader = ({
   );
 };
 
-export default VendorAdditionalDetailsHeader;
+export default LeadsAdditionalDetailsHeader;

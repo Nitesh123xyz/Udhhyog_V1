@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { employees } from "../../utils/DummyData";
 import ImageSlider from "../../components/ImageSlider";
 import { Trash } from "lucide-react";
 import DialogBox from "../../components/DialogBox";
@@ -21,8 +20,7 @@ const UserAdditionalDetails = ({ step, setStep, employeesId }) => {
   const [confirmation, setConfirmation] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [enableDeleteBtn, setEnableDeleteBtn] = useState(false);
-  const rows = [...employees.filter((e) => e.id === employeesId)];
-  const { documents } = rows[0] || [];
+  const { documents } = [];
   const { token } = useAuth();
   const [DeleteUserInformation] = useDeleteUserMutation();
   const imagesFromDocs = (documents || []).map((d) => ({

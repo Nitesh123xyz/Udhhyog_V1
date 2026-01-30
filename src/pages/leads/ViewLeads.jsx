@@ -8,12 +8,12 @@ import Loader from "../../components/Loader";
 import AddVendor from "./AddVendor";
 import VendorHeader from "../../components/vendor/VendorHeader";
 import { useViewLeadsQuery } from "../../features/leads/leadsSlice";
+import CommonHeader from "../../components/CommonHeader";
 
 const ViewLeads = ({ setStep, setLeadsId }) => {
   const { token } = useAuth();
 
   /* ----------------------------- UI STATE ----------------------------- */
-  const [searchInput, setSearchInput] = useState("");
   const [searchKey, setSearchKey] = useState("all");
   const [query, setQuery] = useState(null);
 
@@ -23,12 +23,28 @@ const ViewLeads = ({ setStep, setLeadsId }) => {
   const [rows, setRows] = useState([]);
   const [TotalPages, setTotalPages] = useState(0);
 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
   const [openAddForm, setOpenAddFrom] = useState(false);
   const [sortingKey, setSortingKey] = useState("ASC");
   const [sortingValue, setSortingValue] = useState("lead_id");
 
   /* ---------------------------- QUERY INPUT ---------------------------- */
-  const queryVendor = {
+
+  const searchOptions = [
+    { name: "all", value: "All" },
+    { name: "lead_id", value: "Lead ID" },
+    { name: "companyname", value: "Company Name" },
+    { name: "number", value: "Number" },
+    { name: "emailid", value: "Email ID" },
+    { name: "source", value: "Source" },
+    { name: "requirement", value: "Requirement" },
+    { name: "assignedto", value: "Assigned To" },
+  ];
+
+  /* ---------------------------- QUERY INPUT ---------------------------- */
+  const SearchQuery = {
     token,
     pageno: currentPage,
     pagesize: itemsPerPage,
@@ -40,14 +56,13 @@ const ViewLeads = ({ setStep, setLeadsId }) => {
   };
 
   /* ---------------------------- RTK QUERY ------------------------------ */
-  const { data, isLoading } = useViewLeadsQuery(queryVendor);
-  console.log(data);
+  const { data, isLoading } = useViewLeadsQuery(SearchQuery);
 
   /* ----------------------- SYNC DATA → STATE --------------------------- */
   useEffect(() => {
     if (data?.body) {
       setRows(data?.body?.lead || []);
-      // setTotalPages(data. || 0);
+      setTotalPages(data.body?.total_count || 0);
     }
   }, [data]);
 
@@ -100,7 +115,8 @@ const ViewLeads = ({ setStep, setLeadsId }) => {
 
   return (
     <>
-      <VendorHeader
+      <CommonHeader
+        searchOptions={searchOptions}
         setOpenAddFrom={setOpenAddFrom}
         setQuery={setQuery}
         setSearchKey={setSearchKey}
@@ -138,10 +154,11 @@ const ViewLeads = ({ setStep, setLeadsId }) => {
               </tbody>
             </table>
           </div>
-
           <Pagination
             itemsPerPage={itemsPerPage}
             currentPage={currentPage}
+            startIndex={startIndex}
+            endIndex={endIndex}
             setCurrentPage={setCurrentPage}
             setItemsPerPage={(val) => {
               setItemsPerPage(Number(val));
@@ -150,7 +167,6 @@ const ViewLeads = ({ setStep, setLeadsId }) => {
             TotalPages={TotalPages}
           />
         </div>
-
         {openAddForm && <AddVendor setOpenAddFrom={setOpenAddFrom} />}
       </section>
     </>
@@ -164,9 +180,6 @@ const RenderDataUi = ({ RenderInfo, setStep, setLeadsId }) => {
     companyname,
     team_id,
     emailid,
-    requirement,
-    source,
-    file,
     assignedto,
     date,
     status,
@@ -186,19 +199,14 @@ const RenderDataUi = ({ RenderInfo, setStep, setLeadsId }) => {
           {lead_id}
         </td>
         <td
-          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-        >
-          {number}
-        </td>
-        <td
           className={`px-6 py-4 whitespace-nowrap text-xs font-medium text-[var(--text)]`}
         >
           {companyname}
         </td>
         <td
-          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
         >
-          {team_id}
+          {number}
         </td>
         <td
           className={`px-5 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
@@ -206,19 +214,9 @@ const RenderDataUi = ({ RenderInfo, setStep, setLeadsId }) => {
           {emailid}
         </td>
         <td
-          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
+          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)]`}
         >
-          {requirement}
-        </td>
-        <td
-          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-        >
-          {source}
-        </td>
-        <td
-          className={`px-8 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}
-        >
-          {file}
+          {team_id}
         </td>
         <td
           className={`px-10 py-4 whitespace-nowrap text-xs text-[var(--text)] capitalize`}

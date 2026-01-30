@@ -8,11 +8,13 @@ import Loader from "../../components/Loader";
 import { useViewVendorQuery } from "../../features/vendor/vendorSlice";
 import AddVendor from "./AddVendor";
 import VendorHeader from "../../components/vendor/VendorHeader";
+import CommonHeader from "../../components/CommonHeader";
 
 const ViewVendor = ({ setStep, setVendorId }) => {
   const { token } = useAuth();
 
   /* ----------------------------- UI STATE ----------------------------- */
+  const [searchKey, setSearchKey] = useState("all");
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState(null);
 
@@ -31,20 +33,44 @@ const ViewVendor = ({ setStep, setVendorId }) => {
 
   const [vendorHeaderData, setVendorHeaderData] = useState(VendorHeading);
   const [openAddForm, setOpenAddFrom] = useState(false);
+  const [sortingKey, setSortingKey] = useState("ASC");
+  const [sortingValue, setSortingValue] = useState("companyname");
 
   /* ---------------------------- QUERY INPUT ---------------------------- */
-  const queryVendor = {
+
+  const searchOptions = [
+    { name: "all", value: "All" },
+    { name: "companyname", value: "Company Name" },
+    { name: "com_gst", value: "GST Number" },
+    { name: "com_emialid", value: "Email ID" },
+    { name: "pincode", value: "Pincode" },
+    { name: "phonno1", value: "Phone Number" },
+  ];
+
+  /* ---------------------------- QUERY INPUT ---------------------------- */
+  // const queryVendor = {
+  //   token,
+  //   pageno: String(currentPage),
+  //   pagesize: String(itemsPerPage),
+  //   sortkey: currentSort,
+  //   searchall: query ?? null,
+  //   action: "view",
+  //   subaction: "all",
+  // };
+
+  const SearchQuery = {
     token,
-    pageno: String(currentPage),
-    pagesize: String(itemsPerPage),
-    sortkey: currentSort,
-    searchall: query ?? null,
-    action: "view",
-    subaction: "all",
+    pageno: currentPage,
+    pagesize: itemsPerPage,
+    searchkey: query ? searchKey : "all",
+    searchvalue: query ?? null,
+    sortkey: sortingKey,
+    sortcol: sortingValue,
+    action: "viewall",
   };
 
   /* ---------------------------- RTK QUERY ------------------------------ */
-  const { data, isLoading } = useViewVendorQuery(queryVendor);
+  const { data, isLoading } = useViewVendorQuery(SearchQuery);
 
   /* ----------------------- SYNC DATA → STATE --------------------------- */
   useEffect(() => {
@@ -65,23 +91,33 @@ const ViewVendor = ({ setStep, setVendorId }) => {
   }, [searchInput]);
 
   /* ----------------------------- SORTING ------------------------------- */
-  const handleSorting = (field) => {
-    if (!field?.status) return;
+  // const handleSorting = (field) => {
+  //   if (!field?.status) return;
 
-    const nextOrder = order === "_a" ? "_d" : "_a";
-    const sortValue = `${field.name}_${nextOrder === "_a" ? "a" : "d"}`;
+  //   const nextOrder = order === "_a" ? "_d" : "_a";
+  //   const sortValue = `${field.name}_${nextOrder === "_a" ? "a" : "d"}`;
 
-    setOrder(nextOrder);
-    setCurrentActive(field.name);
-    setCurrentSort(sortValue);
+  //   setOrder(nextOrder);
+  //   setCurrentActive(field.name);
+  //   setCurrentSort(sortValue);
+  //   setCurrentPage(1);
+
+  //   setVendorHeaderData((prev) =>
+  //     prev.map((it) => ({
+  //       ...it,
+  //       active: it.name === field.name,
+  //     })),
+  //   );
+  // };
+
+  const handleSorting = (item) => {
+    if (!item.status) return;
+    const newOrder =
+      sortingValue === item.name && sortingKey === "ASC" ? "DESC" : "ASC";
+
+    setSortingKey(newOrder);
+    setSortingValue(item.name);
     setCurrentPage(1);
-
-    setVendorHeaderData((prev) =>
-      prev.map((it) => ({
-        ...it,
-        active: it.name === field.name,
-      })),
-    );
   };
 
   /* -------------------------- TABLE HEADERS ---------------------------- */
@@ -122,7 +158,12 @@ const ViewVendor = ({ setStep, setVendorId }) => {
 
   return (
     <>
-      <VendorHeader setQuery={setSearchInput} setOpenAddFrom={setOpenAddFrom} />
+      <CommonHeader
+        searchOptions={searchOptions}
+        setOpenAddFrom={setOpenAddFrom}
+        setQuery={setQuery}
+        setSearchKey={setSearchKey}
+      />
 
       <section className="max-w-screen">
         <div
